@@ -1,0 +1,509 @@
+﻿Version=5.02
+NumberOfModules=1
+Module1=RadioService
+Build1=Default,com.freshollie.radioapp
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.basic4ppc.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="12" android:targetSdkVersion="22"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="false" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'SetActivityAttribute(main,android:screenOrientation, "sensorLandscape")~\n~'End of default text.~\n~AddApplicationText(~\n~<activity android:name="anywheresoftware.b4a.objects.preferenceactivity"/>)
+IconFile=
+NumberOfFiles=2
+File1=Landscape.bal
+File2=Portrait.bal
+NumberOfLibraries=15
+Library1=core
+Library2=audio
+Library3=broadcastreceiver
+Library4=preferenceactivity
+Library5=serial
+Library6=usbserial
+Library7=mediacontroller
+Library8=phone
+Library9=esclicksoundgen
+Library10=reflection
+Library11=inifiles
+Library12=randomaccessfile
+Library13=usb
+Library14=audiofocus
+Library15=notificationbuilder
+@EndOfDesignText@
+#Region'--------------------Attributes------------------
+
+#Region  Project Attributes 
+	#ApplicationLabel: DAB+/FM Radio APP Pro
+	#VersionCode: 17
+	#VersionName:
+	#SupportedOrientations: landscape
+	#CanInstallToExternalStorage: false
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: True
+	#IncludeTitle: False
+#End Region
+
+#End Region
+
+#Region'--------------------Globals---------------------
+
+Sub Process_Globals
+	Dim manager As PreferenceManager
+	Dim screen As PreferenceScreen
+	Dim myclick As esClickSound
+	Dim VolumeRange As List
+	
+End Sub
+
+Sub Globals
+	Dim btnExit, btnConfig, btnLevel, btnMute, btnFMUp, btnFMDn, btnVolUp, btnVolDn, btnFMHi, btnFMLo, btnKey As Button 
+	Dim btnSt1, btnSt2, btnSt3, btnSt4, btnSt5, btnSt6, btnFM, btnDAB As ToggleButton 
+	Dim panMain, panKeyboard, panSelect As Panel
+	Dim btnEnter, btnClear, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn0  As Button
+	Dim labFreq, labVolume, labStrength, labProgramType, labProgram, labProgram2, labProgramText, labEvent,labDataRate,labStereoMode As Label
+	Dim lvDAB As ListView
+	Dim pbStrength As ProgressBar 
+End Sub
+
+#End Region
+
+#Region'--------------------Funktionen------------------
+
+Sub SetEvaluatedData(Arguments As List)
+	labEvent.text = Arguments.Get(0)
+	If panKeyboard.Visible <> True Then labFreq.text = Arguments.Get(1)
+	labStrength.text = Arguments.Get(2)
+	pbStrength.progress = Arguments.Get(3)
+	labVolume.text = Arguments.Get(4)
+	labProgram.text = Arguments.Get(5)
+	labProgramType.text = Arguments.Get(6)
+    labProgram2.text = Arguments.Get(7)
+	labProgramText.text = Arguments.Get(8)
+	labStereoMode.text = Arguments.Get(9)
+	labDataRate.text = Arguments.Get(10)
+	
+End Sub
+
+Sub SetDefaults
+	'defaults are only set on the first run.	
+	manager.SetString("Threshold","5")
+	manager.SetString("DuckVolume","5")
+End Sub
+
+Sub CreatePreferenceScreen
+	screen.Initialize("Settings", "")
+	Dim cat4,cat1 As PreferenceCategory
+	cat1.Initialize("Volumes")
+	cat1.AddList("DuckVolume", "Duck Volume", "Volume when, for example, google maps starts speaking", "4", VolumeRange)
+	cat4.Initialize("DAB")
+	cat4.AddCheckBox("Clean","Clean","Clean DAB database on new search", False)
+	
+	screen.AddPreferenceCategory(cat1)
+	screen.AddPreferenceCategory(cat4)
+	
+End Sub
+
+
+#End Region
+
+#Region'--------------------Buttons---------------------
+
+#Region'-------------------Keyboard--------------------
+
+Sub ClickNumber(Number As String)
+	labFreq.Text = labFreq.Text & Number
+	If RadioService.isDAB And RadioService.DAB Then
+		
+	Else
+	Select labFreq.Text.Length
+	Case 2	
+		If labFreq.Text.SubString2(0,1) = "8" Or labFreq.Text.SubString2(0,1) = "9" Then labFreq.Text = labFreq.Text & "."  
+	Case 3	
+		labFreq.Text = labFreq.Text & "."
+	End Select
+	End If
+End Sub
+	
+Sub btn0_Click
+	ClickNumber("0")
+End Sub
+
+Sub btn1_Click
+	ClickNumber("1")
+End Sub
+
+Sub btn2_Click
+	ClickNumber("2")
+End Sub
+
+Sub btn3_Click
+	ClickNumber("3")
+End Sub
+
+Sub btn4_Click
+	ClickNumber("4")
+End Sub
+
+Sub btn5_Click
+	ClickNumber("5")
+End Sub
+
+Sub btn6_Click
+	ClickNumber("6")
+End Sub
+
+Sub btn7_Click
+	ClickNumber("7")
+End Sub
+
+Sub btn8_Click
+	ClickNumber("8")
+End Sub
+
+Sub btn9_Click
+	ClickNumber("9")
+End Sub
+
+Sub btnClear_Click
+	labFreq.Text = ""
+End Sub
+
+Sub btnEnter_Click	
+	If labFreq.Text <> "" Then
+		CallSub2(RadioService,"EnterFrequency",labFreq.Text)
+		If RadioService.EnterClickedReturnValue Then
+			LabelClean
+		End If
+	End If
+	panKeyboard.Visible = False
+	
+End Sub
+
+#End Region
+
+Sub btnKey_Click	
+	panKeyboard.Visible = True
+	labFreq.Text = ""
+End Sub
+
+Sub btnConfig_Click	
+	StartActivity(screen.CreateIntent)	
+End Sub
+
+Sub btnMute_Click	
+	CallSub(RadioService, "ToggleMute")
+End Sub
+
+Sub btnFM_Click	
+	CallSub(RadioService, "SwitchToFM")
+	
+	labProgram2.Visible = False
+	btnDAB.Checked = False
+	btnFM.Checked = True
+	btnSt1.Checked = False
+	btnSt2.Checked = False
+	btnSt3.Checked = False
+	btnSt4.Checked = False
+	btnSt5.Checked = False
+	btnSt6.Checked = False
+	btnFM.Checked = True
+	LabelClean
+End Sub
+
+Sub btnFM_LongClick	
+	myclick.standardFx(1)
+	
+	CallSub(RadioService, "ChangeFMLevel")
+
+	LabelClean
+End Sub
+
+Sub btnDAB_Click
+	CallSub(RadioService, "SwitchToDAB")
+
+	RadioService.isDAB = True	
+	labProgram2.Visible = True
+	btnFM.Checked = False
+	btnDAB.Checked = True
+	btnSt1.Checked = False
+	btnSt2.Checked = False
+	btnSt3.Checked = False
+	btnSt4.Checked = False
+	btnSt5.Checked = False
+	btnSt6.Checked = False	
+	btnDAB.Checked = True
+	LabelClean
+End Sub
+
+Sub btnDAB_LongClick	
+	myclick.standardFx(1)
+	CallSub(RadioService, "ChangeDABLevel")
+	LabelClean	
+End Sub
+
+Sub btnSt1_Click
+	CallSub2(RadioService, "SelectChannel",1)
+	btnSt2.Checked = False
+	btnSt1.Checked = True
+	btnSt3.Checked = False
+	btnSt4.Checked = False
+	btnSt5.Checked = False
+	btnSt6.Checked = False
+	LabelClean
+End Sub
+
+Sub btnSt1_LongClick
+	myclick.returnFx(1)
+	CallSub2(RadioService, "SetChannel", 1)
+End Sub
+
+Sub btnSt2_Click
+	CallSub2(RadioService, "SelectChannel",2)
+	btnSt1.Checked = False
+	btnSt2.Checked = True
+	btnSt3.Checked = False
+	btnSt4.Checked = False
+	btnSt5.Checked = False
+	btnSt6.Checked = False
+	LabelClean
+End Sub
+
+Sub btnSt2_LongClick
+	myclick.returnFx(1)
+	CallSub2(RadioService, "SetChannel", 2)
+End Sub
+
+Sub btnSt3_Click
+	CallSub2(RadioService, "SelectChannel",3)
+	btnSt1.Checked = False
+	btnSt3.Checked = True
+	btnSt2.Checked = False
+	btnSt4.Checked = False
+	btnSt5.Checked = False
+	btnSt6.Checked = False
+	LabelClean
+End Sub
+
+Sub btnSt3_LongClick
+	myclick.returnFx(1)
+	CallSub2(RadioService, "SetChannel", 3)
+End Sub
+
+Sub btnSt4_Click
+	CallSub2(RadioService, "SelectChannel",4)
+	btnSt4.Checked = True
+	btnSt1.Checked = False
+	btnSt2.Checked = False
+	btnSt3.Checked = False
+	btnSt5.Checked = False
+	btnSt6.Checked = False
+	LabelClean
+End Sub
+
+Sub btnSt4_LongClick
+	myclick.returnFx(1)
+	CallSub2(RadioService, "SetChannel", 4)
+End Sub
+
+Sub btnSt5_Click
+	CallSub2(RadioService, "SelectChannel",5)
+	btnSt1.Checked = False
+	btnSt5.Checked = True
+	btnSt2.Checked = False
+	btnSt3.Checked = False
+	btnSt4.Checked = False
+	btnSt6.Checked = False
+	LabelClean
+End Sub
+
+Sub btnSt5_LongClick
+	myclick.returnFx(1)
+	CallSub2(RadioService, "SetChannel", 5)
+End Sub
+
+Sub btnSt6_Click
+	CallSub2(RadioService, "SelectChannel",6)
+	btnSt1.Checked = False
+	btnSt2.Checked = False
+	btnSt6.Checked = True
+	btnSt3.Checked = False
+	btnSt4.Checked = False
+	btnSt5.Checked = False
+	LabelClean
+End Sub
+
+Sub btnSt6_LongClick
+	myclick.returnFx(1)
+	CallSub2(RadioService, "SetChannel", 6)
+End Sub
+
+Sub btnFMUP_Click
+	CallSub(RadioService,"RadioChannelUp")
+	LabelClean
+End Sub
+
+Sub btnFMDN_Click
+	CallSub(RadioService,"RadioChannelDown") 
+	LabelClean
+End Sub
+
+Sub btnFMHi_Click		
+	CallSub(RadioService,"FMHigher")
+	LabelClean
+End Sub
+
+Sub btnFMLo_Click
+	CallSub(RadioService,"FMLower")
+	LabelClean
+End Sub
+
+Sub btnVolUp_Click	
+	CallSub(RadioService,"VolumeUp")
+End Sub
+
+Sub btnVolDn_Click	
+	CallSub(RadioService,"VolumeDown")
+End Sub
+
+Sub btnExit_Click
+	CallSub(RadioService, "ExitApp")
+End Sub
+
+#End Region
+
+#Region'--------------------Labels----------------------
+Sub btnLevel_Click	
+	CallSub(RadioService,"IncrementLevel")
+	btnLevel.Text = "L " & RadioService.Ebene
+End Sub
+
+Sub updateStationList
+	Dim i As Int
+	lvDAB.Clear
+	For i = 0 To RadioService.lstDAB.Size - 1
+		lvDAB.AddSingleLine(RadioService.lstDAB.Get(i))  
+	Next
+	If RadioService.isDAB And RadioService.DAB Then
+		lvDAB.SetSelection(RadioService.Frequenz)
+	end if
+End Sub
+
+Sub labFreq_LongClick
+	myclick.returnFx(1)
+	CallSub2(RadioService, "StartChannelSearch", manager.GetBoolean("Clean"))
+	LabelClean
+End Sub
+
+Sub labDABFM_Click	
+	Dim i As Int
+	For i = 0 To panMain.NumberOfViews - 1
+   		If panMain.GetView(i) Is Label Then 
+   			'this will change the font to Labels, EditText, Buttons and other views with text.
+      		Dim l As Label
+      		l = panMain.GetView(i)
+      		l.Color = Colors.ARGB(0, 128, 128, 128)
+		End If
+   		If panMain.GetView(i) Is Panel Then 
+   			'this will change the font to Labels, EditText, Buttons and other views with text.
+      		Dim s As Panel
+      		s = panMain.GetView(i)
+      		s.Color = Colors.ARGB(0, 128, 128, 128)
+   		End If
+	Next
+End Sub
+
+Sub labDABFM_LongClick	
+	Dim i As Int
+	For i = 0 To panMain.NumberOfViews - 1
+   		If panMain.GetView(i) Is Label Then 
+   			'this will change the font to Labels, EditText, Buttons and other views with text.
+      		Dim l As Label
+      		l = panMain.GetView(i)
+      		l.Color = Colors.ARGB(100, 128, 128, 128)
+		End If
+   		If panMain.GetView(i) Is Panel Then 
+   			'this will change the font to Labels, EditText, Buttons and other views with text.
+      		Dim s As Panel
+      		s = panMain.GetView(i)
+      		s.Color = Colors.ARGB(100, 128, 128, 128)
+   		End If
+	Next
+End Sub
+
+Sub LabelClean
+	CallSub(RadioService, "LabelClean")
+	btnLevel.Text = "L " & RadioService.Ebene
+End Sub
+
+Sub lvDAB_ItemClick (Position As Int, Value As Object) 
+	CallSub2(RadioService,"SelectDABItem",Position)
+End Sub
+
+Sub SelectedDABChannel (Position As Int)
+	lvDAB.SetSelection(Position)
+	Log("Channel " & Position & " selected") 
+End Sub
+
+#End Region
+
+Sub SetTextValuesFromSettings(Arglist As List)
+	btnLevel.Text = Arglist.Get(0)
+	If Arglist.Get(1) Then
+		btnDAB.Checked = True
+	Else
+		btnFM.Checked = True
+	End If
+	labProgram2.Visible = Arglist.Get(2)
+	updateStationList
+End Sub
+
+#Region'--------------------Activity--------------------
+Sub Activity_Create(FirstTime As Boolean)
+
+	If GetDeviceLayoutValues.Width > GetDeviceLayoutValues.Height Then
+     	Activity.LoadLayout("Landscape")
+  	Else
+     	Activity.LoadLayout("Portrait")
+  	End If	
+	
+	If FirstTime Then
+	
+		If manager.GetAll.Size = 0 Then SetDefaults
+		If manager.GetString("DuckVolume") = "" Then SetDefaults
+		
+		VolumeRange.Initialize 
+		VolumeRange.AddAll(Array As String("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"))  
+		myclick.Initialize	 
+		CreatePreferenceScreen
+		RadioService.DuckVolume = manager.GetString("DuckVolume")
+		If RadioService.ServiceStarted <> True Then
+			StartService(RadioService)
+		Else
+			updateStationList
+		End If
+	End If
+
+End Sub
+
+Sub Activity_Resume
+	RadioService.DuckVolume = manager.GetString("DuckVolume")
+	If RadioService.ServiceStarted Then
+		RadioService.iIndex = 0
+		updateStationList
+	End If
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+End Sub
+
+
+Sub Activity_KeyPress (KeyCode As Int) As Boolean
+	Select KeyCode
+   	Case KeyCodes.KEYCODE_VOLUME_UP
+      	btnVolUp_Click   
+      	Return True
+	Case KeyCodes.KEYCODE_VOLUME_DOWN
+      	btnVolDn_Click  
+      	Return True
+	Case Else
+		Return False
+	End Select
+End Sub
+
+#End Region
