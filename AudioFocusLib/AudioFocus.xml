@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.02</doclet-version-NOT-library-version>
+    <class>
+        <name>com.freshollie.audiofocus.AudioFocus</name>
+        <shortname>AudioFocus</shortname>
+        <owner>process</owner>
+        <event>onfocuslost</event>
+        <event>ontransient</event>
+        <event>ontransientcanduck</event>
+        <event>ongain</event>
+        <method>
+            <name>Initialize</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>abandonAudioFocus</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>requestFocus</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+    </class>
+    <version>1.0</version>
+    <author>Freshollie</author>
+</root>

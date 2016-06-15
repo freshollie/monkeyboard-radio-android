@@ -1,0 +1,1300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.02</doclet-version-NOT-library-version>
+    <class>
+        <name>barxdroid.NotificationBuilder.NotificationWearExtender</name>
+        <shortname>NotificationWearableExtender</shortname>
+        <objectwrapper>android.support.v4.app.NotificationCompat.WearableExtender</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>setDisplayIntent</name>
+            <comment>Googles Docs
+ ------------
+ Set an activity to be displayed while viewing the notification.
+ 
+ My Version after doing a little research
+ ----------------------------------------
+ When creating a notification directly from an App on the Wear device, you can use custom layouts. This is done by creating the layout
+ in an activity in the App. Then call this method, passing the layout activity as the Parameter. 
+ 
+ The activity to launch needs to allow embedding, must be exported and should have an empty task affinity.
+ It is also recommended to use the device default light theme.
+ This is achieved by adding the following to the Manifest Editor
+
+[code] 
+ SetActivityAttribute (DisplayActivity, android:exported, "true")
+ SetActivityAttribute (DisplayActivity, android:allowEmbedded, "true")
+ SetActivityAttribute (DisplayActivity, android:taskAffinity, "")
+ SetActivityAttribute (DisplayActivity, android:theme, "@android:style/Theme.DeviceDefault.Light")
+ [/code]</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Activity</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>AddAction</name>
+            <comment>Similar to NotificatioBuilder.AddAction, but the Action will show on Wear Devices only.
+ If this method is used the Wear device will NOT display any of the other actions.
+ 
+ Tags are named 'Notification_Wear_Action_Tag</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>icon</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>title</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>tag</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>object</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>AddPage</name>
+            <comment>Adds an additional page to notifications shown on Wear Device
+ 
+ Page - A new notification.
+ 
+ Example:
+ 
+ &lt;code&gt;
+ Dim Notification1, Notification2 as NotificationBuilder
+ 'code to build notifications
+ ...
+ Notification1.AddPage(Notification2.build())
+ ...
+ &lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Page</name>
+                <type>android.support.v4.app.NotificationCompat.Builder</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ClearActions</name>
+            <comment>Clears any previously added Actions.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>AddAction2</name>
+            <comment>Similar to AddAction but allows you to pass a RemoteInput object for voice input.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>icon</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>title</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>tag</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>object</name>
+                <type>java.lang.Object</type>
+            </parameter>
+            <parameter>
+                <name>RemoteInput</name>
+                <type>android.support.v4.app.RemoteInput.Builder</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ClearPages</name>
+            <comment>Clears any previously added Pages.</comment>
+            <returntype>void</returntype>
+        </method>
+        <property>
+            <name>ContentIcon</name>
+            <parameter>
+                <name>Icon</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the Icon that goes with the content of this notification
+ 
+ The image file should manually copied to the Objects\res\drawable\ folder and set to read-only.
+ The file name is case sensitive and should not contain the file extension.
+ You can use "icon" to use the applications icon.</comment>
+        </property>
+        <property>
+            <name>HideIcon</name>
+            <parameter>
+                <name>val</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Hides the Icon if set to true.</comment>
+        </property>
+        <property>
+            <name>Background</name>
+            <returntype>android.graphics.Bitmap</returntype>
+            <parameter>
+                <name>Background</name>
+                <type>android.graphics.Bitmap</type>
+            </parameter>
+            <comment>Set or Get the background of the Wear Notification (no matter what the Style)</comment>
+        </property>
+        <property>
+            <name>CustomContentHeight</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Height</name>
+                <type>int</type>
+            </parameter>
+            <comment>Sets or Gets the custom height for the display of this notifications content.
+ 
+ NOTE: This option is only available for custom display notifications created using DisplayIntent</comment>
+        </property>
+        <property>
+            <name>ContentIntentAvailableOffline</name>
+            <parameter>
+                <name>val</name>
+                <type>java.lang.Boolean</type>
+            </parameter>
+            <comment>Sets whether the content intent is available when the wearable device is not connected to a companion device.</comment>
+        </property>
+        <property>
+            <name>ContentAction</name>
+            <parameter>
+                <name>ActionIndex</name>
+                <type>int</type>
+            </parameter>
+            <comment>Sets the action to be clickable with the content of this notification. i.e. When you click the main notification, it will trigger the Action.
+ 
+ This action will no longer display separately from this notification's content.
+ For notifications with multiple pages, child pages can also have content actions set, 
+ although the list of available actions comes from the main notification and not from the child page's notification.
+ 
+ ActionIndex is the ID of the Action to use. ID's start at 0</comment>
+        </property>
+        <property>
+            <name>CustomSizePreset</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SizePreset</name>
+                <type>int</type>
+            </parameter>
+            <comment>Sets or Gets the custom size preset for the display of this notification out of the available presents.
+ Use the built in constants. e.g. WearExtender1.SIZE_LARGE
+ Possible values - SIZE_DEFAULT, SIZE_FULL_SCREEN, SIZE_LARGE, SIZE_MEDIUM, SIZE_SMALL, SIZE_XSMALL</comment>
+        </property>
+        <property>
+            <name>ContentIconGravity</name>
+            <parameter>
+                <name>Gravity</name>
+                <type>int</type>
+            </parameter>
+            <comment>Sets the gravity for the ContentIcon.
+ Supported values START, END
+ Use the built in constants. e.g &lt;code&gt;WearExtender.START&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>ShowBackgroundOnly</name>
+            <parameter>
+                <name>val</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Only the background image of this notification should be displayed, and other semantic content should be hidden.
+ This method only applies to sub Pages.</comment>
+        </property>
+        <property>
+            <name>StartScrollBottom</name>
+            <parameter>
+                <name>val</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the scrolling position for the contents of this notification should start at the bottom of the contents
+ instead of the top when the contents are too long to display within the screen. Default is false (start scroll at the top)</comment>
+        </property>
+        <property>
+            <name>Gravity</name>
+            <parameter>
+                <name>Gravity</name>
+                <type>int</type>
+            </parameter>
+            <comment>Sets the gravity of the Notification on the device.
+ Supported values BOTTOM, CENTER_VERTICALLY, TOP
+ Use the built in constants. e.g WearExtender.TOP</comment>
+        </property>
+        <field>
+            <name>SIZE_DEFAULT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TOP</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>SIZE_SMALL</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>SIZE_LARGE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>START</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>END</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>SIZE_XSMALL</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>BOTTOM</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>SIZE_MEDIUM</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>CENTER_VERTICAL</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>SIZE_FULL_SCREEN</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>barxdroid.NotificationBuilder.NotificationRemoteInput</name>
+        <shortname>NotificationRemoteInput</shortname>
+        <objectwrapper>android.support.v4.app.RemoteInput.Builder</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>GetRemoteInput</name>
+            <comment>Extracts a RemoteInput (voice) string from starting intent
+ 
+ Use this in the Activity_Resume of the Activity called by the Action.
+ Example:
+ 
+ &lt;code&gt;
+ Dim In as intent
+ In = Activity.GetStartingIntent
+ If In.HasExtra("Notification_Wear_Action_Tag") Then
+     If In.GetExtra("Notification_Wear_Action_Tag") = Tag Then 'Tag set when adding Action to Notification
+         Dim Rem as NotificationRemoteInput
+         
+         ToastMessageShow(Rem.GetRemoteInput(In, Label), false) 'Label set on Initialize
+     End If
+ End If
+ &lt;/code&gt;</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>intent</name>
+                <type>android.content.Intent</type>
+            </parameter>
+            <parameter>
+                <name>key</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object.
+ 
+ Label - Used to retrieve the reply later.
+ 
+ See GetRemoteInput for details on how to get the input.
+ 
+ NOTE: you do not need to call Initialize in order to use GetRemoteInput.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Label</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <property>
+            <name>Choices</name>
+            <parameter>
+                <name>Choices</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+            <comment>Set a list of preset choices to show when requesting for voice input
+ 
+ example:
+ &lt;code&gt;RemoteInput1.Choices = Array as String("Yes", "No", "Maybe")&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>Label</name>
+            <parameter>
+                <name>Label</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the label to show when requesting for voice input</comment>
+        </property>
+    </class>
+    <class>
+        <name>barxdroid.NotificationBuilder.NotificationInboxStyle</name>
+        <shortname>NotificationInboxStyle</shortname>
+        <objectwrapper>android.support.v4.app.NotificationCompat.InboxStyle</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Helper class for generating large-format notifications that include a list of (up to 5) strings.
+ If the platform does not provide large-format notifications, this method has no effect</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <property>
+            <name>AddLine</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Adds a line to the details section. 
+ You can add a MAXIMUM of 5 lines.</comment>
+        </property>
+        <property>
+            <name>SummaryText</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the first line of text after the details section</comment>
+        </property>
+        <property>
+            <name>BigContentTitle</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Overrides the ContentTitle set in the Notification Builder.</comment>
+        </property>
+    </class>
+    <class>
+        <name>barxdroid.NotificationBuilder.NotificationCustomLayout</name>
+        <shortname>NotificationCustomLayout</shortname>
+        <objectwrapper>android.widget.RemoteViews</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>SetTextField</name>
+            <comment>Sets the text field in a custom layout
+ 
+ TextField - The name of the text element as defined in the xml layout
+ Text - The string that will be assigned to the text element</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>TextField</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Text</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setEnableClickEvent</name>
+            <comment>Enables the Click action for a view in a custom layout.
+ 
+ View - The name of the view as defined in the xml layout
+ Module - The activity or Service that will be launched when the view is clicked.
+ Tag - The tag that will be returned as an extra in the starting intent
+ 
+ Implements setOnClickPendingIntent
+ Android V3+</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>View</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Module</name>
+                <type>java.lang.Object</type>
+            </parameter>
+            <parameter>
+                <name>Tag</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initilizes the Object
+ 
+ LayoutFile - The name of the .xml file containing the layout (do not add '.xml')</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>LayoutFile</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetVisibility</name>
+            <comment>Sets the visibility of a view within the custom layout
+ View - The name of the view as defined in the xml layout
+ Visibility - Pass one of the following Int's
+ 
+ 0 - Visible		Visible on screen; the default value.
+ 1 - Invisible	Not displayed, but taken into account during layout (space is left for it).
+ 2 - Gone			Completely hidden, as if the view had not been added.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>View</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Visibility</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetTextColor</name>
+            <comment>Sets the color of the text in a text field in a custom layout
+ 
+ TextField - The name of the text element as defined in the xml layout
+ Color - The color that will be assigned to the text element</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>TextField</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Color</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize2</name>
+            <comment>!!! NOT WORKING !!!
+ 
+ Initializes the object, using a Panel of views for the layout</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Panel</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetImage</name>
+            <comment>Sets an image within a custom layout
+ 
+ Image - The name of the image element as defined in the xml layout
+ Bitmap - The image to apply</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Image</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Bitmap</name>
+                <type>android.graphics.Bitmap</type>
+            </parameter>
+        </method>
+        <method>
+            <name>BuildLayout</name>
+            <comment>Returns the CustomLayout object</comment>
+            <returntype>android.widget.RemoteViews</returntype>
+        </method>
+        <method>
+            <name>SetProgress</name>
+            <comment>Sets the parameters for a progress bar used in a notification
+ 
+ ProgressBar - The name of the progress bar as defined in the xml layout
+ MaxProgress - the upper limit of the progress bar. A good value is 100
+ Progress - the current level of progress to be shown. Must be &amp;lt;= maxProgress.
+ Indeterminate - set the progress bar as indeterminate</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ProgressBar</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>MaxProgress</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Progress</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Indeterminate</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <field>
+            <name>NORMAL_HEIGHT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>EXPANDED_HEIGHT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>barxdroid.NotificationBuilder.NotificationBuilder</name>
+        <shortname>NotificationBuilder</shortname>
+        <objectwrapper>android.support.v4.app.NotificationCompat.Builder</objectwrapper>
+        <owner>process</owner>
+        <permission>android.permission.VIBRATE</permission>
+        <method>
+            <name>setDeleteActivity</name>
+            <comment>Experimental - Setting a DeleteActivity will (should) show the activity when the user clears the notification manually. 
+ 
+ API 11+</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Activity</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setSmallIcon2</name>
+            <comment>Similar to .SmallIcon but takes a 'Level' parameter for when a LevelListDrawable is used.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Icon</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Level</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setIntent</name>
+            <comment>Sets the Intent that will be called when the Notification is tapped.
+ 
+ Use &lt;code&gt;nb.Activity&lt;/code&gt; to call an activity in your project.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>intent</name>
+                <type>android.content.Intent</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Notify</name>
+            <comment>Displays the notification.
+ id - The notification id. This id can be used later to update the notification (by calling Notify again with the same id),
+ or to cancel the notification</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>id</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Cancel</name>
+            <comment>Cancels the notification with the given id</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>id</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setProgress</name>
+            <comment>Sets the progress the notification represents. This may be shown as a progress bar dependent on SDK version.
+ 
+ API 14+</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Max</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Progress</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Indeterminate</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setDeleteService</name>
+            <comment>Experimental - Setting a DeleteService will (should) show the service when the user clears the notification manually.
+ 
+ A{PI 11+</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Service</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>AddAction</name>
+            <comment>Adds an Action to the notification.
+ 
+ Actions are buttons displayed on the notification that can allow users to do something without starting the app. e.g Call back a missed call, pause a sound track, etc
+  
+ The icon file should manually copied to the Objects\res\drawable\ folder and set to read-only.
+ The file name is case sensitive and should not contain the file extension.
+ If tag is set to "" then it will default to the passed title.
+ 
+ tags are named 'Notification_Action_Tag'
+ 
+ Use AddAction2 to pass a Service module instead of an Activity.
+ 
+ MAXIMUM of 3 Actions can be added to each notification.
+ 
+ API 16+</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>icon</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>title</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>tag</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Activity</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setActivity</name>
+            <comment>Sets the activity that will be launched when the Notification is tapped.
+ 
+ Use &lt;code&gt;nb.Intent&lt;/code&gt; to use your own calling intent</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Activity</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setParentActivity</name>
+            <comment>Sets a Parent Activity to add to the 'Back Stack'. If this method is used then once you have entered
+ an Activity from your notification, pressing back will return to the Parent Activity, rather than exiting the App.
+ 
+ API 11+</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Activity</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>setCustomLight</name>
+            <comment>Sets a custom argb value for the notification light, also sets the rates at which it flashes.
+ argb - The color that the devices led will flash.
+ onMs - The time in milliseconds that the led will stay on each blink.
+ offMs - The time in millliseconds that the led will be off after each blink.
+ 
+ NOTE: Not all devices will honour these settings, it is dependent on hardware abilities.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>argb</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>onMs</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>offMs</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>AddAction2</name>
+            <comment>Similar to AddAction, but you pass a Service Module rather than an Activity Module.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>icon</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>title</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>tag</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Service</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Extend</name>
+            <comment>Applies an Extender to the Notification.
+ 
+ i.e NotificationWearableExtender is used to extend the notification with functions only available to Wearable devices.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>NotificationWearableExtender</name>
+                <type>android.support.v4.app.NotificationCompat.Extender</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetStyle</name>
+            <comment>Add an extended style to the notification. 
+ 
+ Must be passed a style object:-
+     NotificationInboxStyle
+     NotificationBigTextStyle
+     NotificationBigPictureStyle
+ 
+ API 16+</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>style</name>
+                <type>android.support.v4.app.NotificationCompat.Style</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetNotification</name>
+            <comment>Gets the Notification Object. Useful for things like Foreground Services</comment>
+            <returntype>android.app.Notification</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <property>
+            <name>Group</name>
+            <parameter>
+                <name>GroupKey</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Set this notification to be part of a group of notifications sharing the same key.
+ Grouped notifications may display in a cluster or stack on devices which support such rendering.
+ (Generally the GroupSummary will display on the handheld and the Group items will display on a Wearable)
+ 
+ To make this notification the summary for its group, also call
+     &lt;code&gt;nb.GroupSummary = True&lt;/code&gt;
+ A sort order can be specified by using
+     &lt;code&gt;nb.SortKey(Key)&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>UsesChrono</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>If set the timestamp place on the notification will be used as a stopwatch. It will automatically update the minutes and seconds since .When()
+ 
+  API 16+</comment>
+        </property>
+        <property>
+            <name>SortKey</name>
+            <parameter>
+                <name>SortKey</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Set a sort key that orders this notification among other notifications from the same package. 
+ This can be useful if an external sort was already applied and an app would like to preserve this. 
+ Notifications will be sorted lexicographically using this value.
+ 
+ This sort key can also be used to order members of a notification group.</comment>
+        </property>
+        <property>
+            <name>DefaultLight</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the notification will show a light.
+ 
+ Setting to True will over ride any custom light settings.
+ 
+ Example:
+ &lt;code&gt;nb.DefaultLight = True&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>AutoCancel</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the notification will be cancelled automatically when the user taps it.</comment>
+        </property>
+        <property>
+            <name>LocalOnly</name>
+            <parameter>
+                <name>val</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether or not this notification is only relevant to the current device.
+ Some notifications can be bridged to other devices for remote display. I.E Wear Devices</comment>
+        </property>
+        <property>
+            <name>ContentText</name>
+            <parameter>
+                <name>Text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Set the text in the Text field.</comment>
+        </property>
+        <property>
+            <name>Number</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>v</name>
+                <type>int</type>
+            </parameter>
+            <comment>Gets or Sets the number to be shown on the notification.
+ This is useful to represent multiple events in a single notification.</comment>
+        </property>
+        <property>
+            <name>ContentInfo</name>
+            <parameter>
+                <name>Text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the text in the right-hand side of the notification.</comment>
+        </property>
+        <property>
+            <name>BigCustomLayout</name>
+            <parameter>
+                <name>NotificationBigCustomLayout</name>
+                <type>android.widget.RemoteViews</type>
+            </parameter>
+            <comment>Sets a custom layout for an expanded notification
+ 
+ Pass a NotificationCustomLayout object
+ 
+ If the height is explicitly set, it should be 256dp
+ 
+ API 16+</comment>
+        </property>
+        <property>
+            <name>ShowTime</name>
+            <parameter>
+                <name>value</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the time stamp is shown on the notification.
+ Default is 'true'</comment>
+        </property>
+        <property>
+            <name>Priority</name>
+            <parameter>
+                <name>v</name>
+                <type>int</type>
+            </parameter>
+            <comment>Experimental - Googles' notes:-
+ 'Set the relative priority for this notification. 
+ Priority is an indication of how much of the user's valuable attention should be consumed by this notification. 
+ Low-priority notifications may be hidden from the user in certain situations, while the user might be interrupted for a higher-priority notification. 
+ The system sets a notification's priority based on various factors including the setPriority value. 
+ The effect may differ slightly on different platforms.'
+ 
+ API 16+</comment>
+        </property>
+        <property>
+            <name>Ticker</name>
+            <parameter>
+                <name>Ticker</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the Ticker Text which shows along side the status bar icon of new Notifications.</comment>
+        </property>
+        <property>
+            <name>OnlyAlertOnce</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the notification will only play sound / vibrate /show light if the notification is not already showing.</comment>
+        </property>
+        <property>
+            <name>LargeIcon</name>
+            <parameter>
+                <name>Icon</name>
+                <type>android.graphics.Bitmap</type>
+            </parameter>
+            <comment>Add a large icon to the notification (and the ticker on some devices). 
+ In the platform template, this image will be shown on the left of the notification view in place of the small icon (which will move to the right side).</comment>
+        </property>
+        <property>
+            <name>SmallIcon</name>
+            <parameter>
+                <name>Icon</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the Small Icon to be displayed.
+ The image file should manually copied to the Objects\res\drawable\ folder and set to read-only.
+ The file name is case sensitive and should not contain the file extension.
+ You can use "icon" to use the applications icon.</comment>
+        </property>
+        <property>
+            <name>DefaultVibrate</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the notification will vibrate the device.
+ 
+ Note: Setting to True will over ride any custom vibration settings.
+ 
+ Example:
+ &lt;code&gt;nb.Vibrate = True&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>OnGoingEvent</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the notification is an 'ongoing event'. 
+ The notification will be shown in the ongoing section and will not be cleared.</comment>
+        </property>
+        <property>
+            <name>DefaultSound</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the notification will play a sound.
+ 
+ Note: Setting to True will over ride any custom sound set.
+ 
+ Example:
+ &lt;code&gt;nb.DefaultSound = False&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>When</name>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.Long</type>
+            </parameter>
+            <comment>Sets the time stamp that shows on the notification. This should indicate the time the event occurred.
+ Default is the current time.
+ Setting to 0 will reset to current time.</comment>
+        </property>
+        <property>
+            <name>CustomVibrate</name>
+            <parameter>
+                <name>Values</name>
+                <type>long[]</type>
+            </parameter>
+            <comment>Sets a custom vibrate pattern for new notification
+ The Array of values can be as long as you wish.
+ The first Value is the pause before vibration starts, then its ON, OFF, ON, OFF,........
+ 
+ Example:
+ &lt;code&gt;
+ Dim nb as NotificationBuilder
+ Dim v() as Long
+ 
+ v = Array as Long(0, 100, 200, 300, 400)
+ nb.CustomVibrate(v)
+ &lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>CustomSound</name>
+            <parameter>
+                <name>path</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets a custom sound to be played on new notification
+ 
+ Example:
+ &lt;code&gt;cn.CustomSound = "file:///sdcard/notification/ringer.mp3"&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>SubText</name>
+            <parameter>
+                <name>Text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Set the third line of text in the platform notification template. 
+ Don't use if you're also using setProgress(); they occupy the same location in the standard template.
+ If the platform does not provide large-format notifications, this method has no effect. The third line of text only appears in expanded view.
+ 
+  API 16+</comment>
+        </property>
+        <property>
+            <name>CustomLayout</name>
+            <parameter>
+                <name>NotificationCustomLayout</name>
+                <type>android.widget.RemoteViews</type>
+            </parameter>
+            <comment>Sets a custom layout for the notification.
+ 
+ Pass a NotificationCustomLayout object.
+ 
+ If the height is explicitly set, it should be 64dp
+ 
+ API 11+</comment>
+        </property>
+        <property>
+            <name>GroupSummary</name>
+            <parameter>
+                <name>isGroupSummary</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Set this notification to be the group summary for a group of notifications. 
+ Grouped notifications may display in a cluster or stack on devices which support such rendering.
+ (Generally the GroupSummary will display on the handheld and the Group items will display on a Wearable) 
+ 
+ The GroupSummary notification will not show on the notification stack on Wearables, but will show as the only notification on handheld devices.
+ See URL &lt;link&gt;Click|https://developer.android.com/training/wearables/notifications/stacks.html&lt;/link&gt;
+ 
+ Requires a group key also be set using
+     &lt;code&gt;nb.Group(GroupKey)&lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>Tag</name>
+            <parameter>
+                <name>Tag</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>The Tag is a string that can be extracted later on Activity_Resume.
+ This can be used to determine which notification has been clicked by the user when multiple notifications exist.
+ 
+ Example of extracting the Tag:
+ &lt;code&gt;
+ Sub Activity_Resume
+   Dim in as Intent
+   Dim intentExtra as String
+   
+   in = Activity.GetStartingIntent
+   If in.HasExtra("Notification_Tag") Then
+     intentExtra = in.GetExtra("Notification_Tag")
+   End If
+ End Sub
+ &lt;/code&gt;</comment>
+        </property>
+        <property>
+            <name>ContentTitle</name>
+            <parameter>
+                <name>Title</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the text in the Title field.</comment>
+        </property>
+    </class>
+    <class>
+        <name>barxdroid.NotificationBuilder.NotificationBigTextStyle</name>
+        <shortname>NotificationBigTextStyle</shortname>
+        <objectwrapper>android.support.v4.app.NotificationCompat.BigTextStyle</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Helper class for generating large-format notifications that include a lot of text.
+ If the platform does not provide large-format notifications, this method has no effect.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <property>
+            <name>BigText</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Provides the longer text to displayed in the content area. Replaces ContextText.</comment>
+        </property>
+        <property>
+            <name>SummaryText</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the first line of text after the details section</comment>
+        </property>
+        <property>
+            <name>BigContentTitle</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Overrides the ContentTitle set in the Notification Builder.</comment>
+        </property>
+    </class>
+    <class>
+        <name>barxdroid.NotificationBuilder.NotificationBigPictureStyle</name>
+        <shortname>NotificationBigPictureStyle</shortname>
+        <objectwrapper>android.support.v4.app.NotificationCompat.BigPictureStyle</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Helper class for generating large-format notifications that include a large image attachment.
+ If the platform does not provide large-format notifications, this method has no effect.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <property>
+            <name>SummaryText</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the first line of text after the details section</comment>
+        </property>
+        <property>
+            <name>BigPicture</name>
+            <parameter>
+                <name>bitmap</name>
+                <type>android.graphics.Bitmap</type>
+            </parameter>
+            <comment>Provides the Big Picture to be used in the BigPicture notification.</comment>
+        </property>
+        <property>
+            <name>BigContentTitle</name>
+            <parameter>
+                <name>text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Overrides the ContentTitle set in the Notification Builder.</comment>
+        </property>
+    </class>
+    <version>3.03</version>
+    <author>BarxDroid</author>
+    <dependsOn>android-support-v4</dependsOn>
+    <dependsOn>android-support-v4</dependsOn>
+    <dependsOn>android-support-v4</dependsOn>
+    <dependsOn>android-support-v4</dependsOn>
+    <dependsOn>android-support-v4</dependsOn>
+    <dependsOn>android-support-v4</dependsOn>
+</root>
