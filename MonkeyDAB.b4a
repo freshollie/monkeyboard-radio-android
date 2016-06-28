@@ -1,13 +1,14 @@
 ﻿Version=5.02
-NumberOfModules=1
+NumberOfModules=2
 Module1=RadioService
+Module2=Slideshow
 Build1=Default,com.freshollie.radioapp
 ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.basic4ppc.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="12" android:targetSdkVersion="22"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="false" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'SetActivityAttribute(main,android:screenOrientation, "sensorLandscape")~\n~'End of default text.~\n~AddApplicationText(~\n~<activity android:name="anywheresoftware.b4a.objects.preferenceactivity"/>)
 IconFile=
 NumberOfFiles=2
 File1=Landscape.bal
 File2=Portrait.bal
-NumberOfLibraries=15
+NumberOfLibraries=16
 Library1=core
 Library2=audio
 Library3=broadcastreceiver
@@ -23,6 +24,7 @@ Library12=randomaccessfile
 Library13=usb
 Library14=audiofocus
 Library15=notificationbuilder
+Library16=javaobject
 @EndOfDesignText@
 #Region'--------------------Attributes------------------
 
@@ -84,12 +86,14 @@ Sub SetDefaults
 	'defaults are only set on the first run.	
 	manager.SetString("Threshold","5")
 	manager.SetString("DuckVolume","5")
+	manager.SetString("DefaultVolume","13")
 End Sub
 
 Sub CreatePreferenceScreen
 	screen.Initialize("Settings", "")
 	Dim cat4,cat1 As PreferenceCategory
 	cat1.Initialize("Volumes")
+	cat1.AddList("DefaultVolume", "Default Volume", "", "4", VolumeRange)
 	cat1.AddList("DuckVolume", "Duck Volume", "Volume when, for example, google maps starts speaking", "4", VolumeRange)
 	cat4.Initialize("DAB")
 	cat4.AddCheckBox("Clean","Clean","Clean DAB database on new search", False)
@@ -374,14 +378,17 @@ Sub btnLevel_Click
 End Sub
 
 Sub updateStationList
-	Dim i As Int
-	lvDAB.Clear
-	For i = 0 To RadioService.lstDAB.Size - 1
-		lvDAB.AddSingleLine(RadioService.lstDAB.Get(i))  
-	Next
-	If RadioService.isDAB And RadioService.DAB Then
-		lvDAB.SetSelection(RadioService.Frequenz)
-	end if
+	Try
+		Dim i As Int
+		lvDAB.Clear
+		For i = 0 To RadioService.lstDAB.Size - 1
+			lvDAB.AddSingleLine(RadioService.lstDAB.Get(i))  
+		Next
+		If RadioService.isDAB And RadioService.DAB Then
+			lvDAB.SetSelection(RadioService.Frequenz)
+		End If
+	Catch 
+	End Try
 End Sub
 
 Sub labFreq_LongClick
@@ -465,13 +472,14 @@ Sub Activity_Create(FirstTime As Boolean)
 	If FirstTime Then
 	
 		If manager.GetAll.Size = 0 Then SetDefaults
-		If manager.GetString("DuckVolume") = "" Then SetDefaults
+		If manager.GetString("DuckVolume") = "" Or manager.GetString("DefaultVolume") = "" Then SetDefaults
 		
 		VolumeRange.Initialize 
 		VolumeRange.AddAll(Array As String("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"))  
 		myclick.Initialize	 
 		CreatePreferenceScreen
 		RadioService.DuckVolume = manager.GetString("DuckVolume")
+		RadioService.DefaultVolume = manager.GetString("DefaultVolume")
 		If RadioService.ServiceStarted <> True Then
 			StartService(RadioService)
 		Else
@@ -483,6 +491,10 @@ End Sub
 
 Sub Activity_Resume
 	RadioService.DuckVolume = manager.GetString("DuckVolume")
+	RadioService.DefaultVolume = manager.GetString("DefaultVolume")
+	Log(manager.GetString("DefaultVolume"))
+	Dim Volume As Int = manager.GetString("DefaultVolume")
+	CallSub2(RadioService, "SetVolume", Volume)
 	If RadioService.ServiceStarted Then
 		RadioService.iIndex = 0
 		updateStationList

@@ -17,7 +17,7 @@ Sub Process_Globals
 	Dim MyTimer, SysReady, USBTimer As Timer
 	Dim Broadcast As BroadCastReceiver
 
-	Dim Start, Mute, DABSearch, isDAB, DAB, Connected, FillList, ClearDatabase, NameResponded As Boolean 
+	Dim Start, Mute, DABSearch, isDAB, DAB, Connected, FillList, ClearDatabase As Boolean 
 	Dim Volume, Strength As Byte
 	Dim Ack(1024), Frq(21), DFrq(21), Frequenz, iIndex, xIndex, Dev, Ebene, AllDAB, iStep, iLoop As Int
 	Dim lstDAB As List
@@ -31,8 +31,8 @@ Sub Process_Globals
 	Dim PreviousNotificationText2 As String
 	Dim ServiceStarted As Boolean
 	Dim Mediakey As MediaController
-	Dim DuckVolume As Int
-	
+	Dim DuckVolume, DefaultVolume, LastVolume As Int
+	Private session As JavaObject
 	
 	Dim EnterClickedReturnValue As Boolean
 	
@@ -46,7 +46,7 @@ Sub Wait(Sekunden As Int)
    Dim Ti As Long
    Ti = DateTime.Now + (Sekunden * 1000)
    Do While DateTime.Now < Ti
-      DoEvents
+   DoEvents
    Loop
 End Sub
 #End Region
@@ -67,22 +67,24 @@ Sub Evaluate(index As Int)
 		
 		Case 0x05 'Stream_GetPlayStatus response
 			Select Case Ack(6)
-            Case 0
-                Status = "Playing"
-            Case 1
-                Status = "Searching"
-            Case 2
-                Status = "Tunning"
-            Case 3
-                Status = "Stop"
-            Case 4
-                Status = "Sorting"
-            Case 5
-                Status = "Reconfiguration"
-            Case Else
-                Status = "N/A"
-        	End Select
-			labEventText = Status
+			
+			Case 0
+				Status = "Playing"
+			Case 1
+				Status = "Searching"
+			Case 2
+				Status = "Tunning"
+			Case 3
+				Status = "Stop"
+			Case 4
+				Status = "Sorting"
+			Case 5
+				Status = "Reconfiguration"
+			Case Else
+				Status = "N/A"
+		  	End Select
+		
+		labEventText = Status
 			
 		Case 0x07
 			If Ack(6) = 0 Then 		
@@ -136,73 +138,74 @@ Sub Evaluate(index As Int)
 					
 		Case 0x0E
 			Select Case Ack(6)
-            Case 0
-                ProgramType = ""
-            Case 1
-                ProgramType = "News"
-            Case 2
-                ProgramType = "Current Affairs"
-            Case 3
-                ProgramType = "Information"
-            Case 4
-                ProgramType = "Sport"
-            Case 5
-                ProgramType = "Education"
-            Case 6
-                ProgramType = "Drama"
-            Case 7
-                ProgramType = "Arts"
-            Case 8
-                ProgramType = "Science"
-            Case 9
-                ProgramType = "Talk"
-            Case 10
-                ProgramType = "Pop Music"
-            Case 11
-                ProgramType = "Rock Music"
-            Case 12
-                ProgramType = "Easy Listening"
-            Case 13
-                ProgramType = "Light Classical"
-            Case 14
-                ProgramType = "Classical Music"
-            Case 15
-                ProgramType = "Other Music"
-            Case 16
-                ProgramType = "Weather"
-            Case 17
-                ProgramType = "Finance"
-            Case 18
-                ProgramType = "Children"
-            Case 19
-                ProgramType = "Factual"
-            Case 20
-                ProgramType = "Religion"
-            Case 21
-                ProgramType = "Phone In"
-            Case 22
-                ProgramType = "Travel"
-            Case 23
-                ProgramType = "Leisure"
-            Case 24
-                ProgramType = "Jazz and Blues"
-            Case 25
-                ProgramType = "Country Music"
-            Case 26
-                ProgramType = "National Music"
-            Case 27
-                ProgramType = "Oldies Music"
-            Case 28
-                ProgramType = "Folk Music"
-            Case 29
-                ProgramType = "Documentary"
-            Case 30
-                ProgramType = "Undefined"
-            Case 31
-                ProgramType = "Undefined"
-            Case Else
-                ProgramType = ""
-        	End Select					
+			Case 0
+				ProgramType = ""
+			Case 1
+				ProgramType = "News"
+			Case 2
+				ProgramType = "Current Affairs"
+			Case 3
+				ProgramType = "Information"
+			Case 4
+				ProgramType = "Sport"
+			Case 5
+				ProgramType = "Education"
+			Case 6
+				ProgramType = "Drama"
+			Case 7
+				ProgramType = "Arts"
+			Case 8
+				ProgramType = "Science"
+			Case 9
+				ProgramType = "Talk"
+			Case 10
+				ProgramType = "Pop Music"
+			Case 11
+				ProgramType = "Rock Music"
+			Case 12
+				ProgramType = "Easy Listening"
+			Case 13
+				ProgramType = "Light Classical"
+			Case 14
+				ProgramType = "Classical Music"
+			Case 15
+				ProgramType = "Other Music"
+			Case 16
+				ProgramType = "Weather"
+			Case 17
+				ProgramType = "Finance"
+			Case 18
+				ProgramType = "Children"
+			Case 19
+				ProgramType = "Factual"
+			Case 20
+				ProgramType = "Religion"
+			Case 21
+				ProgramType = "Phone In"
+			Case 22
+				ProgramType = "Travel"
+			Case 23
+				ProgramType = "Leisure"
+			Case 24
+				ProgramType = "Jazz and Blues"
+			Case 25
+				ProgramType = "Country Music"
+			Case 26
+				ProgramType = "National Music"
+			Case 27
+				ProgramType = "Oldies Music"
+			Case 28
+				ProgramType = "Folk Music"
+			Case 29
+				ProgramType = "Documentary"
+			Case 30
+				ProgramType = "Undefined"
+			Case 31
+				ProgramType = "Undefined"
+			Case Else
+				ProgramType = ""
+			End Select
+								
 			labProgramTypeText = ProgramType
 			
 		Case 0x10
@@ -264,7 +267,9 @@ Sub Evaluate(index As Int)
 				ProgramNameText = ProgramName2
 				ProgramName2=ProgramName2.Replace(" ","")				
 			End If
+			
 		End Select
+		
 	Case 0x00
 	
 		If Ack(2) = 0x01 And Ack(3) = 0x01 And ClearDatabase Then 
@@ -349,19 +354,19 @@ Sub OpenRadio
 
 	Dim UsbMngr As UsbManager  ' USB library
 	
-    UsbMngr.Initialize
-    Dim UsbDevices() As UsbDevice  ' USB library
+ UsbMngr.Initialize
+ Dim UsbDevices() As UsbDevice  ' USB library
 	
-    UsbDevices = UsbMngr.GetDevices
+ UsbDevices = UsbMngr.GetDevices
 	
-    'Iterate over USB devices and find the correct one
+ 'Iterate over USB devices and find the correct one
 	
-    If UsbDevices.Length > 0 Then
+ If UsbDevices.Length > 0 Then
 		Log(UsbDevices.Length)
 		
-        For i = 0 To UsbDevices.Length - 1
-            Dim UsbDvc As UsbDevice
-            UsbDvc = UsbDevices(i)
+  For i = 0 To UsbDevices.Length - 1
+   Dim UsbDvc As UsbDevice
+   UsbDvc = UsbDevices(i)
 			
 	 		If (UsbDvc.ProductId = UsbPid) And (UsbDvc.VendorId = UsbVid) Then
 				USB.SetCustomDevice(USB.DRIVER_CDCACM, UsbVid, UsbPid)
@@ -379,16 +384,24 @@ Sub OpenRadio
 						
 						astreams.Initialize(USB.GetInputStream, USB.GetOutputStream, "astreams")
 						
-						RTS(True)	    				
+						RTS(True)	 				
 						DTR(False)
 						
 						If Not(SysReady.IsInitialized) Then SysReady.Initialize("SysReady",500)
 						If Not(MyTimer.IsInitialized) Then MyTimer.Initialize("MyTimer",25)
 						
-						Wait(1)		
+						StartMediaKeys
+						Mediakey.MediaButton(KeyCodes.KEYCODE_MEDIA_STOP)
+		
+						AudioFocusManager.Initialize("AudioFocusManager")
+						AudioFocusManager.requestFocus
 						
 						Connected = True
+						
+						Wait(1)		
+						
 	   					MyTimer.Enabled = True
+						Return 
 					End If
 				End If
 				
@@ -396,6 +409,7 @@ Sub OpenRadio
 			End If
 		Next
 	End If
+	ExitApp
 End Sub
 
 
@@ -405,22 +419,6 @@ End Sub
 
 Sub SendRadio(buffer() As Byte)
 	If Connected Then astreams.Write(buffer)
-End Sub
-
-Sub StartChannelSearch(ShouldClean As Boolean)
-	If isDAB And DAB Then
-		If Not(DABSearch) Then
-			If ShouldClean Then
-				MyTimer.Enabled = False
-				SendRadio(Array As Byte(0xFE,0x00,0x01,0x01,0x00,0x01,0x01,0xFD))
-				ClearDatabase = True
-				SysReady.Enabled = True
-			Else
-				SendRadio(Array As Byte(0xFE,0x01,0x03,0x01,0x00,0x02,0x00,0x47,0xFD))
-				DABSearch = True
-			End If
-		End If
-	End If
 End Sub
 
 #End Region
@@ -459,13 +457,13 @@ Sub MyTimer_Tick
 					Case 1
 						SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,Volume,0xFD)) ' Set volume STREAM_SetVolume(Volume) Only called Once
 					Case 2		
-	    				SendRadio(Array As Byte(0xFE,0x01,0x09,0x01,0x00,0x01,0x01,0xFD)) ' Set mode to stereo STREAM_SetStereoMode(1) Only called once
+	 					SendRadio(Array As Byte(0xFE,0x01,0x09,0x01,0x00,0x01,0x01,0xFD)) ' Set mode to stereo STREAM_SetStereoMode(1) Only called once
 					Case 3		
 						SendRadio(Array As Byte(0xFE,0x01,0x0D,0x01,0x00,0x00,0xFD)) ' Get Volume Stream_GetVolume()
 					Case 4
 						SendRadio(Array As Byte(0xFE,0x01,0x15,0x01,0x00,0x05,0x00,0x00,0x00,Frequenz,0x01,0xFD)) 'Get Ensemble program name STREAM_GetEnsembleName(Frequenz, 1) long name 
 					Case 5		
-	    				SendRadio(Array As Byte(0xFE,0x01,0x1A,0x01,0x00,0x05,0x00,0x00,0x00,Frequenz,0x01,0xFD)) 'Get The service name of DAB Program STREAM_GetServiceName(Frequenz, 1) long name
+	 					SendRadio(Array As Byte(0xFE,0x01,0x1A,0x01,0x00,0x05,0x00,0x00,0x00,Frequenz,0x01,0xFD)) 'Get The service name of DAB Program STREAM_GetServiceName(Frequenz, 1) long name
 					Case 6	
 						SendRadio(Array As Byte(0xFE,0x01,0x07,0x01,0x00,0x00,0xFD)) ' Get current DAB index STREAM_GetPlayIndex()													
 					Case 7	
@@ -494,17 +492,17 @@ Sub MyTimer_Tick
 					Case 1
 						SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,Volume,0xFD))
 					Case 2		
-	    				SendRadio(Array As Byte(0xFE,0x01,0x09,0x01,0x00,0x01,0x01,0xFD))
+	 					SendRadio(Array As Byte(0xFE,0x01,0x09,0x01,0x00,0x01,0x01,0xFD))
 					Case 3		
-	    				SendRadio(Array As Byte(0xFE,0x01,0x0D,0x01,0x00,0x00,0xFD))
+	 					SendRadio(Array As Byte(0xFE,0x01,0x0D,0x01,0x00,0x00,0xFD))
 					Case 4	
 						SendRadio(Array As Byte(0xFE,0x01,0x07,0x01,0x00,0x00,0xFD))
 					Case 5	
 						SendRadio(Array As Byte(0xFE,0x01,0x08,0x01,0x00,0x00,0xFD))
 					Case 6			
-	    				SendRadio(Array As Byte(0xFE,0x01,0x0E,0x01,0x00,0x04,0xFF,0xFF,0xFF,0xFF,0xFD)) 
+	 					SendRadio(Array As Byte(0xFE,0x01,0x0E,0x01,0x00,0x04,0xFF,0xFF,0xFF,0xFF,0xFD)) 
 					Case 7		
-	    				SendRadio(Array As Byte(0xFE,0x01,0x0F,0x01,0x00,0x05,0xFF,0xFF,0xFF,0xFF,0x01,0xFD))   
+	 					SendRadio(Array As Byte(0xFE,0x01,0x0F,0x01,0x00,0x05,0xFF,0xFF,0xFF,0xFF,0x01,0xFD))   
 					Case 8
 						SendRadio(Array As Byte(0xFE,0x01,0x05,0x01,0x00,0x00,0xFD))
 					Case 9
@@ -565,12 +563,16 @@ End Sub
 Sub ExitApp
 	Log("Attempting To close app when ServiceStarted = " & ServiceStarted)
 	If ServiceStarted Then
-	    SaveSettings
+		If Connected Then
+	 	SaveSettings
+		End If
 		SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,0x00,0xFD))
 		Wait(1)
 		astreams.Close
 		CloseRadio
 		AudioFocusManager.abandonAudioFocus
+		Log("Abonding media focus")
+		session.RunMethod("release",Null)
 		Service.StopForeground(1)
 		RadioNotification.Cancel(1)
 		ServiceStarted = False
@@ -595,12 +597,13 @@ End Sub
 
 Sub MuteAudio
 	Log("Muting")
+	LastVolume = Volume
 	SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,0x00,0xFD))
 End Sub
 
 Sub UnmuteAudio
 	Log("Unmuting")
-	SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,Volume,0xFD))
+	SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,LastVolume,0xFD))
 End Sub
 
 Sub EnterFrequency(FrequencyText As String)	
@@ -796,6 +799,8 @@ Sub VolumeDown
 End Sub
 
 Sub SetVolume(Volume1 As Int)
+	Log("Setting Volume " & Volume1)
+	Volume = Volume1
 	SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,Volume1,0xFD))
 	Mute = False
 End Sub
@@ -819,7 +824,7 @@ Sub BroadcastReceiver_OnReceive(Action As String,i As Object)
 	Dim Intent1 As Intent = i
 	Log(Action)
 	
-    If Intent1.HasExtra("device") Then
+ If Intent1.HasExtra("device") Then
 	  	If USB.UsbPresent(Dev) = USB.USB_NONE Then
 			ExitApp
 		End If
@@ -833,7 +838,7 @@ Sub BroadcastReceiver_OnReceive(Action As String,i As Object)
 	Else If Action = "com.freshollie.radioapp.intent.unmute" Then
 		UnmuteAudio
 		
-    End If
+ End If
 End Sub
 
 Sub AudioFocusManager_onFocusLost
@@ -848,6 +853,7 @@ End Sub
 
 Sub AudioFocusManager_onTransientCanDuck
 	Log("Lowering volume, on transient can duck")
+	LastVolume = Volume
 	SetVolume(DuckVolume)
 End Sub
 
@@ -860,7 +866,7 @@ End Sub
 
 #Region'-----------------Service-----------------
 Sub Service_Create
-    RadioNotification.Initialize
+ RadioNotification.Initialize
 End Sub
 
 Sub Service_Start (StartingIntent As Intent)
@@ -877,6 +883,7 @@ Sub Service_Start (StartingIntent As Intent)
 		Else if intentExtra = "Next Channel" Then
 			RadioChannelUp
 		End If
+		
 	Else
 		ServiceStarted = True
 		If Not(File.Exists(MyPath, "")) Then File.MakeDir(File.DirRootExternal, "dabmonkey")
@@ -900,10 +907,6 @@ Sub Service_Start (StartingIntent As Intent)
 		Broadcast.addAction("com.freshollie.radioapp.intent.unmute")
 		Broadcast.registerReceiver("")
 		
-		Mediakey.MediaButton(KeyCodes.KEYCODE_MEDIA_STOP)
-		
-		AudioFocusManager.Initialize("AudioFocusManager")
-		AudioFocusManager.requestFocus
 		
 		MyPath = File.DirRootExternal & "/dabmonkey"
 		
@@ -923,90 +926,127 @@ Sub Service_Destroy
 	Service.StopForeground(1)
 End Sub
 
+Sub StartMediaKeys()
+	Dim context As JavaObject
+	context.InitializeContext
+	session.InitializeNewInstance("android.media.session.MediaSession", Array(context, "tag"))
+
+	Dim cb As JavaObject
+	cb.InitializeNewInstance(Application.PackageName & ".radioservice.MyCallback", Null)
+	session.RunMethod("setCallback", Array(cb))
+
+	session.RunMethod("setFlags",Array(3))
+	session.RunMethod("setActive", Array(True))
+	Log("Accquired media session")
+End Sub
+
+'Return true to allow the OS default exceptions handler to handle the uncaught exception.
+Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
+    Return True
+End Sub
+
+Sub Media_OnCommand(Command As String)
+   'Log(Command)
+End Sub
+
+Sub Media_OnButton(KeyCode As Int) As Boolean
+	Select(KeyCode)
+	
+	Case(KeyCodes.KEYCODE_MEDIA_NEXT)
+		RadioChannelUp
+	
+	Case(KeyCodes.KEYCODE_MEDIA_PREVIOUS)
+		RadioChannelDown
+		
+	End Select
+	
+    Return True
+End Sub
+	
 #End Region
 
 #Region--------------------SettingsLoad------------------
 Sub LoadSettings
-		#Region'--------------------Settings--------------------	
-		If Not(lstDAB.IsInitialized) Then lstDAB.Initialize
-		INI.Name(MyPath & "/config.ini")
-		Volume = INI.ReadInt("Last", "Volume", 5)
-		Frq(0) = INI.ReadInt("Last", "Frq0", 88000)
-		Frq(1) = INI.ReadInt("Last", "Frq1", 88000)
-		Frq(2) = INI.ReadInt("Last", "Frq2", 88000)
-		Frq(3) = INI.ReadInt("Last", "Frq3", 88000)
-		Frq(4) = INI.ReadInt("Last", "Frq4", 88000)
-		Frq(5) = INI.ReadInt("Last", "Frq5", 88000)
-		Frq(6) = INI.ReadInt("Last", "Frq6", 88000)
-		Frq(7) = INI.ReadInt("Last", "Frq7", 88000)
-		Frq(8) = INI.ReadInt("Last", "Frq8", 88000)
-		Frq(9) = INI.ReadInt("Last", "Frq9", 88000)
-		Frq(10) = INI.ReadInt("Last", "Frq10", 88000)
-		Frq(11) = INI.ReadInt("Last", "Frq11", 88000)
-		Frq(12) = INI.ReadInt("Last", "Frq12", 88000)
-		Frq(13) = INI.ReadInt("Last", "Frq13", 88000)
-		Frq(14) = INI.ReadInt("Last", "Frq14", 88000)
-		Frq(15) = INI.ReadInt("Last", "Frq15", 88000)
-		Frq(16) = INI.ReadInt("Last", "Frq16", 88000)
-		Frq(17) = INI.ReadInt("Last", "Frq17", 88000)
-		Frq(18) = INI.ReadInt("Last", "Frq18", 88000)
-		Frq(19) = INI.ReadInt("Last", "Frq19", 88000)
-		Frq(20) = INI.ReadInt("Last", "Frq20", 88000)
-		DFrq(0) = INI.ReadInt("Last", "DAB0", 0)
-		DFrq(1) = INI.ReadInt("Last", "DAB1", 0)
-		DFrq(2) = INI.ReadInt("Last", "DAB2", 0)
-		DFrq(3) = INI.ReadInt("Last", "DAB3", 0)
-		DFrq(4) = INI.ReadInt("Last", "DAB4", 0)
-		DFrq(5) = INI.ReadInt("Last", "DAB5", 0)
-		DFrq(6) = INI.ReadInt("Last", "DAB6", 0)
-		DFrq(7) = INI.ReadInt("Last", "DAB7", 0)
-		DFrq(8) = INI.ReadInt("Last", "DAB8", 0)
-		DFrq(9) = INI.ReadInt("Last", "DAB9", 0)
-		DFrq(10) = INI.ReadInt("Last", "DAB10", 0)
-		DFrq(11) = INI.ReadInt("Last", "DAB11", 0)
-		DFrq(12) = INI.ReadInt("Last", "DAB12", 0)
-		DFrq(13) = INI.ReadInt("Last", "DAB13", 0)
-		DFrq(14) = INI.ReadInt("Last", "DAB14", 0)
-		DFrq(15) = INI.ReadInt("Last", "DAB15", 0)
-		DFrq(16) = INI.ReadInt("Last", "DAB16", 0)
-		DFrq(17) = INI.ReadInt("Last", "DAB17", 0)
-		DFrq(18) = INI.ReadInt("Last", "DAB18", 0)
-		DFrq(19) = INI.ReadInt("Last", "DAB19", 0)
-		DFrq(20) = INI.ReadInt("Last", "DAB20", 0)
-		Frequenz = INI.ReadInt("Last", "Frequenz", 88000)	
-		Ebene = INI.ReadInt("Last", "Ebene", 0)
-		
-		Dim labLevelText As String
-		Dim labProgram2Visible, isDABChecked As Boolean
-		
-		Dim ArgList As List
-		
-		ArgList.Initialize()
-		
-		labLevelText = "L " & Ebene
-		If File.Exists(MyPath & "/","DAB.dat") Then 
-			Dim DatesFile As RandomAccessFile
-			DatesFile.Initialize(MyPath,"/DAB.dat",False)
-			lstDAB = DatesFile.ReadObject(0)
-			DatesFile.Close
-		End If
-		#End Region	
-		If (Frequenz < 87500) And DAB Then
-			isDAB = True
-			labProgram2Visible = True
-			isDABChecked = True	
-		Else
-			If Frequenz < 87500 Then Frequenz = 87500
-			isDAB = False
-			labProgram2Visible = False
-			isDABChecked = False
-		End If
-		
-		ArgList.Add(labLevelText)
-		ArgList.Add(isDABChecked)
-		ArgList.Add(labProgram2Visible)
-		
-		CallSub2(Main, "SetTextValuesFromSettings", ArgList)
+	#Region'--------------------Settings--------------------	
+	If Not(lstDAB.IsInitialized) Then lstDAB.Initialize
+	INI.Name(MyPath & "/config.ini")
+	Volume = INI.ReadInt("Last", "Volume", DefaultVolume)
+	Frq(0) = INI.ReadInt("Last", "Frq0", 88000)
+	Frq(1) = INI.ReadInt("Last", "Frq1", 88000)
+	Frq(2) = INI.ReadInt("Last", "Frq2", 88000)
+	Frq(3) = INI.ReadInt("Last", "Frq3", 88000)
+	Frq(4) = INI.ReadInt("Last", "Frq4", 88000)
+	Frq(5) = INI.ReadInt("Last", "Frq5", 88000)
+	Frq(6) = INI.ReadInt("Last", "Frq6", 88000)
+	Frq(7) = INI.ReadInt("Last", "Frq7", 88000)
+	Frq(8) = INI.ReadInt("Last", "Frq8", 88000)
+	Frq(9) = INI.ReadInt("Last", "Frq9", 88000)
+	Frq(10) = INI.ReadInt("Last", "Frq10", 88000)
+	Frq(11) = INI.ReadInt("Last", "Frq11", 88000)
+	Frq(12) = INI.ReadInt("Last", "Frq12", 88000)
+	Frq(13) = INI.ReadInt("Last", "Frq13", 88000)
+	Frq(14) = INI.ReadInt("Last", "Frq14", 88000)
+	Frq(15) = INI.ReadInt("Last", "Frq15", 88000)
+	Frq(16) = INI.ReadInt("Last", "Frq16", 88000)
+	Frq(17) = INI.ReadInt("Last", "Frq17", 88000)
+	Frq(18) = INI.ReadInt("Last", "Frq18", 88000)
+	Frq(19) = INI.ReadInt("Last", "Frq19", 88000)
+	Frq(20) = INI.ReadInt("Last", "Frq20", 88000)
+	DFrq(0) = INI.ReadInt("Last", "DAB0", 0)
+	DFrq(1) = INI.ReadInt("Last", "DAB1", 0)
+	DFrq(2) = INI.ReadInt("Last", "DAB2", 0)
+	DFrq(3) = INI.ReadInt("Last", "DAB3", 0)
+	DFrq(4) = INI.ReadInt("Last", "DAB4", 0)
+	DFrq(5) = INI.ReadInt("Last", "DAB5", 0)
+	DFrq(6) = INI.ReadInt("Last", "DAB6", 0)
+	DFrq(7) = INI.ReadInt("Last", "DAB7", 0)
+	DFrq(8) = INI.ReadInt("Last", "DAB8", 0)
+	DFrq(9) = INI.ReadInt("Last", "DAB9", 0)
+	DFrq(10) = INI.ReadInt("Last", "DAB10", 0)
+	DFrq(11) = INI.ReadInt("Last", "DAB11", 0)
+	DFrq(12) = INI.ReadInt("Last", "DAB12", 0)
+	DFrq(13) = INI.ReadInt("Last", "DAB13", 0)
+	DFrq(14) = INI.ReadInt("Last", "DAB14", 0)
+	DFrq(15) = INI.ReadInt("Last", "DAB15", 0)
+	DFrq(16) = INI.ReadInt("Last", "DAB16", 0)
+	DFrq(17) = INI.ReadInt("Last", "DAB17", 0)
+	DFrq(18) = INI.ReadInt("Last", "DAB18", 0)
+	DFrq(19) = INI.ReadInt("Last", "DAB19", 0)
+	DFrq(20) = INI.ReadInt("Last", "DAB20", 0)
+	Frequenz = INI.ReadInt("Last", "Frequenz", 88000)	
+	Ebene = INI.ReadInt("Last", "Ebene", 0)
+	
+	Dim labLevelText As String
+	Dim labProgram2Visible, isDABChecked As Boolean
+	
+	Dim ArgList As List
+	
+	ArgList.Initialize()
+	
+	labLevelText = "L " & Ebene
+	If File.Exists(MyPath & "/","DAB.dat") Then 
+		Dim DatesFile As RandomAccessFile
+		DatesFile.Initialize(MyPath,"/DAB.dat",False)
+		lstDAB = DatesFile.ReadObject(0)
+		DatesFile.Close
+	End If
+	#End Region	
+	If (Frequenz < 87500) And DAB Then
+		isDAB = True
+		labProgram2Visible = True
+		isDABChecked = True	
+	Else
+		If Frequenz < 87500 Then Frequenz = 87500
+		isDAB = False
+		labProgram2Visible = False
+		isDABChecked = False
+	End If
+	
+	ArgList.Add(labLevelText)
+	ArgList.Add(isDABChecked)
+	ArgList.Add(labProgram2Visible)
+	
+	CallSub2(Main, "SetTextValuesFromSettings", ArgList)
 		
 		
 End Sub
@@ -1065,3 +1105,31 @@ Sub SaveSettings
 	DatesFile.Close
 	End Sub
 #End Region
+
+#if java
+import android.media.session.MediaSession.*;
+import android.view.KeyEvent;
+import android.os.Bundle;
+import android.os.ResultReceiver;
+import android.content.Intent;
+import anywheresoftware.b4a.objects.IntentWrapper;
+public static class MyCallback extends Callback {
+   public MyCallback() {
+   }
+   public void onCommand(String command, Bundle args, ResultReceiver cb) {
+   BA.Log(command);
+     processBA.raiseEventFromUI(null, "media_oncommand", command);
+   }
+   public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
+   	KeyEvent event = (KeyEvent)mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+    IntentWrapper baIntent = new IntentWrapper();
+    baIntent.setObject(mediaButtonIntent);
+	if (event.getAction() == KeyEvent.ACTION_UP){
+   		Boolean b = (Boolean) processBA.raiseEvent(null, "media_onbutton", event.getKeyCode());
+    	return b == null ? false : b;
+	} else {
+	return false;
+	}
+   }
+}
+#end if
