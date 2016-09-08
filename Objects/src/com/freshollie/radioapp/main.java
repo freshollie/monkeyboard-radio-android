@@ -24,7 +24,7 @@ public class main extends Activity implements B4AActivity{
 	BA activityBA;
     ActivityWrapper _activity;
     java.util.ArrayList<B4AMenuItem> menuItems;
-	public static final boolean fullScreen = true;
+	public static final boolean fullScreen = false;
 	public static final boolean includeTitle = false;
     public static WeakReference<Activity> previousOne;
 
@@ -367,97 +367,97 @@ public static boolean isAnyActivityVisible() {
 vis = vis | (main.mostCurrent != null);
 return vis;}
 public static String  _activity_create(boolean _firsttime) throws Exception{
- //BA.debugLineNum = 439;BA.debugLine="Sub Activity_Create(FirstTime As Boolean)";
- //BA.debugLineNum = 441;BA.debugLine="If GetDeviceLayoutValues.Width > GetDeviceLayoutV";
+ //BA.debugLineNum = 438;BA.debugLine="Sub Activity_Create(FirstTime As Boolean)";
+ //BA.debugLineNum = 440;BA.debugLine="If GetDeviceLayoutValues.Width > GetDeviceLayoutV";
 if (anywheresoftware.b4a.keywords.Common.GetDeviceLayoutValues(mostCurrent.activityBA).Width>anywheresoftware.b4a.keywords.Common.GetDeviceLayoutValues(mostCurrent.activityBA).Height) { 
- //BA.debugLineNum = 442;BA.debugLine="Activity.LoadLayout(\"Landscape\")";
+ //BA.debugLineNum = 441;BA.debugLine="Activity.LoadLayout(\"Landscape\")";
 mostCurrent._activity.LoadLayout("Landscape",mostCurrent.activityBA);
  }else {
- //BA.debugLineNum = 444;BA.debugLine="Activity.LoadLayout(\"Portrait\")";
+ //BA.debugLineNum = 443;BA.debugLine="Activity.LoadLayout(\"Portrait\")";
 mostCurrent._activity.LoadLayout("Portrait",mostCurrent.activityBA);
  };
- //BA.debugLineNum = 447;BA.debugLine="If FirstTime Then";
+ //BA.debugLineNum = 446;BA.debugLine="If FirstTime Then";
 if (_firsttime) { 
- //BA.debugLineNum = 449;BA.debugLine="If manager.GetAll.Size = 0 Then SetDefaults";
+ //BA.debugLineNum = 448;BA.debugLine="If manager.GetAll.Size = 0 Then SetDefaults";
 if (_manager.GetAll().getSize()==0) { 
 _setdefaults();};
- //BA.debugLineNum = 450;BA.debugLine="If manager.GetString(\"DuckVolume\") = \"\" Or manag";
+ //BA.debugLineNum = 449;BA.debugLine="If manager.GetString(\"DuckVolume\") = \"\" Or manag";
 if ((_manager.GetString("DuckVolume")).equals("") || (_manager.GetString("DefaultVolume")).equals("")) { 
 _setdefaults();};
- //BA.debugLineNum = 452;BA.debugLine="VolumeRange.Initialize";
+ //BA.debugLineNum = 451;BA.debugLine="VolumeRange.Initialize";
 _volumerange.Initialize();
- //BA.debugLineNum = 453;BA.debugLine="VolumeRange.AddAll(Array As String(\"0\", \"1\", \"2\"";
+ //BA.debugLineNum = 452;BA.debugLine="VolumeRange.AddAll(Array As String(\"0\", \"1\", \"2\"";
 _volumerange.AddAll(anywheresoftware.b4a.keywords.Common.ArrayToList(new String[]{"0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"}));
- //BA.debugLineNum = 454;BA.debugLine="myclick.Initialize";
+ //BA.debugLineNum = 453;BA.debugLine="myclick.Initialize";
 _myclick.Initialize(processBA);
- //BA.debugLineNum = 455;BA.debugLine="CreatePreferenceScreen";
+ //BA.debugLineNum = 454;BA.debugLine="CreatePreferenceScreen";
 _createpreferencescreen();
- //BA.debugLineNum = 456;BA.debugLine="RadioService.DuckVolume = manager.GetString(\"Duc";
+ //BA.debugLineNum = 455;BA.debugLine="RadioService.DuckVolume = manager.GetString(\"Duc";
 mostCurrent._radioservice._duckvolume = (int)(Double.parseDouble(_manager.GetString("DuckVolume")));
- //BA.debugLineNum = 457;BA.debugLine="RadioService.DefaultVolume = manager.GetString(\"";
+ //BA.debugLineNum = 456;BA.debugLine="RadioService.DefaultVolume = manager.GetString(\"";
 mostCurrent._radioservice._defaultvolume = (int)(Double.parseDouble(_manager.GetString("DefaultVolume")));
- //BA.debugLineNum = 458;BA.debugLine="If RadioService.ServiceStarted <> True Then";
+ //BA.debugLineNum = 457;BA.debugLine="If RadioService.ServiceStarted <> True Then";
 if (mostCurrent._radioservice._servicestarted!=anywheresoftware.b4a.keywords.Common.True) { 
- //BA.debugLineNum = 459;BA.debugLine="StartService(RadioService)";
+ //BA.debugLineNum = 458;BA.debugLine="StartService(RadioService)";
 anywheresoftware.b4a.keywords.Common.StartService(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()));
  }else {
- //BA.debugLineNum = 461;BA.debugLine="updateStationList";
+ //BA.debugLineNum = 460;BA.debugLine="updateStationList";
 _updatestationlist();
  };
  };
- //BA.debugLineNum = 465;BA.debugLine="End Sub";
+ //BA.debugLineNum = 464;BA.debugLine="End Sub";
 return "";
 }
 public static boolean  _activity_keypress(int _keycode) throws Exception{
- //BA.debugLineNum = 486;BA.debugLine="Sub Activity_KeyPress (KeyCode As Int) As Boolean";
- //BA.debugLineNum = 487;BA.debugLine="Select KeyCode";
+ //BA.debugLineNum = 485;BA.debugLine="Sub Activity_KeyPress (KeyCode As Int) As Boolean";
+ //BA.debugLineNum = 486;BA.debugLine="Select KeyCode";
 switch (BA.switchObjectToInt(_keycode,anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_VOLUME_UP,anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_VOLUME_DOWN)) {
 case 0:
- //BA.debugLineNum = 489;BA.debugLine="btnVolUp_Click";
+ //BA.debugLineNum = 488;BA.debugLine="btnVolUp_Click";
 _btnvolup_click();
- //BA.debugLineNum = 490;BA.debugLine="Return True";
+ //BA.debugLineNum = 489;BA.debugLine="Return True";
 if (true) return anywheresoftware.b4a.keywords.Common.True;
  break;
 case 1:
- //BA.debugLineNum = 492;BA.debugLine="btnVolDn_Click";
+ //BA.debugLineNum = 491;BA.debugLine="btnVolDn_Click";
 _btnvoldn_click();
- //BA.debugLineNum = 493;BA.debugLine="Return True";
+ //BA.debugLineNum = 492;BA.debugLine="Return True";
 if (true) return anywheresoftware.b4a.keywords.Common.True;
  break;
 default:
- //BA.debugLineNum = 495;BA.debugLine="Return False";
+ //BA.debugLineNum = 494;BA.debugLine="Return False";
 if (true) return anywheresoftware.b4a.keywords.Common.False;
  break;
 }
 ;
- //BA.debugLineNum = 497;BA.debugLine="End Sub";
+ //BA.debugLineNum = 496;BA.debugLine="End Sub";
 return false;
 }
 public static String  _activity_pause(boolean _userclosed) throws Exception{
- //BA.debugLineNum = 482;BA.debugLine="Sub Activity_Pause (UserClosed As Boolean)";
- //BA.debugLineNum = 483;BA.debugLine="End Sub";
+ //BA.debugLineNum = 481;BA.debugLine="Sub Activity_Pause (UserClosed As Boolean)";
+ //BA.debugLineNum = 482;BA.debugLine="End Sub";
 return "";
 }
 public static String  _activity_resume() throws Exception{
- //BA.debugLineNum = 467;BA.debugLine="Sub Activity_Resume";
- //BA.debugLineNum = 468;BA.debugLine="RadioService.DuckVolume = manager.GetString(\"Duck";
+ //BA.debugLineNum = 466;BA.debugLine="Sub Activity_Resume";
+ //BA.debugLineNum = 467;BA.debugLine="RadioService.DuckVolume = manager.GetString(\"Duck";
 mostCurrent._radioservice._duckvolume = (int)(Double.parseDouble(_manager.GetString("DuckVolume")));
- //BA.debugLineNum = 469;BA.debugLine="RadioService.DefaultVolume = manager.GetString(\"D";
+ //BA.debugLineNum = 468;BA.debugLine="RadioService.DefaultVolume = manager.GetString(\"D";
 mostCurrent._radioservice._defaultvolume = (int)(Double.parseDouble(_manager.GetString("DefaultVolume")));
- //BA.debugLineNum = 471;BA.debugLine="If RadioService.Mute = False And RadioService.Duc";
+ //BA.debugLineNum = 470;BA.debugLine="If RadioService.Mute = False And RadioService.Duc";
 if (mostCurrent._radioservice._mute==anywheresoftware.b4a.keywords.Common.False && mostCurrent._radioservice._ducked==anywheresoftware.b4a.keywords.Common.False) { 
- //BA.debugLineNum = 472;BA.debugLine="CallSub2(RadioService, \"SetVolume\", RadioService";
+ //BA.debugLineNum = 471;BA.debugLine="CallSub2(RadioService, \"SetVolume\", RadioService";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()),"SetVolume",(Object)(mostCurrent._radioservice._defaultvolume));
  }else {
- //BA.debugLineNum = 474;BA.debugLine="RadioService.LastVolume = RadioService.DefaultVo";
+ //BA.debugLineNum = 473;BA.debugLine="RadioService.LastVolume = RadioService.DefaultVo";
 mostCurrent._radioservice._lastvolume = mostCurrent._radioservice._defaultvolume;
  };
- //BA.debugLineNum = 477;BA.debugLine="If RadioService.ServiceStarted Then";
+ //BA.debugLineNum = 476;BA.debugLine="If RadioService.ServiceStarted Then";
 if (mostCurrent._radioservice._servicestarted) { 
- //BA.debugLineNum = 478;BA.debugLine="updateStationList";
+ //BA.debugLineNum = 477;BA.debugLine="updateStationList";
 _updatestationlist();
  };
- //BA.debugLineNum = 480;BA.debugLine="End Sub";
+ //BA.debugLineNum = 479;BA.debugLine="End Sub";
 return "";
 }
 public static String  _btn0_click() throws Exception{
@@ -607,9 +607,7 @@ public static String  _btnexit_click() throws Exception{
  //BA.debugLineNum = 342;BA.debugLine="Sub btnExit_Click";
  //BA.debugLineNum = 343;BA.debugLine="CallSub(RadioService, \"ExitApp\")";
 anywheresoftware.b4a.keywords.Common.CallSubNew(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()),"ExitApp");
- //BA.debugLineNum = 344;BA.debugLine="ExitApplication";
-anywheresoftware.b4a.keywords.Common.ExitApplication();
- //BA.debugLineNum = 345;BA.debugLine="End Sub";
+ //BA.debugLineNum = 344;BA.debugLine="End Sub";
 return "";
 }
 public static String  _btnfm_click() throws Exception{
@@ -698,12 +696,12 @@ mostCurrent._labfreq.setText((Object)(""));
 return "";
 }
 public static String  _btnlevel_click() throws Exception{
- //BA.debugLineNum = 350;BA.debugLine="Sub btnLevel_Click";
- //BA.debugLineNum = 351;BA.debugLine="CallSub(RadioService,\"IncrementLevel\")";
+ //BA.debugLineNum = 349;BA.debugLine="Sub btnLevel_Click";
+ //BA.debugLineNum = 350;BA.debugLine="CallSub(RadioService,\"IncrementLevel\")";
 anywheresoftware.b4a.keywords.Common.CallSubNew(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()),"IncrementLevel");
- //BA.debugLineNum = 352;BA.debugLine="btnLevel.Text = \"L \" & RadioService.Ebene";
+ //BA.debugLineNum = 351;BA.debugLine="btnLevel.Text = \"L \" & RadioService.Ebene";
 mostCurrent._btnlevel.setText((Object)("L "+BA.NumberToString(mostCurrent._radioservice._ebene)));
- //BA.debugLineNum = 353;BA.debugLine="End Sub";
+ //BA.debugLineNum = 352;BA.debugLine="End Sub";
 return "";
 }
 public static String  _btnmute_click() throws Exception{
@@ -1019,97 +1017,97 @@ public static String  _labdabfm_click() throws Exception{
 int _i = 0;
 anywheresoftware.b4a.objects.LabelWrapper _l = null;
 anywheresoftware.b4a.objects.PanelWrapper _s = null;
- //BA.debugLineNum = 375;BA.debugLine="Sub labDABFM_Click";
- //BA.debugLineNum = 376;BA.debugLine="Dim i As Int";
+ //BA.debugLineNum = 374;BA.debugLine="Sub labDABFM_Click";
+ //BA.debugLineNum = 375;BA.debugLine="Dim i As Int";
 _i = 0;
- //BA.debugLineNum = 377;BA.debugLine="For i = 0 To panMain.NumberOfViews - 1";
+ //BA.debugLineNum = 376;BA.debugLine="For i = 0 To panMain.NumberOfViews - 1";
 {
-final int step282 = 1;
-final int limit282 = (int) (mostCurrent._panmain.getNumberOfViews()-1);
-for (_i = (int) (0); (step282 > 0 && _i <= limit282) || (step282 < 0 && _i >= limit282); _i = ((int)(0 + _i + step282))) {
- //BA.debugLineNum = 378;BA.debugLine="If panMain.GetView(i) Is Label Then";
+final int step281 = 1;
+final int limit281 = (int) (mostCurrent._panmain.getNumberOfViews()-1);
+for (_i = (int) (0); (step281 > 0 && _i <= limit281) || (step281 < 0 && _i >= limit281); _i = ((int)(0 + _i + step281))) {
+ //BA.debugLineNum = 377;BA.debugLine="If panMain.GetView(i) Is Label Then";
 if (mostCurrent._panmain.GetView(_i).getObjectOrNull() instanceof android.widget.TextView) { 
- //BA.debugLineNum = 380;BA.debugLine="Dim l As Label";
+ //BA.debugLineNum = 379;BA.debugLine="Dim l As Label";
 _l = new anywheresoftware.b4a.objects.LabelWrapper();
- //BA.debugLineNum = 381;BA.debugLine="l = panMain.GetView(i)";
+ //BA.debugLineNum = 380;BA.debugLine="l = panMain.GetView(i)";
 _l.setObject((android.widget.TextView)(mostCurrent._panmain.GetView(_i).getObject()));
- //BA.debugLineNum = 382;BA.debugLine="l.Color = Colors.ARGB(0, 128, 128, 128)";
+ //BA.debugLineNum = 381;BA.debugLine="l.Color = Colors.ARGB(0, 128, 128, 128)";
 _l.setColor(anywheresoftware.b4a.keywords.Common.Colors.ARGB((int) (0),(int) (128),(int) (128),(int) (128)));
  };
- //BA.debugLineNum = 384;BA.debugLine="If panMain.GetView(i) Is Panel Then";
+ //BA.debugLineNum = 383;BA.debugLine="If panMain.GetView(i) Is Panel Then";
 if (mostCurrent._panmain.GetView(_i).getObjectOrNull() instanceof android.view.ViewGroup) { 
- //BA.debugLineNum = 386;BA.debugLine="Dim s As Panel";
+ //BA.debugLineNum = 385;BA.debugLine="Dim s As Panel";
 _s = new anywheresoftware.b4a.objects.PanelWrapper();
- //BA.debugLineNum = 387;BA.debugLine="s = panMain.GetView(i)";
+ //BA.debugLineNum = 386;BA.debugLine="s = panMain.GetView(i)";
 _s.setObject((android.view.ViewGroup)(mostCurrent._panmain.GetView(_i).getObject()));
- //BA.debugLineNum = 388;BA.debugLine="s.Color = Colors.ARGB(0, 128, 128, 128)";
+ //BA.debugLineNum = 387;BA.debugLine="s.Color = Colors.ARGB(0, 128, 128, 128)";
 _s.setColor(anywheresoftware.b4a.keywords.Common.Colors.ARGB((int) (0),(int) (128),(int) (128),(int) (128)));
  };
  }
 };
- //BA.debugLineNum = 391;BA.debugLine="End Sub";
+ //BA.debugLineNum = 390;BA.debugLine="End Sub";
 return "";
 }
 public static String  _labdabfm_longclick() throws Exception{
 int _i = 0;
 anywheresoftware.b4a.objects.LabelWrapper _l = null;
 anywheresoftware.b4a.objects.PanelWrapper _s = null;
- //BA.debugLineNum = 393;BA.debugLine="Sub labDABFM_LongClick";
- //BA.debugLineNum = 394;BA.debugLine="Dim i As Int";
+ //BA.debugLineNum = 392;BA.debugLine="Sub labDABFM_LongClick";
+ //BA.debugLineNum = 393;BA.debugLine="Dim i As Int";
 _i = 0;
- //BA.debugLineNum = 395;BA.debugLine="For i = 0 To panMain.NumberOfViews - 1";
+ //BA.debugLineNum = 394;BA.debugLine="For i = 0 To panMain.NumberOfViews - 1";
 {
-final int step297 = 1;
-final int limit297 = (int) (mostCurrent._panmain.getNumberOfViews()-1);
-for (_i = (int) (0); (step297 > 0 && _i <= limit297) || (step297 < 0 && _i >= limit297); _i = ((int)(0 + _i + step297))) {
- //BA.debugLineNum = 396;BA.debugLine="If panMain.GetView(i) Is Label Then";
+final int step296 = 1;
+final int limit296 = (int) (mostCurrent._panmain.getNumberOfViews()-1);
+for (_i = (int) (0); (step296 > 0 && _i <= limit296) || (step296 < 0 && _i >= limit296); _i = ((int)(0 + _i + step296))) {
+ //BA.debugLineNum = 395;BA.debugLine="If panMain.GetView(i) Is Label Then";
 if (mostCurrent._panmain.GetView(_i).getObjectOrNull() instanceof android.widget.TextView) { 
- //BA.debugLineNum = 398;BA.debugLine="Dim l As Label";
+ //BA.debugLineNum = 397;BA.debugLine="Dim l As Label";
 _l = new anywheresoftware.b4a.objects.LabelWrapper();
- //BA.debugLineNum = 399;BA.debugLine="l = panMain.GetView(i)";
+ //BA.debugLineNum = 398;BA.debugLine="l = panMain.GetView(i)";
 _l.setObject((android.widget.TextView)(mostCurrent._panmain.GetView(_i).getObject()));
- //BA.debugLineNum = 400;BA.debugLine="l.Color = Colors.ARGB(100, 128, 128, 128)";
+ //BA.debugLineNum = 399;BA.debugLine="l.Color = Colors.ARGB(100, 128, 128, 128)";
 _l.setColor(anywheresoftware.b4a.keywords.Common.Colors.ARGB((int) (100),(int) (128),(int) (128),(int) (128)));
  };
- //BA.debugLineNum = 402;BA.debugLine="If panMain.GetView(i) Is Panel Then";
+ //BA.debugLineNum = 401;BA.debugLine="If panMain.GetView(i) Is Panel Then";
 if (mostCurrent._panmain.GetView(_i).getObjectOrNull() instanceof android.view.ViewGroup) { 
- //BA.debugLineNum = 404;BA.debugLine="Dim s As Panel";
+ //BA.debugLineNum = 403;BA.debugLine="Dim s As Panel";
 _s = new anywheresoftware.b4a.objects.PanelWrapper();
- //BA.debugLineNum = 405;BA.debugLine="s = panMain.GetView(i)";
+ //BA.debugLineNum = 404;BA.debugLine="s = panMain.GetView(i)";
 _s.setObject((android.view.ViewGroup)(mostCurrent._panmain.GetView(_i).getObject()));
- //BA.debugLineNum = 406;BA.debugLine="s.Color = Colors.ARGB(100, 128, 128, 128)";
+ //BA.debugLineNum = 405;BA.debugLine="s.Color = Colors.ARGB(100, 128, 128, 128)";
 _s.setColor(anywheresoftware.b4a.keywords.Common.Colors.ARGB((int) (100),(int) (128),(int) (128),(int) (128)));
  };
  }
 };
- //BA.debugLineNum = 409;BA.debugLine="End Sub";
+ //BA.debugLineNum = 408;BA.debugLine="End Sub";
 return "";
 }
 public static String  _labelclean() throws Exception{
- //BA.debugLineNum = 411;BA.debugLine="Sub LabelClean";
- //BA.debugLineNum = 412;BA.debugLine="CallSub(RadioService, \"LabelClean\")";
+ //BA.debugLineNum = 410;BA.debugLine="Sub LabelClean";
+ //BA.debugLineNum = 411;BA.debugLine="CallSub(RadioService, \"LabelClean\")";
 anywheresoftware.b4a.keywords.Common.CallSubNew(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()),"LabelClean");
- //BA.debugLineNum = 413;BA.debugLine="btnLevel.Text = \"L \" & RadioService.Ebene";
+ //BA.debugLineNum = 412;BA.debugLine="btnLevel.Text = \"L \" & RadioService.Ebene";
 mostCurrent._btnlevel.setText((Object)("L "+BA.NumberToString(mostCurrent._radioservice._ebene)));
- //BA.debugLineNum = 414;BA.debugLine="End Sub";
+ //BA.debugLineNum = 413;BA.debugLine="End Sub";
 return "";
 }
 public static String  _labfreq_longclick() throws Exception{
- //BA.debugLineNum = 369;BA.debugLine="Sub labFreq_LongClick";
- //BA.debugLineNum = 370;BA.debugLine="myclick.returnFx(1)";
+ //BA.debugLineNum = 368;BA.debugLine="Sub labFreq_LongClick";
+ //BA.debugLineNum = 369;BA.debugLine="myclick.returnFx(1)";
 _myclick.returnFx((float) (1));
- //BA.debugLineNum = 371;BA.debugLine="CallSub2(RadioService, \"StartChannelSearch\", mana";
+ //BA.debugLineNum = 370;BA.debugLine="CallSub2(RadioService, \"StartChannelSearch\", mana";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()),"StartChannelSearch",(Object)(_manager.GetBoolean("Clean")));
- //BA.debugLineNum = 372;BA.debugLine="LabelClean";
+ //BA.debugLineNum = 371;BA.debugLine="LabelClean";
 _labelclean();
- //BA.debugLineNum = 373;BA.debugLine="End Sub";
+ //BA.debugLineNum = 372;BA.debugLine="End Sub";
 return "";
 }
 public static String  _lvdab_itemclick(int _position,Object _value) throws Exception{
- //BA.debugLineNum = 416;BA.debugLine="Sub lvDAB_ItemClick (Position As Int, Value As Obj";
- //BA.debugLineNum = 417;BA.debugLine="CallSub2(RadioService,\"SelectDABItem\",Position)";
+ //BA.debugLineNum = 415;BA.debugLine="Sub lvDAB_ItemClick (Position As Int, Value As Obj";
+ //BA.debugLineNum = 416;BA.debugLine="CallSub2(RadioService,\"SelectDABItem\",Position)";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()),"SelectDABItem",(Object)(_position));
- //BA.debugLineNum = 418;BA.debugLine="End Sub";
+ //BA.debugLineNum = 417;BA.debugLine="End Sub";
 return "";
 }
 
@@ -1143,12 +1141,12 @@ _broadcastreceiver = new com.rootsoft.broadcastreceiver.BroadCastReceiver();
 return "";
 }
 public static String  _selecteddabchannel(int _position) throws Exception{
- //BA.debugLineNum = 420;BA.debugLine="Sub SelectedDABChannel (Position As Int)";
- //BA.debugLineNum = 421;BA.debugLine="lvDAB.SetSelection(Position)";
+ //BA.debugLineNum = 419;BA.debugLine="Sub SelectedDABChannel (Position As Int)";
+ //BA.debugLineNum = 420;BA.debugLine="lvDAB.SetSelection(Position)";
 mostCurrent._lvdab.SetSelection(_position);
- //BA.debugLineNum = 422;BA.debugLine="Log(\"Channel \" & Position & \" selected\")";
+ //BA.debugLineNum = 421;BA.debugLine="Log(\"Channel \" & Position & \" selected\")";
 anywheresoftware.b4a.keywords.Common.Log("Channel "+BA.NumberToString(_position)+" selected");
- //BA.debugLineNum = 423;BA.debugLine="End Sub";
+ //BA.debugLineNum = 422;BA.debugLine="End Sub";
 return "";
 }
 public static String  _setdefaults() throws Exception{
@@ -1191,50 +1189,50 @@ mostCurrent._labdatarate.setText(_arguments.Get((int) (10)));
 return "";
 }
 public static String  _settextvaluesfromsettings(anywheresoftware.b4a.objects.collections.List _arglist) throws Exception{
- //BA.debugLineNum = 427;BA.debugLine="Sub SetTextValuesFromSettings(Arglist As List)";
- //BA.debugLineNum = 428;BA.debugLine="btnLevel.Text = Arglist.Get(0)";
+ //BA.debugLineNum = 426;BA.debugLine="Sub SetTextValuesFromSettings(Arglist As List)";
+ //BA.debugLineNum = 427;BA.debugLine="btnLevel.Text = Arglist.Get(0)";
 mostCurrent._btnlevel.setText(_arglist.Get((int) (0)));
- //BA.debugLineNum = 429;BA.debugLine="If Arglist.Get(1) Then";
+ //BA.debugLineNum = 428;BA.debugLine="If Arglist.Get(1) Then";
 if (BA.ObjectToBoolean(_arglist.Get((int) (1)))) { 
- //BA.debugLineNum = 430;BA.debugLine="btnDAB.Checked = True";
+ //BA.debugLineNum = 429;BA.debugLine="btnDAB.Checked = True";
 mostCurrent._btndab.setChecked(anywheresoftware.b4a.keywords.Common.True);
  }else {
- //BA.debugLineNum = 432;BA.debugLine="btnFM.Checked = True";
+ //BA.debugLineNum = 431;BA.debugLine="btnFM.Checked = True";
 mostCurrent._btnfm.setChecked(anywheresoftware.b4a.keywords.Common.True);
  };
- //BA.debugLineNum = 434;BA.debugLine="labProgram2.Visible = Arglist.Get(2)";
+ //BA.debugLineNum = 433;BA.debugLine="labProgram2.Visible = Arglist.Get(2)";
 mostCurrent._labprogram2.setVisible(BA.ObjectToBoolean(_arglist.Get((int) (2))));
- //BA.debugLineNum = 435;BA.debugLine="updateStationList";
+ //BA.debugLineNum = 434;BA.debugLine="updateStationList";
 _updatestationlist();
- //BA.debugLineNum = 436;BA.debugLine="End Sub";
+ //BA.debugLineNum = 435;BA.debugLine="End Sub";
 return "";
 }
 public static String  _updatestationlist() throws Exception{
 int _i = 0;
- //BA.debugLineNum = 355;BA.debugLine="Sub updateStationList";
- //BA.debugLineNum = 356;BA.debugLine="Try";
-try { //BA.debugLineNum = 357;BA.debugLine="Dim i As Int";
+ //BA.debugLineNum = 354;BA.debugLine="Sub updateStationList";
+ //BA.debugLineNum = 355;BA.debugLine="Try";
+try { //BA.debugLineNum = 356;BA.debugLine="Dim i As Int";
 _i = 0;
- //BA.debugLineNum = 358;BA.debugLine="lvDAB.Clear";
+ //BA.debugLineNum = 357;BA.debugLine="lvDAB.Clear";
 mostCurrent._lvdab.Clear();
- //BA.debugLineNum = 359;BA.debugLine="For i = 0 To RadioService.lstDAB.Size - 1";
+ //BA.debugLineNum = 358;BA.debugLine="For i = 0 To RadioService.lstDAB.Size - 1";
 {
-final int step266 = 1;
-final int limit266 = (int) (mostCurrent._radioservice._lstdab.getSize()-1);
-for (_i = (int) (0); (step266 > 0 && _i <= limit266) || (step266 < 0 && _i >= limit266); _i = ((int)(0 + _i + step266))) {
- //BA.debugLineNum = 360;BA.debugLine="lvDAB.AddSingleLine(RadioService.lstDAB.Get(i))";
+final int step265 = 1;
+final int limit265 = (int) (mostCurrent._radioservice._lstdab.getSize()-1);
+for (_i = (int) (0); (step265 > 0 && _i <= limit265) || (step265 < 0 && _i >= limit265); _i = ((int)(0 + _i + step265))) {
+ //BA.debugLineNum = 359;BA.debugLine="lvDAB.AddSingleLine(RadioService.lstDAB.Get(i))";
 mostCurrent._lvdab.AddSingleLine(BA.ObjectToString(mostCurrent._radioservice._lstdab.Get(_i)));
  }
 };
- //BA.debugLineNum = 362;BA.debugLine="If RadioService.isDAB And RadioService.DAB Then";
+ //BA.debugLineNum = 361;BA.debugLine="If RadioService.isDAB And RadioService.DAB Then";
 if (mostCurrent._radioservice._isdab && mostCurrent._radioservice._dab) { 
- //BA.debugLineNum = 363;BA.debugLine="lvDAB.SetSelection(RadioService.Frequenz)";
+ //BA.debugLineNum = 362;BA.debugLine="lvDAB.SetSelection(RadioService.Frequenz)";
 mostCurrent._lvdab.SetSelection(mostCurrent._radioservice._frequenz);
  };
  } 
-       catch (Exception e273) {
-			processBA.setLastException(e273); };
- //BA.debugLineNum = 367;BA.debugLine="End Sub";
+       catch (Exception e272) {
+			processBA.setLastException(e272); };
+ //BA.debugLineNum = 366;BA.debugLine="End Sub";
 return "";
 }
 }

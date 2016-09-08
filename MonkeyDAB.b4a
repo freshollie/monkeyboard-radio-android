@@ -369,7 +369,6 @@ End Sub
 
 Sub btnExit_Click
 	CallSub(RadioService, "ExitApp")
-	ExitApplication
 End Sub
 
 #End Region
