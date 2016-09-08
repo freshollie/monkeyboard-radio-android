@@ -16,13 +16,12 @@ Sub Process_Globals
 	Dim astreams As AsyncStreams
 	Dim MyTimer, SysReady, USBTimer As Timer
 	Dim Broadcast As BroadCastReceiver
-
-	Dim Start, Mute, DABSearch, isDAB, DAB, Connected, FillList, ClearDatabase As Boolean 
+	Dim AudioFocusManager As AudioFocus
+	Dim Start, Mute, DABSearch, isDAB, DAB, Connected, FillList, ClearDatabase, Ducked As Boolean 
 	Dim Volume, Strength As Byte
 	Dim Ack(1024), Frq(21), DFrq(21), Frequenz, iIndex, xIndex, Dev, Ebene, AllDAB, iStep, iLoop As Int
 	Dim lstDAB As List
 	Dim RadioNotification As NotificationBuilder
-	Dim AudioFocusManager As AudioFocus
 	Dim ProgramText, ProgramType, ProgramName, ProgramName2, Esamble, Status As String
 	Dim labEventText,labFreqText,labStrengthText,labVolumeText,labProgramText,labProgramTypeText,labProgram2Text,ProgramNameText,StereoModeText,DataRateText As String
 	Dim pbStrengthProgress As Double
@@ -31,7 +30,7 @@ Sub Process_Globals
 	Dim PreviousNotificationText2 As String
 	Dim ServiceStarted As Boolean
 	Dim Mediakey As MediaController
-	Dim DuckVolume, DefaultVolume, LastVolume As Int
+	Dim DuckVolume, DefaultVolume, LastVolume, part As Int
 	Private session As JavaObject
 	
 	Dim EnterClickedReturnValue As Boolean
@@ -59,10 +58,15 @@ Sub Evaluate(index As Int)
 	
 	Dim j As Int
 	Dim ArgumentsList As List
-	
+'	Dim kj = 1 As Int
+	'Log("New eval")
+'	Do While kj<index
+'		Log(Ack(kj))
+'		kj= kj +1
+'	Loop
+'	
 	Select Ack(1)
-	Case 0x01 ' If its an acknolodged command
-	
+	Case 0x01 ' If its an acknowledged command
 		Select Ack(2) 
 		
 		Case 0x05 'Stream_GetPlayStatus response
@@ -83,6 +87,7 @@ Sub Evaluate(index As Int)
 			Case Else
 				Status = "N/A"
 		  	End Select
+			
 		
 		labEventText = Status
 			
@@ -243,7 +248,7 @@ Sub Evaluate(index As Int)
 			AllDAB = Bit.ParseInt(Bit.ToHexString(Ack(6)) & Bit.ToHexString(Ack(7)) &  Bit.ToHexString(Ack(8)) &  Bit.ToHexString(Ack(9)), 16)
 			labEventText = AllDAB & " please wait !"
 			lstDAB.Clear
-			NameResponded = True
+			'NameResponded = True
 			iStep = 0
 			MyTimer.Interval = 500
 			Wait(3)
@@ -271,16 +276,34 @@ Sub Evaluate(index As Int)
 		End Select
 		
 	Case 0x00
-	
 		If Ack(2) = 0x01 And Ack(3) = 0x01 And ClearDatabase Then 
 			iLoop = iLoop +1
 			If iLoop > 2 Then
+				Log("What")
 				SysReady.Enabled = False
 				SendRadio(Array As Byte(0xFE,0x01,0x03,0x01,0x00,0x02,0x00,0x47,0xFD))
 				DABSearch = True
 				iLoop = 0
 				MyTimer.Enabled = True
 				ClearDatabase = False
+			End If
+		Else 'Reponse from board 
+			
+			If iIndex < 3 Then 
+				
+				Select(iIndex)
+				
+				Case(0)
+					If part = 1 Then iIndex = iIndex + 1
+					Log("Responded")
+				Case(1)
+					If part = 2 Then iIndex = iIndex + 1
+					Log("Responded")
+				Case(2)
+					If part = 3 Then iIndex = iIndex + 1
+					Log("Responded")
+				End Select
+				
 			End If
 		End If
 	End Select
@@ -316,7 +339,10 @@ Sub Evaluate(index As Int)
 		Service.StartForeground(1,RadioNotification.GetNotification)
 	End If
 	
-	CallSub2(Main,"SetEvaluatedData",ArgumentsList)
+	If IsPaused(Main) <> True Then
+		CallSub2(Main,"SetEvaluatedData",ArgumentsList)
+	End If
+	
 	
 	
 End Sub
@@ -330,7 +356,7 @@ Sub LabelClean
 		ProgramText = ""
 		ProgramType = "" 
 		Strength = 0
-		iIndex = 2
+		iIndex = 3
 		MyTimer.Enabled = True
 	End If
 End Sub
@@ -354,20 +380,20 @@ Sub OpenRadio
 
 	Dim UsbMngr As UsbManager  ' USB library
 	
- UsbMngr.Initialize
- Dim UsbDevices() As UsbDevice  ' USB library
-	
- UsbDevices = UsbMngr.GetDevices
-	
- 'Iterate over USB devices and find the correct one
-	
- If UsbDevices.Length > 0 Then
+	UsbMngr.Initialize
+	Dim UsbDevices() As UsbDevice  ' USB library
+
+	UsbDevices = UsbMngr.GetDevices
+
+	'Iterate over USB devices and find the correct one
+
+	If UsbDevices.Length > 0 Then
 		Log(UsbDevices.Length)
 		
-  For i = 0 To UsbDevices.Length - 1
-   Dim UsbDvc As UsbDevice
-   UsbDvc = UsbDevices(i)
-			
+		For i = 0 To UsbDevices.Length - 1
+			Dim UsbDvc As UsbDevice
+			UsbDvc = UsbDevices(i)
+				
 	 		If (UsbDvc.ProductId = UsbPid) And (UsbDvc.VendorId = UsbVid) Then
 				USB.SetCustomDevice(USB.DRIVER_CDCACM, UsbVid, UsbPid)
 				
@@ -392,13 +418,20 @@ Sub OpenRadio
 						
 						StartMediaKeys
 						Mediakey.MediaButton(KeyCodes.KEYCODE_MEDIA_STOP)
-		
 						AudioFocusManager.Initialize("AudioFocusManager")
 						AudioFocusManager.requestFocus
+						Ducked = False
 						
 						Connected = True
+						SetUpNotfication
+						Broadcast.sendBroadcast("com.freshollie.radioapp.RUNNING")
 						
-						Wait(1)		
+						DAB = True		
+						LoadSettings
+						iIndex = 0
+						part = 0
+						Start = True
+						Wait(1)	
 						
 	   					MyTimer.Enabled = True
 						Return 
@@ -414,7 +447,7 @@ End Sub
 
 
 Sub CloseRadio
-	If Dev <> USB.USB_NONE Then USB.Close
+	USB.Close()
 End Sub
 
 Sub SendRadio(buffer() As Byte)
@@ -453,11 +486,17 @@ Sub MyTimer_Tick
 					' A different one of these cases is called every 
 					Select iIndex
 					Case 0
-						SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00,0x05,0x00,0x00,0x00,0x00,Frequenz,0xFD)) ' Play DAB Steam_PLAY(0, Frequenz) Only Called once
+						Log("Set to Fequency " & Frequenz) 
+						SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00,0x05,0x00,0x00,0x00,0x00,Frequenz,0xFD)) ' Play DAB Stream_PLAY(0, Frequenz) Only Called once
+						part = 1
 					Case 1
+						Log("Setting volume")
 						SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,Volume,0xFD)) ' Set volume STREAM_SetVolume(Volume) Only called Once
-					Case 2		
+						part = 2
+					Case 2	
+						Log("Setting stereoMode")
 	 					SendRadio(Array As Byte(0xFE,0x01,0x09,0x01,0x00,0x01,0x01,0xFD)) ' Set mode to stereo STREAM_SetStereoMode(1) Only called once
+						part = 3 
 					Case 3		
 						SendRadio(Array As Byte(0xFE,0x01,0x0D,0x01,0x00,0x00,0xFD)) ' Get Volume Stream_GetVolume()
 					Case 4
@@ -478,7 +517,8 @@ Sub MyTimer_Tick
 						SendRadio(Array As Byte(0xFE,0x01,0x0B,0x01,0x00,0x00,0xFD)) ' Get the channel type of the current stream STREAM_GetStereo()
 					Case 12
 						SendRadio(Array As Byte(0xFE,0x01,0x12,0x01,0x00,0x00,0xFD)) ' Get the data rate of the current stream STREAM_GetDataRate()
-						iIndex = 2
+						iIndex = 3
+						Return
 					End Select
 				Else							
 					Select iIndex
@@ -507,12 +547,13 @@ Sub MyTimer_Tick
 						SendRadio(Array As Byte(0xFE,0x01,0x05,0x01,0x00,0x00,0xFD))
 					Case 9
 						SendRadio(Array As Byte(0xFE,0x01,0x10,0x01,0x00,0x00,0xFD))	
-						iIndex = 2
+						iIndex = 3
+						Return
 					End Select
 				End If
-				iIndex = iIndex + 1
+				If iIndex > 2 Then iIndex = iIndex + 1
 				'labVolume.Text = Volume & " " & iIndex
-				If iIndex > 12 Then iIndex = 2
+				If iIndex > 12 Then iIndex = 3
 			End If
 		End If
 	End If 
@@ -533,7 +574,6 @@ Sub Astreams_NewData (buffer() As Byte)
 	
    	For y = 0 To buffer.Length -1 				
 		itemp = Bit.And(0xff, buffer(y))
-		
 		If itemp = 254 Then 
 			Start = True
 			xIndex = 0
@@ -554,33 +594,51 @@ End Sub
 
 Sub Astreams_Error
 	astreams.Close
+	ExitApp
 End Sub
 
 Sub Astreams_Terminated
+	ExitApp
 	astreams.Close
 End Sub
 
 Sub ExitApp
 	Log("Attempting To close app when ServiceStarted = " & ServiceStarted)
-	If ServiceStarted Then
-		If Connected Then
-	 	SaveSettings
-		End If
+	
+	If ServiceStarted And Connected Then
+	
+ 		SaveSettings
 		SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,0x00,0xFD))
-		Wait(1)
+		
+		Wait(0.5)
+
 		astreams.Close
+
 		CloseRadio
+	
 		AudioFocusManager.abandonAudioFocus
-		Log("Abonding media focus")
+	
+		Log("Abandoning media focus")
+		
 		session.RunMethod("release",Null)
+	
+		Broadcast.sendBroadcast("com.freshollie.radioapp.STOPPED")
 		Service.StopForeground(1)
 		RadioNotification.Cancel(1)
+			
+		
 		ServiceStarted = False
-		ExitApplication
+		Connected = False
+		
+		If IsPaused(Main) Then
+			ExitApplication
+		End If
+		
 	Else
 		Log("Attempt aborted")
-		ExitApplication
+		
 	End If
+	
 End Sub
 #End Region
 
@@ -603,6 +661,7 @@ End Sub
 
 Sub UnmuteAudio
 	Log("Unmuting")
+	Volume = LastVolume
 	SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,LastVolume,0xFD))
 End Sub
 
@@ -817,19 +876,35 @@ Sub SelectDABItem (Position As Int)
 	End Sub
 #End Region
 
+Sub StartChannelSearch(ShouldClean As Boolean)
+ 	If isDAB And DAB Then
+		If Not(DABSearch) Then
+			If ShouldClean Then
+				MyTimer.Enabled = False
+				SendRadio(Array As Byte(0xFE,0x00,0x01,0x01,0x00,0x01,0x01,0xFD))
+				ClearDatabase = True
+				SysReady.Enabled = True
+			Else
+				SendRadio(Array As Byte(0xFE,0x01,0x03,0x01,0x00,0x02,0x00,0x47,0xFD))
+				DABSearch = True
+			End If
+ 		End If
+	End If
+End Sub
 
 #Region'----------IntentReceiver--------
 
 Sub BroadcastReceiver_OnReceive(Action As String,i As Object)
 	Dim Intent1 As Intent = i
 	Log(Action)
-	
- If Intent1.HasExtra("device") Then
-	  	If USB.UsbPresent(Dev) = USB.USB_NONE Then
+
+	If Intent1.HasExtra("device") Then
+		If USB.UsbPresent(Dev) = USB.USB_NONE Then
 			ExitApp
 		End If
-		
-	Else If Action = "com.freshollie.radioapp.intent.close" Then
+	End If
+	
+	If Action = "com.freshollie.radioapp.intent.close" Then
 		ExitApp
 	
 	Else If Action = "com.freshollie.radioapp.intent.mute" Then
@@ -854,11 +929,13 @@ End Sub
 Sub AudioFocusManager_onTransientCanDuck
 	Log("Lowering volume, on transient can duck")
 	LastVolume = Volume
+	Ducked = True
 	SetVolume(DuckVolume)
 End Sub
 
 Sub AudioFocusManager_onGain
 	Log("Back to normal, gained focus")
+	Ducked = False
 	UnmuteAudio
 End Sub
 
@@ -866,7 +943,29 @@ End Sub
 
 #Region'-----------------Service-----------------
 Sub Service_Create
- RadioNotification.Initialize
+	RadioNotification.Initialize
+	Broadcast.Initialize("BroadcastReceiver")
+	'Broadcast.addAction("android.hardware.usb.action.USB_DEVICE_DETACHED")
+	Broadcast.addAction("com.freshollie.radioapp.intent.close")
+	Broadcast.addAction("com.freshollie.radioapp.intent.mute")
+	Broadcast.addAction("com.freshollie.radioapp.intent.unmute")
+	Broadcast.registerReceiver("")
+End Sub
+
+Sub SetUpNotfication
+	RadioNotification.AddAction2("ic_skip_previous_black_24dp", "","Previous Channel", Me)
+	RadioNotification.AddAction2("ic_stop_black_24dp", "","Stop", Me)
+	RadioNotification.AddAction2("ic_skip_next_black_24dp", "","Next Channel", Me)
+	RadioNotification.DefaultLight = True
+	RadioNotification.DefaultVibrate = False
+	RadioNotification.DefaultSound = False
+	RadioNotification.setActivity(Main)
+	RadioNotification.SmallIcon = "ic_radio_black_24dp"
+	RadioNotification.ContentTitle = "Radio Running"
+	RadioNotification.AutoCancel = False
+	
+	Service.StartForeground(1, RadioNotification.GetNotification)
+	
 End Sub
 
 Sub Service_Start (StartingIntent As Intent)
@@ -884,39 +983,16 @@ Sub Service_Start (StartingIntent As Intent)
 			RadioChannelUp
 		End If
 		
-	Else
+	Else if Connected = False Then
 		ServiceStarted = True
+		
 		If Not(File.Exists(MyPath, "")) Then File.MakeDir(File.DirRootExternal, "dabmonkey")
-		RadioNotification.AddAction2("ic_skip_previous_black_24dp", "","Previous Channel", Me)
-		RadioNotification.AddAction2("ic_stop_black_24dp", "","Stop", Me)
-		RadioNotification.AddAction2("ic_skip_next_black_24dp", "","Next Channel", Me)
-		RadioNotification.DefaultLight = True
- 		RadioNotification.DefaultVibrate = False
-  		RadioNotification.DefaultSound = False
-		RadioNotification.setActivity(Main)
-		RadioNotification.SmallIcon = "ic_radio_black_24dp"
-		RadioNotification.ContentTitle = "Radio Running"
-		RadioNotification.AutoCancel = False
-		
-		Service.StartForeground(1, RadioNotification.GetNotification)
-		
-		Broadcast.Initialize("BroadcastReceiver")
-		Broadcast.addAction("android.hardware.usb.action.USB_DEVICE_DETACHED")
-		Broadcast.addAction("com.freshollie.radioapp.intent.close")
-		Broadcast.addAction("com.freshollie.radioapp.intent.mute")
-		Broadcast.addAction("com.freshollie.radioapp.intent.unmute")
-		Broadcast.registerReceiver("")
-		
 		
 		MyPath = File.DirRootExternal & "/dabmonkey"
 		
 		Connected = False
-		If Not(USBTimer.IsInitialized) Then USBTimer.Initialize("USBTimer",5000)
-		OpenRadio
 		
-			
-		DAB = True		
-		LoadSettings
+		OpenRadio
 	
 	End If
 
@@ -924,6 +1000,7 @@ End Sub
 
 Sub Service_Destroy
 	Service.StopForeground(1)
+	Broadcast.unregisterReceiver
 End Sub
 
 Sub StartMediaKeys()
@@ -1113,13 +1190,16 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.content.Intent;
 import anywheresoftware.b4a.objects.IntentWrapper;
+
 public static class MyCallback extends Callback {
    public MyCallback() {
    }
+   
    public void onCommand(String command, Bundle args, ResultReceiver cb) {
    BA.Log(command);
      processBA.raiseEventFromUI(null, "media_oncommand", command);
    }
+   
    public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
    	KeyEvent event = (KeyEvent)mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
     IntentWrapper baIntent = new IntentWrapper();
