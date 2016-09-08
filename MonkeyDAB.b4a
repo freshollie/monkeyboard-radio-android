@@ -3,7 +3,7 @@ NumberOfModules=2
 Module1=RadioService
 Module2=Slideshow
 Build1=Default,com.freshollie.radioapp
-ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.basic4ppc.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="12" android:targetSdkVersion="22"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="false" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'SetActivityAttribute(main,android:screenOrientation, "sensorLandscape")~\n~'End of default text.~\n~AddApplicationText(~\n~<activity android:name="anywheresoftware.b4a.objects.preferenceactivity"/>)
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.basic4ppc.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="12" android:targetSdkVersion="22"/>~\n~<supports-screens android:largeScreens="true" ~\n~	android:normalScreens="true" ~\n~	android:smallScreens="false" ~\n~	android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'SetActivityAttribute(main,android:screenOrientation, "sensorLandscape")~\n~'End of default text.~\n~AddApplicationText(~\n~<activity android:name="anywheresoftware.b4a.objects.preferenceactivity"/>)
 IconFile=
 NumberOfFiles=2
 File1=Landscape.bal
@@ -37,7 +37,7 @@ Library16=javaobject
 #End Region
 
 #Region  Activity Attributes 
-	#FullScreen: True
+	#FullScreen: False
 	#IncludeTitle: False
 #End Region
 
@@ -50,6 +50,7 @@ Sub Process_Globals
 	Dim screen As PreferenceScreen
 	Dim myclick As esClickSound
 	Dim VolumeRange As List
+	Dim BroadcastReceiver As BroadCastReceiver
 	
 End Sub
 
@@ -61,6 +62,7 @@ Sub Globals
 	Dim labFreq, labVolume, labStrength, labProgramType, labProgram, labProgram2, labProgramText, labEvent,labDataRate,labStereoMode As Label
 	Dim lvDAB As ListView
 	Dim pbStrength As ProgressBar 
+	
 End Sub
 
 #End Region
@@ -75,7 +77,7 @@ Sub SetEvaluatedData(Arguments As List)
 	labVolume.text = Arguments.Get(4)
 	labProgram.text = Arguments.Get(5)
 	labProgramType.text = Arguments.Get(6)
-    labProgram2.text = Arguments.Get(7)
+	labProgram2.text = Arguments.Get(7)
 	labProgramText.text = Arguments.Get(8)
 	labStereoMode.text = Arguments.Get(9)
 	labDataRate.text = Arguments.Get(10)
@@ -367,6 +369,7 @@ End Sub
 
 Sub btnExit_Click
 	CallSub(RadioService, "ExitApp")
+	ExitApplication
 End Sub
 
 #End Region
@@ -402,15 +405,15 @@ Sub labDABFM_Click
 	For i = 0 To panMain.NumberOfViews - 1
    		If panMain.GetView(i) Is Label Then 
    			'this will change the font to Labels, EditText, Buttons and other views with text.
-      		Dim l As Label
-      		l = panMain.GetView(i)
-      		l.Color = Colors.ARGB(0, 128, 128, 128)
+	  		Dim l As Label
+	  		l = panMain.GetView(i)
+	  		l.Color = Colors.ARGB(0, 128, 128, 128)
 		End If
    		If panMain.GetView(i) Is Panel Then 
    			'this will change the font to Labels, EditText, Buttons and other views with text.
-      		Dim s As Panel
-      		s = panMain.GetView(i)
-      		s.Color = Colors.ARGB(0, 128, 128, 128)
+	  		Dim s As Panel
+	  		s = panMain.GetView(i)
+	  		s.Color = Colors.ARGB(0, 128, 128, 128)
    		End If
 	Next
 End Sub
@@ -420,15 +423,15 @@ Sub labDABFM_LongClick
 	For i = 0 To panMain.NumberOfViews - 1
    		If panMain.GetView(i) Is Label Then 
    			'this will change the font to Labels, EditText, Buttons and other views with text.
-      		Dim l As Label
-      		l = panMain.GetView(i)
-      		l.Color = Colors.ARGB(100, 128, 128, 128)
+	  		Dim l As Label
+	  		l = panMain.GetView(i)
+	  		l.Color = Colors.ARGB(100, 128, 128, 128)
 		End If
    		If panMain.GetView(i) Is Panel Then 
    			'this will change the font to Labels, EditText, Buttons and other views with text.
-      		Dim s As Panel
-      		s = panMain.GetView(i)
-      		s.Color = Colors.ARGB(100, 128, 128, 128)
+	  		Dim s As Panel
+	  		s = panMain.GetView(i)
+	  		s.Color = Colors.ARGB(100, 128, 128, 128)
    		End If
 	Next
 End Sub
@@ -464,9 +467,9 @@ End Sub
 Sub Activity_Create(FirstTime As Boolean)
 
 	If GetDeviceLayoutValues.Width > GetDeviceLayoutValues.Height Then
-     	Activity.LoadLayout("Landscape")
+	 	Activity.LoadLayout("Landscape")
   	Else
-     	Activity.LoadLayout("Portrait")
+	 	Activity.LoadLayout("Portrait")
   	End If	
 	
 	If FirstTime Then
@@ -492,11 +495,14 @@ End Sub
 Sub Activity_Resume
 	RadioService.DuckVolume = manager.GetString("DuckVolume")
 	RadioService.DefaultVolume = manager.GetString("DefaultVolume")
-	Log(manager.GetString("DefaultVolume"))
-	Dim Volume As Int = manager.GetString("DefaultVolume")
-	CallSub2(RadioService, "SetVolume", Volume)
+
+	If RadioService.Mute = False And RadioService.Ducked = False Then
+		CallSub2(RadioService, "SetVolume", RadioService.DefaultVolume)
+	Else
+		RadioService.LastVolume = RadioService.DefaultVolume
+	End If
+	
 	If RadioService.ServiceStarted Then
-		RadioService.iIndex = 0
 		updateStationList
 	End If
 End Sub
@@ -508,11 +514,11 @@ End Sub
 Sub Activity_KeyPress (KeyCode As Int) As Boolean
 	Select KeyCode
    	Case KeyCodes.KEYCODE_VOLUME_UP
-      	btnVolUp_Click   
-      	Return True
+	  	btnVolUp_Click   
+	  	Return True
 	Case KeyCodes.KEYCODE_VOLUME_DOWN
-      	btnVolDn_Click  
-      	Return True
+	  	btnVolDn_Click  
+	  	Return True
 	Case Else
 		Return False
 	End Select
