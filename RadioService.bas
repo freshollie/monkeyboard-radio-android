@@ -14,7 +14,7 @@ Sub Process_Globals
 	Dim UsbPid As Int = 0xa 
 	Dim UsbVid As Int = 0x4D8
 	Dim astreams As AsyncStreams
-	Dim MyTimer, SysReady, USBTimer As Timer
+	Dim MyTimer, SysReady, USBTimer, TryAgain As Timer
 	Dim Broadcast As BroadCastReceiver
 	Dim AudioFocusManager As AudioFocus
 	Dim Start, Mute, DABSearch, isDAB, DAB, Connected, FillList, ClearDatabase, Ducked As Boolean 
@@ -31,6 +31,8 @@ Sub Process_Globals
 	Dim ServiceStarted As Boolean
 	Dim Mediakey As MediaController
 	Dim DuckVolume, DefaultVolume, LastVolume, part As Int
+	Dim MuteResponse As String
+	
 	Private session As JavaObject
 	
 	Dim EnterClickedReturnValue As Boolean
@@ -288,6 +290,11 @@ Sub Evaluate(index As Int)
 				ClearDatabase = False
 			End If
 		Else 'Reponse from board 
+			If MuteResponse = "0" Then
+				Log("Mute has been performed, can now close application")
+				MuteResponse = "1"
+				ExitApp
+			End If
 			
 			If iIndex < 3 Then 
 				
@@ -431,6 +438,7 @@ Sub OpenRadio
 						iIndex = 0
 						part = 0
 						Start = True
+						MuteResponse = "Null"
 						Wait(1)	
 						
 	   					MyTimer.Enabled = True
@@ -602,38 +610,58 @@ Sub Astreams_Terminated
 	astreams.Close
 End Sub
 
+Sub TryAgain_tick
+	If MuteResponse = "0" Then
+		MuteResponse = "Null"
+		ExitApp
+	End If
+	
+	TryAgain.Enabled = False
+
+End Sub
+
 Sub ExitApp
 	Log("Attempting To close app when ServiceStarted = " & ServiceStarted)
 	
 	If ServiceStarted And Connected Then
-	
- 		SaveSettings
-		SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,0x00,0xFD))
-		
-		Wait(0.5)
 
-		astreams.Close
-
-		CloseRadio
-	
-		AudioFocusManager.abandonAudioFocus
-	
-		Log("Abandoning media focus")
-		
-		session.RunMethod("release",Null)
-	
-		Broadcast.sendBroadcast("com.freshollie.radioapp.STOPPED")
-		Service.StopForeground(1)
-		RadioNotification.Cancel(1)
+		If MuteResponse = "Null" Then
+			SaveSettings
+			Log("Attempting to mute")
 			
+			MuteResponse = "0"
 		
-		ServiceStarted = False
-		Connected = False
+			SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,0x00,0xFD)) 'Set volume 0
+			
+			If Not(TryAgain.IsInitialized) Then TryAgain.Initialize("TryAgain",500)
+			TryAgain.Enabled = True
+			Return False
+			
+		Else If MuteResponse = "1" Then
+
+			astreams.Close
+
+			CloseRadio
 		
-		If IsPaused(Main) Then
-			ExitApplication
+			AudioFocusManager.abandonAudioFocus
+		
+			Log("Abandoning media focus")
+			
+			session.RunMethod("release",Null)
+		
+			Broadcast.sendBroadcast("com.freshollie.radioapp.STOPPED")
+			Service.StopForeground(1)
+			RadioNotification.Cancel(1)
+				
+			
+			ServiceStarted = False
+			Connected = False
+			
+			If IsPaused(Main) = False Then
+				ExitApplication
+			End If
+			Return True
 		End If
-		
 	Else
 		Log("Attempt aborted")
 		
