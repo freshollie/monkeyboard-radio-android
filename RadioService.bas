@@ -700,6 +700,9 @@ Sub ExitApp 'Close the whole app
 		End If
 	Else
 		Log("Attempt aborted")
+		If IsPaused(Main) = False Then
+			ExitApplication
+		End If
 		
 	End If
 	
