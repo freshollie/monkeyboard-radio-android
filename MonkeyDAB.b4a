@@ -8,7 +8,7 @@ IconFile=
 NumberOfFiles=2
 File1=Landscape.bal
 File2=Portrait.bal
-NumberOfLibraries=16
+NumberOfLibraries=18
 Library1=core
 Library2=audio
 Library3=broadcastreceiver
@@ -25,6 +25,8 @@ Library13=usb
 Library14=audiofocus
 Library15=notificationbuilder
 Library16=javaobject
+Library17=keygen
+Library18=threading
 @EndOfDesignText@
 #Region'--------------------Attributes------------------
 
@@ -51,6 +53,8 @@ Sub Process_Globals
 	Dim myclick As esClickSound
 	Dim VolumeRange As List
 	Dim BroadcastReceiver As BroadCastReceiver
+	Dim StationListPosition As Int
+	Dim KeyGen As KeyGen
 	
 End Sub
 
@@ -58,10 +62,12 @@ Sub Globals
 	Dim btnExit, btnConfig, btnLevel, btnMute, btnFMUp, btnFMDn, btnVolUp, btnVolDn, btnFMHi, btnFMLo, btnKey As Button 
 	Dim btnSt1, btnSt2, btnSt3, btnSt4, btnSt5, btnSt6, btnFM, btnDAB As ToggleButton 
 	Dim panMain, panKeyboard, panSelect As Panel
-	Dim btnEnter, btnClear, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn0  As Button
+	Dim btnEnter, btnClear, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn0, StartSearchButton  As Button
 	Dim labFreq, labVolume, labStrength, labProgramType, labProgram, labProgram2, labProgramText, labEvent,labDataRate,labStereoMode As Label
 	Dim lvDAB As ListView
 	Dim pbStrength As ProgressBar 
+	Dim thread As Thread
+	
 	
 End Sub
 
@@ -71,10 +77,8 @@ End Sub
 
 Sub SetEvaluatedData(Arguments As List)
 	labEvent.text = Arguments.Get(0)
-	If panKeyboard.Visible <> True Then labFreq.text = Arguments.Get(1)
 	labStrength.text = Arguments.Get(2)
 	pbStrength.progress = Arguments.Get(3)
-	labVolume.text = Arguments.Get(4)
 	labProgram.text = Arguments.Get(5)
 	labProgramType.text = Arguments.Get(6)
 	labProgram2.text = Arguments.Get(7)
@@ -382,18 +386,24 @@ End Sub
 Sub updateStationList
 	Try
 		Dim i As Int
+		lvDAB.SingleLineLayout.Label.TextSize = 20dip
+		'lvDAB.SingleLineLayout.ItemHeight = 30
+		
 		lvDAB.Clear
 		For i = 0 To RadioService.lstDAB.Size - 1
 			lvDAB.AddSingleLine(RadioService.lstDAB.Get(i))  
 		Next
 		If RadioService.isDAB And RadioService.DAB Then
 			lvDAB.SetSelection(RadioService.Frequenz)
+			StationListPosition = RadioService.Frequenz
 		End If
+		
+		
 	Catch 
 	End Try
 End Sub
 
-Sub labFreq_LongClick
+Sub StartSearchButton_LongClick
 	myclick.returnFx(1)
 	CallSub2(RadioService, "StartChannelSearch", manager.GetBoolean("Clean"))
 	LabelClean
@@ -437,7 +447,6 @@ End Sub
 
 Sub LabelClean
 	CallSub(RadioService, "LabelClean")
-	btnLevel.Text = "L " & RadioService.Ebene
 End Sub
 
 Sub lvDAB_ItemClick (Position As Int, Value As Object) 
@@ -446,18 +455,13 @@ End Sub
 
 Sub SelectedDABChannel (Position As Int)
 	lvDAB.SetSelection(Position)
+	StationListPosition = Position
 	Log("Channel " & Position & " selected") 
 End Sub
 
 #End Region
 
 Sub SetTextValuesFromSettings(Arglist As List)
-	btnLevel.Text = Arglist.Get(0)
-	If Arglist.Get(1) Then
-		btnDAB.Checked = True
-	Else
-		btnFM.Checked = True
-	End If
 	labProgram2.Visible = Arglist.Get(2)
 	updateStationList
 End Sub
@@ -510,14 +514,31 @@ Sub Activity_Pause (UserClosed As Boolean)
 End Sub
 
 
+private Sub PressKey(Keycode As Int)
+	KeyGen.keygenerator(Keycode)
+End Sub
+	
+
 Sub Activity_KeyPress (KeyCode As Int) As Boolean
+	Dim thread As Thread
 	Select KeyCode
-   	Case KeyCodes.KEYCODE_VOLUME_UP
-	  	btnVolUp_Click   
+   	Case KeyCodes.KEYCODE_TAB
+		lvDAB.RequestFocus
+		thread.Initialise("PressKey")
+		Dim args(1) As Object
+		args(0) = KeyCodes.KEYCODE_DPAD_DOWN
+		thread.Start("PressKey", args)
+		Return True
+	Case KeyCodes.KEYCODE_DPAD_UP
+		Log(StationListPosition)
+	  	If StationListPosition - 1 >= 0 Then
+			StationListPosition = StationListPosition - 1 
+	  		lvDAB.SetSelection(StationListPosition)
+		End If
 	  	Return True
-	Case KeyCodes.KEYCODE_VOLUME_DOWN
-	  	btnVolDn_Click  
-	  	Return True
+	Case KeyCodes.KEYCODE_ENTER
+		lvDAB_ItemClick(StationListPosition, Null)
+		Return True
 	Case Else
 		Return False
 	End Select

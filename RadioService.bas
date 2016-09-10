@@ -7,6 +7,13 @@ B4A=true
 	#StartAtBoot: False
 #End Region
 
+' Documentation
+' Service will close when device disconnects due to not being able to communicate with the USB device,
+' not due to android device disconnect intents
+'
+' Service can be started silently in the background using shell scripts
+' 
+
 #Region'--------------------Globals---------------------
 
 Sub Process_Globals
@@ -28,7 +35,7 @@ Sub Process_Globals
 	Dim MyPath As String
 	Dim PreviousNotificationText As String
 	Dim PreviousNotificationText2 As String
-	Dim ServiceStarted As Boolean
+	Dim ServiceStarted, ForceClosing As Boolean
 	Dim Mediakey As MediaController
 	Dim DuckVolume, DefaultVolume, LastVolume, part As Int
 	Dim MuteResponse As String
@@ -248,7 +255,7 @@ Sub Evaluate(index As Int)
 			
 		Case 0x16
 			AllDAB = Bit.ParseInt(Bit.ToHexString(Ack(6)) & Bit.ToHexString(Ack(7)) &  Bit.ToHexString(Ack(8)) &  Bit.ToHexString(Ack(9)), 16)
-			labEventText = AllDAB & " please wait !"
+			labEventText ="Copying " & 0 & "/" & AllDAB
 			lstDAB.Clear
 			'NameResponded = True
 			iStep = 0
@@ -266,8 +273,19 @@ Sub Evaluate(index As Int)
 			
 			If FillList Then
 				Log(ProgramName2)
-				iStep = lstDAB.Size+1
-				lstDAB.Add(ProgramName2)
+				Dim lastProgramName As String
+				If lstDAB.Size > 0 Then
+					lastProgramName = lstDAB.Get(lstDAB.Size-1)
+				Else
+					lastProgramName = ""
+				End If
+					
+				If lastProgramName <> ProgramName2 Then
+					iStep = lstDAB.Size+1
+					lstDAB.Add(ProgramName2)
+					labEventText ="Copying " & lstDAB.Size & "/" & AllDAB
+				End If
+				MyTimer_Tick
 			Else
 				Dim b() As Byte = ProgramName2.GetBytes("UTF8")
   				ProgramName2 = BytesToString(b, 0, b.Length, "UTF8")
@@ -281,7 +299,6 @@ Sub Evaluate(index As Int)
 		If Ack(2) = 0x01 And Ack(3) = 0x01 And ClearDatabase Then 
 			iLoop = iLoop +1
 			If iLoop > 2 Then
-				Log("What")
 				SysReady.Enabled = False
 				SendRadio(Array As Byte(0xFE,0x01,0x03,0x01,0x00,0x02,0x00,0x47,0xFD))
 				DABSearch = True
@@ -291,7 +308,7 @@ Sub Evaluate(index As Int)
 			End If
 		Else 'Reponse from board 
 			If MuteResponse = "0" Then
-				Log("Mute has been performed, can now close application")
+				Log("Mute has been performed, can now close radio service")
 				MuteResponse = "1"
 				ExitApp
 			End If
@@ -439,6 +456,7 @@ Sub OpenRadio
 						part = 0
 						Start = True
 						MuteResponse = "Null"
+						ForceClosing = False
 						Wait(1)	
 						
 	   					MyTimer.Enabled = True
@@ -450,6 +468,7 @@ Sub OpenRadio
 			End If
 		Next
 	End If
+	ForceClosing = True
 	ExitApp
 End Sub
 
@@ -602,12 +621,11 @@ End Sub
 
 Sub Astreams_Error
 	astreams.Close
-	ExitApp
+	CloseService
 End Sub
 
 Sub Astreams_Terminated
-	ExitApp
-	astreams.Close
+	CloseService
 End Sub
 
 Sub TryAgain_tick
@@ -620,47 +638,65 @@ Sub TryAgain_tick
 
 End Sub
 
-Sub ExitApp
-	Log("Attempting To close app when ServiceStarted = " & ServiceStarted)
+Sub RunCloseProcesses
+	astreams.Close
+
+	CloseRadio
+
+	AudioFocusManager.abandonAudioFocus
+
+	Log("Abandoning media focus")
 	
+	session.RunMethod("release",Null)
+
+	Broadcast.sendBroadcast("com.freshollie.radioapp.STOPPED")
+	Service.StopForeground(1)
+	RadioNotification.Cancel(1)
+		
+	
+	ServiceStarted = False
+	Connected = False
+	ForceClosing = False
+	
+End Sub
+
+Sub CloseService ' Close the background service but not the app
+	If ServiceStarted And Connected Then
+		SaveSettings
+		RunCloseProcesses
+	End If
+End Sub
+
+Sub ExitApp 'Close the whole app
+	Log("Attempting To close app when ServiceStarted = " & ServiceStarted)
+		
 	If ServiceStarted And Connected Then
 
 		If MuteResponse = "Null" Then
 			SaveSettings
-			Log("Attempting to mute")
 			
-			MuteResponse = "0"
-		
-			SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,0x00,0xFD)) 'Set volume 0
 			
-			If Not(TryAgain.IsInitialized) Then TryAgain.Initialize("TryAgain",500)
-			TryAgain.Enabled = True
-			Return False
+			If ForceClosing = False Then
+				Log("Attempting to mute")
 			
-		Else If MuteResponse = "1" Then
-
-			astreams.Close
-
-			CloseRadio
-		
-			AudioFocusManager.abandonAudioFocus
-		
-			Log("Abandoning media focus")
+				MuteResponse = "0"
 			
-			session.RunMethod("release",Null)
-		
-			Broadcast.sendBroadcast("com.freshollie.radioapp.STOPPED")
-			Service.StopForeground(1)
-			RadioNotification.Cancel(1)
+				SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,0x01,0x00,0xFD)) 'Set volume 0
 				
-			
-			ServiceStarted = False
-			Connected = False
+				If Not(TryAgain.IsInitialized) Then TryAgain.Initialize("TryAgain",500)
+				TryAgain.Enabled = True
+			End If
+		End If
+		
+		If MuteResponse = "1" Or ForceClosing = True Then 'CLose the radio if power has been disconnected
+			Log("What the fuck")
+				
+			RunCloseProcesses
+
 			
 			If IsPaused(Main) = False Then
 				ExitApplication
 			End If
-			Return True
 		End If
 	Else
 		Log("Attempt aborted")
@@ -928,7 +964,7 @@ Sub BroadcastReceiver_OnReceive(Action As String,i As Object)
 
 	If Intent1.HasExtra("device") Then
 		If USB.UsbPresent(Dev) = USB.USB_NONE Then
-			ExitApp
+			CloseService
 		End If
 	End If
 	
@@ -999,6 +1035,9 @@ End Sub
 Sub Service_Start (StartingIntent As Intent)
 	Dim intentExtra As String
 	
+	If MuteResponse = "0" And Connected = True Then
+		RunCloseProcesses
+	End If
 	
 	If StartingIntent.HasExtra("Notification_Action_Tag") Then
 		intentExtra = StartingIntent.GetExtra("Notification_Action_Tag")
