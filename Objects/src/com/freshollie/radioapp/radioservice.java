@@ -163,10 +163,10 @@ public wal.INIFiles.ini _ini = null;
 public com.freshollie.radioapp.main _main = null;
 public com.freshollie.radioapp.slideshow _slideshow = null;
 public static boolean  _application_error(anywheresoftware.b4a.objects.B4AException _error,String _stacktrace) throws Exception{
- //BA.debugLineNum = 1083;BA.debugLine="Sub Application_Error (Error As Exception, StackTr";
- //BA.debugLineNum = 1084;BA.debugLine="Return True";
+ //BA.debugLineNum = 1086;BA.debugLine="Sub Application_Error (Error As Exception, StackTr";
+ //BA.debugLineNum = 1087;BA.debugLine="Return True";
 if (true) return anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 1085;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1088;BA.debugLine="End Sub";
 return false;
 }
 public static String  _astreams_error() throws Exception{
@@ -227,120 +227,120 @@ _closeservice();
 return "";
 }
 public static String  _audiofocusmanager_onfocuslost() throws Exception{
- //BA.debugLineNum = 978;BA.debugLine="Sub AudioFocusManager_onFocusLost";
- //BA.debugLineNum = 979;BA.debugLine="Log(\"Focus Lost, closing\")";
+ //BA.debugLineNum = 981;BA.debugLine="Sub AudioFocusManager_onFocusLost";
+ //BA.debugLineNum = 982;BA.debugLine="Log(\"Focus Lost, closing\")";
 anywheresoftware.b4a.keywords.Common.Log("Focus Lost, closing");
- //BA.debugLineNum = 980;BA.debugLine="ExitApp";
+ //BA.debugLineNum = 983;BA.debugLine="ExitApp";
 _exitapp();
- //BA.debugLineNum = 981;BA.debugLine="End Sub";
+ //BA.debugLineNum = 984;BA.debugLine="End Sub";
 return "";
 }
 public static String  _audiofocusmanager_ongain() throws Exception{
- //BA.debugLineNum = 995;BA.debugLine="Sub AudioFocusManager_onGain";
- //BA.debugLineNum = 996;BA.debugLine="Log(\"Back to normal, gained focus\")";
+ //BA.debugLineNum = 998;BA.debugLine="Sub AudioFocusManager_onGain";
+ //BA.debugLineNum = 999;BA.debugLine="Log(\"Back to normal, gained focus\")";
 anywheresoftware.b4a.keywords.Common.Log("Back to normal, gained focus");
- //BA.debugLineNum = 997;BA.debugLine="Ducked = False";
+ //BA.debugLineNum = 1000;BA.debugLine="Ducked = False";
 _ducked = anywheresoftware.b4a.keywords.Common.False;
- //BA.debugLineNum = 998;BA.debugLine="UnmuteAudio";
+ //BA.debugLineNum = 1001;BA.debugLine="UnmuteAudio";
 _unmuteaudio();
- //BA.debugLineNum = 999;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1002;BA.debugLine="End Sub";
 return "";
 }
 public static String  _audiofocusmanager_ontransient() throws Exception{
- //BA.debugLineNum = 983;BA.debugLine="Sub AudioFocusManager_onTransient";
- //BA.debugLineNum = 984;BA.debugLine="Log(\"Muting, on transient\")";
+ //BA.debugLineNum = 986;BA.debugLine="Sub AudioFocusManager_onTransient";
+ //BA.debugLineNum = 987;BA.debugLine="Log(\"Muting, on transient\")";
 anywheresoftware.b4a.keywords.Common.Log("Muting, on transient");
- //BA.debugLineNum = 985;BA.debugLine="MuteAudio";
+ //BA.debugLineNum = 988;BA.debugLine="MuteAudio";
 _muteaudio();
- //BA.debugLineNum = 986;BA.debugLine="End Sub";
+ //BA.debugLineNum = 989;BA.debugLine="End Sub";
 return "";
 }
 public static String  _audiofocusmanager_ontransientcanduck() throws Exception{
- //BA.debugLineNum = 988;BA.debugLine="Sub AudioFocusManager_onTransientCanDuck";
- //BA.debugLineNum = 989;BA.debugLine="Log(\"Lowering volume, on transient can duck\")";
+ //BA.debugLineNum = 991;BA.debugLine="Sub AudioFocusManager_onTransientCanDuck";
+ //BA.debugLineNum = 992;BA.debugLine="Log(\"Lowering volume, on transient can duck\")";
 anywheresoftware.b4a.keywords.Common.Log("Lowering volume, on transient can duck");
- //BA.debugLineNum = 990;BA.debugLine="LastVolume = Volume";
+ //BA.debugLineNum = 993;BA.debugLine="LastVolume = Volume";
 _lastvolume = (int) (_volume);
- //BA.debugLineNum = 991;BA.debugLine="Ducked = True";
+ //BA.debugLineNum = 994;BA.debugLine="Ducked = True";
 _ducked = anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 992;BA.debugLine="SetVolume(DuckVolume)";
+ //BA.debugLineNum = 995;BA.debugLine="SetVolume(DuckVolume)";
 _setvolume(_duckvolume);
- //BA.debugLineNum = 993;BA.debugLine="End Sub";
+ //BA.debugLineNum = 996;BA.debugLine="End Sub";
 return "";
 }
 public static String  _broadcastreceiver_onreceive(String _action,Object _i) throws Exception{
 anywheresoftware.b4a.objects.IntentWrapper _intent1 = null;
- //BA.debugLineNum = 956;BA.debugLine="Sub BroadcastReceiver_OnReceive(Action As String,i";
- //BA.debugLineNum = 957;BA.debugLine="Dim Intent1 As Intent = i";
+ //BA.debugLineNum = 959;BA.debugLine="Sub BroadcastReceiver_OnReceive(Action As String,i";
+ //BA.debugLineNum = 960;BA.debugLine="Dim Intent1 As Intent = i";
 _intent1 = new anywheresoftware.b4a.objects.IntentWrapper();
 _intent1.setObject((android.content.Intent)(_i));
- //BA.debugLineNum = 958;BA.debugLine="Log(Action)";
+ //BA.debugLineNum = 961;BA.debugLine="Log(Action)";
 anywheresoftware.b4a.keywords.Common.Log(_action);
- //BA.debugLineNum = 960;BA.debugLine="If Intent1.HasExtra(\"device\") Then";
+ //BA.debugLineNum = 963;BA.debugLine="If Intent1.HasExtra(\"device\") Then";
 if (_intent1.HasExtra("device")) { 
- //BA.debugLineNum = 961;BA.debugLine="If USB.UsbPresent(Dev) = USB.USB_NONE Then";
+ //BA.debugLineNum = 964;BA.debugLine="If USB.UsbPresent(Dev) = USB.USB_NONE Then";
 if (_usb.UsbPresent(_dev)==_usb.USB_NONE) { 
- //BA.debugLineNum = 962;BA.debugLine="CloseService";
+ //BA.debugLineNum = 965;BA.debugLine="CloseService";
 _closeservice();
  };
  };
- //BA.debugLineNum = 966;BA.debugLine="If Action = \"com.freshollie.radioapp.intent.close";
+ //BA.debugLineNum = 969;BA.debugLine="If Action = \"com.freshollie.radioapp.intent.close";
 if ((_action).equals("com.freshollie.radioapp.intent.close")) { 
- //BA.debugLineNum = 967;BA.debugLine="ExitApp";
+ //BA.debugLineNum = 970;BA.debugLine="ExitApp";
 _exitapp();
  }else if((_action).equals("com.freshollie.radioapp.intent.mute")) { 
- //BA.debugLineNum = 970;BA.debugLine="MuteAudio";
+ //BA.debugLineNum = 973;BA.debugLine="MuteAudio";
 _muteaudio();
  }else if((_action).equals("com.freshollie.radioapp.intent.unmute")) { 
- //BA.debugLineNum = 973;BA.debugLine="UnmuteAudio";
+ //BA.debugLineNum = 976;BA.debugLine="UnmuteAudio";
 _unmuteaudio();
  };
- //BA.debugLineNum = 976;BA.debugLine="End Sub";
+ //BA.debugLineNum = 979;BA.debugLine="End Sub";
 return "";
 }
 public static String  _changedablevel() throws Exception{
- //BA.debugLineNum = 795;BA.debugLine="Sub ChangeDABLevel";
- //BA.debugLineNum = 796;BA.debugLine="Select Ebene";
+ //BA.debugLineNum = 798;BA.debugLine="Sub ChangeDABLevel";
+ //BA.debugLineNum = 799;BA.debugLine="Select Ebene";
 switch (_ebene) {
 case 0:
- //BA.debugLineNum = 798;BA.debugLine="DFrq(0) = Frequenz";
+ //BA.debugLineNum = 801;BA.debugLine="DFrq(0) = Frequenz";
 _dfrq[(int) (0)] = _frequenz;
  break;
 case 1:
- //BA.debugLineNum = 800;BA.debugLine="DFrq(7) = Frequenz";
+ //BA.debugLineNum = 803;BA.debugLine="DFrq(7) = Frequenz";
 _dfrq[(int) (7)] = _frequenz;
  break;
 case 2:
- //BA.debugLineNum = 802;BA.debugLine="DFrq(14) = Frequenz";
+ //BA.debugLineNum = 805;BA.debugLine="DFrq(14) = Frequenz";
 _dfrq[(int) (14)] = _frequenz;
  break;
 }
 ;
- //BA.debugLineNum = 804;BA.debugLine="End Sub";
+ //BA.debugLineNum = 807;BA.debugLine="End Sub";
 return "";
 }
 public static String  _changefmlevel() throws Exception{
- //BA.debugLineNum = 769;BA.debugLine="Sub ChangeFMLevel";
- //BA.debugLineNum = 770;BA.debugLine="If Not(isDAB) Then";
+ //BA.debugLineNum = 772;BA.debugLine="Sub ChangeFMLevel";
+ //BA.debugLineNum = 773;BA.debugLine="If Not(isDAB) Then";
 if (anywheresoftware.b4a.keywords.Common.Not(_isdab)) { 
- //BA.debugLineNum = 771;BA.debugLine="Select Ebene";
+ //BA.debugLineNum = 774;BA.debugLine="Select Ebene";
 switch (_ebene) {
 case 0:
- //BA.debugLineNum = 773;BA.debugLine="Frq(0) = Frequenz";
+ //BA.debugLineNum = 776;BA.debugLine="Frq(0) = Frequenz";
 _frq[(int) (0)] = _frequenz;
  break;
 case 1:
- //BA.debugLineNum = 775;BA.debugLine="Frq(7) = Frequenz";
+ //BA.debugLineNum = 778;BA.debugLine="Frq(7) = Frequenz";
 _frq[(int) (7)] = _frequenz;
  break;
 case 2:
- //BA.debugLineNum = 777;BA.debugLine="Frq(14) = Frequenz";
+ //BA.debugLineNum = 780;BA.debugLine="Frq(14) = Frequenz";
 _frq[(int) (14)] = _frequenz;
  break;
 }
 ;
  };
- //BA.debugLineNum = 780;BA.debugLine="End Sub";
+ //BA.debugLineNum = 783;BA.debugLine="End Sub";
 return "";
 }
 public static String  _closeradio() throws Exception{
@@ -382,46 +382,46 @@ String _d1 = "";
 String _d2 = "";
 String _d3 = "";
 String _d = "";
- //BA.debugLineNum = 727;BA.debugLine="Sub EnterFrequency(FrequencyText As String)";
- //BA.debugLineNum = 728;BA.debugLine="Dim F As Int";
+ //BA.debugLineNum = 730;BA.debugLine="Sub EnterFrequency(FrequencyText As String)";
+ //BA.debugLineNum = 731;BA.debugLine="Dim F As Int";
 _f = 0;
- //BA.debugLineNum = 730;BA.debugLine="If isDAB And DAB Then";
+ //BA.debugLineNum = 733;BA.debugLine="If isDAB And DAB Then";
 if (_isdab && _dab) { 
- //BA.debugLineNum = 731;BA.debugLine="F = FrequencyText";
+ //BA.debugLineNum = 734;BA.debugLine="F = FrequencyText";
 _f = (int)(Double.parseDouble(_frequencytext));
- //BA.debugLineNum = 732;BA.debugLine="If Not(DABSearch) Then SendRadio(Array As Byte(0";
+ //BA.debugLineNum = 735;BA.debugLine="If Not(DABSearch) Then SendRadio(Array As Byte(0";
 if (anywheresoftware.b4a.keywords.Common.Not(_dabsearch)) { 
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_f),(byte) (0xfd)});};
- //BA.debugLineNum = 733;BA.debugLine="EnterClickedReturnValue = True";
+ //BA.debugLineNum = 736;BA.debugLine="EnterClickedReturnValue = True";
 _enterclickedreturnvalue = anywheresoftware.b4a.keywords.Common.True;
  }else {
- //BA.debugLineNum = 735;BA.debugLine="F = FrequencyText * 1000";
+ //BA.debugLineNum = 738;BA.debugLine="F = FrequencyText * 1000";
 _f = (int) ((double)(Double.parseDouble(_frequencytext))*1000);
- //BA.debugLineNum = 736;BA.debugLine="If F > 87400 And F < 108100 Then";
+ //BA.debugLineNum = 739;BA.debugLine="If F > 87400 And F < 108100 Then";
 if (_f>87400 && _f<108100) { 
- //BA.debugLineNum = 737;BA.debugLine="Dim d1,d2,d3,D As String";
+ //BA.debugLineNum = 740;BA.debugLine="Dim d1,d2,d3,D As String";
 _d1 = "";
 _d2 = "";
 _d3 = "";
 _d = "";
- //BA.debugLineNum = 738;BA.debugLine="D =  Bit.ToHexString(F)";
+ //BA.debugLineNum = 741;BA.debugLine="D =  Bit.ToHexString(F)";
 _d = anywheresoftware.b4a.keywords.Common.Bit.ToHexString(_f);
- //BA.debugLineNum = 739;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
+ //BA.debugLineNum = 742;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
 _d1 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (0),(int) (1)),(int) (16)));
- //BA.debugLineNum = 740;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
+ //BA.debugLineNum = 743;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
 _d2 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (1),(int) (3)),(int) (16)));
- //BA.debugLineNum = 741;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
+ //BA.debugLineNum = 744;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
 _d3 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (3),(int) (5)),(int) (16)));
- //BA.debugLineNum = 742;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
+ //BA.debugLineNum = 745;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x01),(byte) (0x00),(byte)(Double.parseDouble(_d1)),(byte)(Double.parseDouble(_d2)),(byte)(Double.parseDouble(_d3)),(byte) (0xfd)});
- //BA.debugLineNum = 743;BA.debugLine="EnterClickedReturnValue = True";
+ //BA.debugLineNum = 746;BA.debugLine="EnterClickedReturnValue = True";
 _enterclickedreturnvalue = anywheresoftware.b4a.keywords.Common.True;
  }else {
- //BA.debugLineNum = 745;BA.debugLine="EnterClickedReturnValue = False";
+ //BA.debugLineNum = 748;BA.debugLine="EnterClickedReturnValue = False";
 _enterclickedreturnvalue = anywheresoftware.b4a.keywords.Common.False;
  };
  };
- //BA.debugLineNum = 750;BA.debugLine="End Sub";
+ //BA.debugLineNum = 753;BA.debugLine="End Sub";
 return "";
 }
 public static String  _evaluate(int _index) throws Exception{
@@ -980,8 +980,13 @@ anywheresoftware.b4a.keywords.Common.ExitApplication();
  }else {
  //BA.debugLineNum = 697;BA.debugLine="Log(\"Attempt aborted\")";
 anywheresoftware.b4a.keywords.Common.Log("Attempt aborted");
+ //BA.debugLineNum = 698;BA.debugLine="If IsPaused(Main) = False Then";
+if (anywheresoftware.b4a.keywords.Common.IsPaused(processBA,(Object)(mostCurrent._main.getObject()))==anywheresoftware.b4a.keywords.Common.False) { 
+ //BA.debugLineNum = 699;BA.debugLine="ExitApplication";
+anywheresoftware.b4a.keywords.Common.ExitApplication();
  };
- //BA.debugLineNum = 701;BA.debugLine="End Sub";
+ };
+ //BA.debugLineNum = 704;BA.debugLine="End Sub";
 return "";
 }
 public static String  _fmhigher() throws Exception{
@@ -990,33 +995,33 @@ String _d1 = "";
 String _d2 = "";
 String _d3 = "";
 String _d = "";
- //BA.debugLineNum = 877;BA.debugLine="Sub FMHigher";
- //BA.debugLineNum = 878;BA.debugLine="Dim F As Int";
+ //BA.debugLineNum = 880;BA.debugLine="Sub FMHigher";
+ //BA.debugLineNum = 881;BA.debugLine="Dim F As Int";
 _f = 0;
- //BA.debugLineNum = 879;BA.debugLine="F = Frequenz";
+ //BA.debugLineNum = 882;BA.debugLine="F = Frequenz";
 _f = _frequenz;
- //BA.debugLineNum = 880;BA.debugLine="If F > 87400 And F < 108100 Then";
+ //BA.debugLineNum = 883;BA.debugLine="If F > 87400 And F < 108100 Then";
 if (_f>87400 && _f<108100) { 
- //BA.debugLineNum = 881;BA.debugLine="If F > 107900 Then F = 87400";
+ //BA.debugLineNum = 884;BA.debugLine="If F > 107900 Then F = 87400";
 if (_f>107900) { 
 _f = (int) (87400);};
- //BA.debugLineNum = 882;BA.debugLine="Dim d1,d2,d3,D As String";
+ //BA.debugLineNum = 885;BA.debugLine="Dim d1,d2,d3,D As String";
 _d1 = "";
 _d2 = "";
 _d3 = "";
 _d = "";
- //BA.debugLineNum = 883;BA.debugLine="D =  Bit.ToHexString(F + 50)";
+ //BA.debugLineNum = 886;BA.debugLine="D =  Bit.ToHexString(F + 50)";
 _d = anywheresoftware.b4a.keywords.Common.Bit.ToHexString((int) (_f+50));
- //BA.debugLineNum = 884;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
+ //BA.debugLineNum = 887;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
 _d1 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (0),(int) (1)),(int) (16)));
- //BA.debugLineNum = 885;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
+ //BA.debugLineNum = 888;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
 _d2 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (1),(int) (3)),(int) (16)));
- //BA.debugLineNum = 886;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
+ //BA.debugLineNum = 889;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
 _d3 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (3),(int) (5)),(int) (16)));
- //BA.debugLineNum = 887;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
+ //BA.debugLineNum = 890;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x01),(byte) (0x00),(byte)(Double.parseDouble(_d1)),(byte)(Double.parseDouble(_d2)),(byte)(Double.parseDouble(_d3)),(byte) (0xfd)});
  };
- //BA.debugLineNum = 889;BA.debugLine="End Sub";
+ //BA.debugLineNum = 892;BA.debugLine="End Sub";
 return "";
 }
 public static String  _fmlower() throws Exception{
@@ -1025,43 +1030,43 @@ String _d1 = "";
 String _d2 = "";
 String _d3 = "";
 String _d = "";
- //BA.debugLineNum = 891;BA.debugLine="Sub FMLower";
- //BA.debugLineNum = 892;BA.debugLine="Dim F As Int";
+ //BA.debugLineNum = 894;BA.debugLine="Sub FMLower";
+ //BA.debugLineNum = 895;BA.debugLine="Dim F As Int";
 _f = 0;
- //BA.debugLineNum = 893;BA.debugLine="F = Frequenz";
+ //BA.debugLineNum = 896;BA.debugLine="F = Frequenz";
 _f = _frequenz;
- //BA.debugLineNum = 894;BA.debugLine="If F > 87400 And F < 108100 Then";
+ //BA.debugLineNum = 897;BA.debugLine="If F > 87400 And F < 108100 Then";
 if (_f>87400 && _f<108100) { 
- //BA.debugLineNum = 895;BA.debugLine="If F < 87600 Then F = 108100";
+ //BA.debugLineNum = 898;BA.debugLine="If F < 87600 Then F = 108100";
 if (_f<87600) { 
 _f = (int) (108100);};
- //BA.debugLineNum = 896;BA.debugLine="Dim d1,d2,d3,D As String";
+ //BA.debugLineNum = 899;BA.debugLine="Dim d1,d2,d3,D As String";
 _d1 = "";
 _d2 = "";
 _d3 = "";
 _d = "";
- //BA.debugLineNum = 897;BA.debugLine="D =  Bit.ToHexString(F - 50)";
+ //BA.debugLineNum = 900;BA.debugLine="D =  Bit.ToHexString(F - 50)";
 _d = anywheresoftware.b4a.keywords.Common.Bit.ToHexString((int) (_f-50));
- //BA.debugLineNum = 898;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
+ //BA.debugLineNum = 901;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
 _d1 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (0),(int) (1)),(int) (16)));
- //BA.debugLineNum = 899;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
+ //BA.debugLineNum = 902;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
 _d2 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (1),(int) (3)),(int) (16)));
- //BA.debugLineNum = 900;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
+ //BA.debugLineNum = 903;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
 _d3 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (3),(int) (5)),(int) (16)));
- //BA.debugLineNum = 901;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
+ //BA.debugLineNum = 904;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x01),(byte) (0x00),(byte)(Double.parseDouble(_d1)),(byte)(Double.parseDouble(_d2)),(byte)(Double.parseDouble(_d3)),(byte) (0xfd)});
  };
- //BA.debugLineNum = 903;BA.debugLine="End Sub";
+ //BA.debugLineNum = 906;BA.debugLine="End Sub";
 return "";
 }
 public static String  _incrementlevel() throws Exception{
- //BA.debugLineNum = 928;BA.debugLine="Sub IncrementLevel";
- //BA.debugLineNum = 929;BA.debugLine="Ebene = Ebene + 1";
+ //BA.debugLineNum = 931;BA.debugLine="Sub IncrementLevel";
+ //BA.debugLineNum = 932;BA.debugLine="Ebene = Ebene + 1";
 _ebene = (int) (_ebene+1);
- //BA.debugLineNum = 930;BA.debugLine="If Ebene > 2 Then Ebene = 0";
+ //BA.debugLineNum = 933;BA.debugLine="If Ebene > 2 Then Ebene = 0";
 if (_ebene>2) { 
 _ebene = (int) (0);};
- //BA.debugLineNum = 931;BA.debugLine="End Sub";
+ //BA.debugLineNum = 934;BA.debugLine="End Sub";
 return "";
 }
 public static String  _labelclean() throws Exception{
@@ -1096,187 +1101,187 @@ boolean _labprogram2visible = false;
 boolean _isdabchecked = false;
 anywheresoftware.b4a.objects.collections.List _arglist = null;
 anywheresoftware.b4a.randomaccessfile.RandomAccessFile _datesfile = null;
- //BA.debugLineNum = 1108;BA.debugLine="Sub LoadSettings";
- //BA.debugLineNum = 1110;BA.debugLine="If Not(lstDAB.IsInitialized) Then lstDAB.Initiali";
+ //BA.debugLineNum = 1111;BA.debugLine="Sub LoadSettings";
+ //BA.debugLineNum = 1113;BA.debugLine="If Not(lstDAB.IsInitialized) Then lstDAB.Initiali";
 if (anywheresoftware.b4a.keywords.Common.Not(_lstdab.IsInitialized())) { 
 _lstdab.Initialize();};
- //BA.debugLineNum = 1111;BA.debugLine="INI.Name(MyPath & \"/config.ini\")";
+ //BA.debugLineNum = 1114;BA.debugLine="INI.Name(MyPath & \"/config.ini\")";
 mostCurrent._ini._v5(processBA,_mypath+"/config.ini");
- //BA.debugLineNum = 1112;BA.debugLine="Volume = INI.ReadInt(\"Last\", \"Volume\", DefaultVol";
+ //BA.debugLineNum = 1115;BA.debugLine="Volume = INI.ReadInt(\"Last\", \"Volume\", DefaultVol";
 _volume = (byte) (mostCurrent._ini._v0(processBA,"Last","Volume",_defaultvolume));
- //BA.debugLineNum = 1113;BA.debugLine="Frq(0) = INI.ReadInt(\"Last\", \"Frq0\", 88000)";
+ //BA.debugLineNum = 1116;BA.debugLine="Frq(0) = INI.ReadInt(\"Last\", \"Frq0\", 88000)";
 _frq[(int) (0)] = mostCurrent._ini._v0(processBA,"Last","Frq0",(int) (88000));
- //BA.debugLineNum = 1114;BA.debugLine="Frq(1) = INI.ReadInt(\"Last\", \"Frq1\", 88000)";
+ //BA.debugLineNum = 1117;BA.debugLine="Frq(1) = INI.ReadInt(\"Last\", \"Frq1\", 88000)";
 _frq[(int) (1)] = mostCurrent._ini._v0(processBA,"Last","Frq1",(int) (88000));
- //BA.debugLineNum = 1115;BA.debugLine="Frq(2) = INI.ReadInt(\"Last\", \"Frq2\", 88000)";
+ //BA.debugLineNum = 1118;BA.debugLine="Frq(2) = INI.ReadInt(\"Last\", \"Frq2\", 88000)";
 _frq[(int) (2)] = mostCurrent._ini._v0(processBA,"Last","Frq2",(int) (88000));
- //BA.debugLineNum = 1116;BA.debugLine="Frq(3) = INI.ReadInt(\"Last\", \"Frq3\", 88000)";
+ //BA.debugLineNum = 1119;BA.debugLine="Frq(3) = INI.ReadInt(\"Last\", \"Frq3\", 88000)";
 _frq[(int) (3)] = mostCurrent._ini._v0(processBA,"Last","Frq3",(int) (88000));
- //BA.debugLineNum = 1117;BA.debugLine="Frq(4) = INI.ReadInt(\"Last\", \"Frq4\", 88000)";
+ //BA.debugLineNum = 1120;BA.debugLine="Frq(4) = INI.ReadInt(\"Last\", \"Frq4\", 88000)";
 _frq[(int) (4)] = mostCurrent._ini._v0(processBA,"Last","Frq4",(int) (88000));
- //BA.debugLineNum = 1118;BA.debugLine="Frq(5) = INI.ReadInt(\"Last\", \"Frq5\", 88000)";
+ //BA.debugLineNum = 1121;BA.debugLine="Frq(5) = INI.ReadInt(\"Last\", \"Frq5\", 88000)";
 _frq[(int) (5)] = mostCurrent._ini._v0(processBA,"Last","Frq5",(int) (88000));
- //BA.debugLineNum = 1119;BA.debugLine="Frq(6) = INI.ReadInt(\"Last\", \"Frq6\", 88000)";
+ //BA.debugLineNum = 1122;BA.debugLine="Frq(6) = INI.ReadInt(\"Last\", \"Frq6\", 88000)";
 _frq[(int) (6)] = mostCurrent._ini._v0(processBA,"Last","Frq6",(int) (88000));
- //BA.debugLineNum = 1120;BA.debugLine="Frq(7) = INI.ReadInt(\"Last\", \"Frq7\", 88000)";
+ //BA.debugLineNum = 1123;BA.debugLine="Frq(7) = INI.ReadInt(\"Last\", \"Frq7\", 88000)";
 _frq[(int) (7)] = mostCurrent._ini._v0(processBA,"Last","Frq7",(int) (88000));
- //BA.debugLineNum = 1121;BA.debugLine="Frq(8) = INI.ReadInt(\"Last\", \"Frq8\", 88000)";
+ //BA.debugLineNum = 1124;BA.debugLine="Frq(8) = INI.ReadInt(\"Last\", \"Frq8\", 88000)";
 _frq[(int) (8)] = mostCurrent._ini._v0(processBA,"Last","Frq8",(int) (88000));
- //BA.debugLineNum = 1122;BA.debugLine="Frq(9) = INI.ReadInt(\"Last\", \"Frq9\", 88000)";
+ //BA.debugLineNum = 1125;BA.debugLine="Frq(9) = INI.ReadInt(\"Last\", \"Frq9\", 88000)";
 _frq[(int) (9)] = mostCurrent._ini._v0(processBA,"Last","Frq9",(int) (88000));
- //BA.debugLineNum = 1123;BA.debugLine="Frq(10) = INI.ReadInt(\"Last\", \"Frq10\", 88000)";
+ //BA.debugLineNum = 1126;BA.debugLine="Frq(10) = INI.ReadInt(\"Last\", \"Frq10\", 88000)";
 _frq[(int) (10)] = mostCurrent._ini._v0(processBA,"Last","Frq10",(int) (88000));
- //BA.debugLineNum = 1124;BA.debugLine="Frq(11) = INI.ReadInt(\"Last\", \"Frq11\", 88000)";
+ //BA.debugLineNum = 1127;BA.debugLine="Frq(11) = INI.ReadInt(\"Last\", \"Frq11\", 88000)";
 _frq[(int) (11)] = mostCurrent._ini._v0(processBA,"Last","Frq11",(int) (88000));
- //BA.debugLineNum = 1125;BA.debugLine="Frq(12) = INI.ReadInt(\"Last\", \"Frq12\", 88000)";
+ //BA.debugLineNum = 1128;BA.debugLine="Frq(12) = INI.ReadInt(\"Last\", \"Frq12\", 88000)";
 _frq[(int) (12)] = mostCurrent._ini._v0(processBA,"Last","Frq12",(int) (88000));
- //BA.debugLineNum = 1126;BA.debugLine="Frq(13) = INI.ReadInt(\"Last\", \"Frq13\", 88000)";
+ //BA.debugLineNum = 1129;BA.debugLine="Frq(13) = INI.ReadInt(\"Last\", \"Frq13\", 88000)";
 _frq[(int) (13)] = mostCurrent._ini._v0(processBA,"Last","Frq13",(int) (88000));
- //BA.debugLineNum = 1127;BA.debugLine="Frq(14) = INI.ReadInt(\"Last\", \"Frq14\", 88000)";
+ //BA.debugLineNum = 1130;BA.debugLine="Frq(14) = INI.ReadInt(\"Last\", \"Frq14\", 88000)";
 _frq[(int) (14)] = mostCurrent._ini._v0(processBA,"Last","Frq14",(int) (88000));
- //BA.debugLineNum = 1128;BA.debugLine="Frq(15) = INI.ReadInt(\"Last\", \"Frq15\", 88000)";
+ //BA.debugLineNum = 1131;BA.debugLine="Frq(15) = INI.ReadInt(\"Last\", \"Frq15\", 88000)";
 _frq[(int) (15)] = mostCurrent._ini._v0(processBA,"Last","Frq15",(int) (88000));
- //BA.debugLineNum = 1129;BA.debugLine="Frq(16) = INI.ReadInt(\"Last\", \"Frq16\", 88000)";
+ //BA.debugLineNum = 1132;BA.debugLine="Frq(16) = INI.ReadInt(\"Last\", \"Frq16\", 88000)";
 _frq[(int) (16)] = mostCurrent._ini._v0(processBA,"Last","Frq16",(int) (88000));
- //BA.debugLineNum = 1130;BA.debugLine="Frq(17) = INI.ReadInt(\"Last\", \"Frq17\", 88000)";
+ //BA.debugLineNum = 1133;BA.debugLine="Frq(17) = INI.ReadInt(\"Last\", \"Frq17\", 88000)";
 _frq[(int) (17)] = mostCurrent._ini._v0(processBA,"Last","Frq17",(int) (88000));
- //BA.debugLineNum = 1131;BA.debugLine="Frq(18) = INI.ReadInt(\"Last\", \"Frq18\", 88000)";
+ //BA.debugLineNum = 1134;BA.debugLine="Frq(18) = INI.ReadInt(\"Last\", \"Frq18\", 88000)";
 _frq[(int) (18)] = mostCurrent._ini._v0(processBA,"Last","Frq18",(int) (88000));
- //BA.debugLineNum = 1132;BA.debugLine="Frq(19) = INI.ReadInt(\"Last\", \"Frq19\", 88000)";
+ //BA.debugLineNum = 1135;BA.debugLine="Frq(19) = INI.ReadInt(\"Last\", \"Frq19\", 88000)";
 _frq[(int) (19)] = mostCurrent._ini._v0(processBA,"Last","Frq19",(int) (88000));
- //BA.debugLineNum = 1133;BA.debugLine="Frq(20) = INI.ReadInt(\"Last\", \"Frq20\", 88000)";
+ //BA.debugLineNum = 1136;BA.debugLine="Frq(20) = INI.ReadInt(\"Last\", \"Frq20\", 88000)";
 _frq[(int) (20)] = mostCurrent._ini._v0(processBA,"Last","Frq20",(int) (88000));
- //BA.debugLineNum = 1134;BA.debugLine="DFrq(0) = INI.ReadInt(\"Last\", \"DAB0\", 0)";
+ //BA.debugLineNum = 1137;BA.debugLine="DFrq(0) = INI.ReadInt(\"Last\", \"DAB0\", 0)";
 _dfrq[(int) (0)] = mostCurrent._ini._v0(processBA,"Last","DAB0",(int) (0));
- //BA.debugLineNum = 1135;BA.debugLine="DFrq(1) = INI.ReadInt(\"Last\", \"DAB1\", 0)";
+ //BA.debugLineNum = 1138;BA.debugLine="DFrq(1) = INI.ReadInt(\"Last\", \"DAB1\", 0)";
 _dfrq[(int) (1)] = mostCurrent._ini._v0(processBA,"Last","DAB1",(int) (0));
- //BA.debugLineNum = 1136;BA.debugLine="DFrq(2) = INI.ReadInt(\"Last\", \"DAB2\", 0)";
+ //BA.debugLineNum = 1139;BA.debugLine="DFrq(2) = INI.ReadInt(\"Last\", \"DAB2\", 0)";
 _dfrq[(int) (2)] = mostCurrent._ini._v0(processBA,"Last","DAB2",(int) (0));
- //BA.debugLineNum = 1137;BA.debugLine="DFrq(3) = INI.ReadInt(\"Last\", \"DAB3\", 0)";
+ //BA.debugLineNum = 1140;BA.debugLine="DFrq(3) = INI.ReadInt(\"Last\", \"DAB3\", 0)";
 _dfrq[(int) (3)] = mostCurrent._ini._v0(processBA,"Last","DAB3",(int) (0));
- //BA.debugLineNum = 1138;BA.debugLine="DFrq(4) = INI.ReadInt(\"Last\", \"DAB4\", 0)";
+ //BA.debugLineNum = 1141;BA.debugLine="DFrq(4) = INI.ReadInt(\"Last\", \"DAB4\", 0)";
 _dfrq[(int) (4)] = mostCurrent._ini._v0(processBA,"Last","DAB4",(int) (0));
- //BA.debugLineNum = 1139;BA.debugLine="DFrq(5) = INI.ReadInt(\"Last\", \"DAB5\", 0)";
+ //BA.debugLineNum = 1142;BA.debugLine="DFrq(5) = INI.ReadInt(\"Last\", \"DAB5\", 0)";
 _dfrq[(int) (5)] = mostCurrent._ini._v0(processBA,"Last","DAB5",(int) (0));
- //BA.debugLineNum = 1140;BA.debugLine="DFrq(6) = INI.ReadInt(\"Last\", \"DAB6\", 0)";
+ //BA.debugLineNum = 1143;BA.debugLine="DFrq(6) = INI.ReadInt(\"Last\", \"DAB6\", 0)";
 _dfrq[(int) (6)] = mostCurrent._ini._v0(processBA,"Last","DAB6",(int) (0));
- //BA.debugLineNum = 1141;BA.debugLine="DFrq(7) = INI.ReadInt(\"Last\", \"DAB7\", 0)";
+ //BA.debugLineNum = 1144;BA.debugLine="DFrq(7) = INI.ReadInt(\"Last\", \"DAB7\", 0)";
 _dfrq[(int) (7)] = mostCurrent._ini._v0(processBA,"Last","DAB7",(int) (0));
- //BA.debugLineNum = 1142;BA.debugLine="DFrq(8) = INI.ReadInt(\"Last\", \"DAB8\", 0)";
+ //BA.debugLineNum = 1145;BA.debugLine="DFrq(8) = INI.ReadInt(\"Last\", \"DAB8\", 0)";
 _dfrq[(int) (8)] = mostCurrent._ini._v0(processBA,"Last","DAB8",(int) (0));
- //BA.debugLineNum = 1143;BA.debugLine="DFrq(9) = INI.ReadInt(\"Last\", \"DAB9\", 0)";
+ //BA.debugLineNum = 1146;BA.debugLine="DFrq(9) = INI.ReadInt(\"Last\", \"DAB9\", 0)";
 _dfrq[(int) (9)] = mostCurrent._ini._v0(processBA,"Last","DAB9",(int) (0));
- //BA.debugLineNum = 1144;BA.debugLine="DFrq(10) = INI.ReadInt(\"Last\", \"DAB10\", 0)";
+ //BA.debugLineNum = 1147;BA.debugLine="DFrq(10) = INI.ReadInt(\"Last\", \"DAB10\", 0)";
 _dfrq[(int) (10)] = mostCurrent._ini._v0(processBA,"Last","DAB10",(int) (0));
- //BA.debugLineNum = 1145;BA.debugLine="DFrq(11) = INI.ReadInt(\"Last\", \"DAB11\", 0)";
+ //BA.debugLineNum = 1148;BA.debugLine="DFrq(11) = INI.ReadInt(\"Last\", \"DAB11\", 0)";
 _dfrq[(int) (11)] = mostCurrent._ini._v0(processBA,"Last","DAB11",(int) (0));
- //BA.debugLineNum = 1146;BA.debugLine="DFrq(12) = INI.ReadInt(\"Last\", \"DAB12\", 0)";
+ //BA.debugLineNum = 1149;BA.debugLine="DFrq(12) = INI.ReadInt(\"Last\", \"DAB12\", 0)";
 _dfrq[(int) (12)] = mostCurrent._ini._v0(processBA,"Last","DAB12",(int) (0));
- //BA.debugLineNum = 1147;BA.debugLine="DFrq(13) = INI.ReadInt(\"Last\", \"DAB13\", 0)";
+ //BA.debugLineNum = 1150;BA.debugLine="DFrq(13) = INI.ReadInt(\"Last\", \"DAB13\", 0)";
 _dfrq[(int) (13)] = mostCurrent._ini._v0(processBA,"Last","DAB13",(int) (0));
- //BA.debugLineNum = 1148;BA.debugLine="DFrq(14) = INI.ReadInt(\"Last\", \"DAB14\", 0)";
+ //BA.debugLineNum = 1151;BA.debugLine="DFrq(14) = INI.ReadInt(\"Last\", \"DAB14\", 0)";
 _dfrq[(int) (14)] = mostCurrent._ini._v0(processBA,"Last","DAB14",(int) (0));
- //BA.debugLineNum = 1149;BA.debugLine="DFrq(15) = INI.ReadInt(\"Last\", \"DAB15\", 0)";
+ //BA.debugLineNum = 1152;BA.debugLine="DFrq(15) = INI.ReadInt(\"Last\", \"DAB15\", 0)";
 _dfrq[(int) (15)] = mostCurrent._ini._v0(processBA,"Last","DAB15",(int) (0));
- //BA.debugLineNum = 1150;BA.debugLine="DFrq(16) = INI.ReadInt(\"Last\", \"DAB16\", 0)";
+ //BA.debugLineNum = 1153;BA.debugLine="DFrq(16) = INI.ReadInt(\"Last\", \"DAB16\", 0)";
 _dfrq[(int) (16)] = mostCurrent._ini._v0(processBA,"Last","DAB16",(int) (0));
- //BA.debugLineNum = 1151;BA.debugLine="DFrq(17) = INI.ReadInt(\"Last\", \"DAB17\", 0)";
+ //BA.debugLineNum = 1154;BA.debugLine="DFrq(17) = INI.ReadInt(\"Last\", \"DAB17\", 0)";
 _dfrq[(int) (17)] = mostCurrent._ini._v0(processBA,"Last","DAB17",(int) (0));
- //BA.debugLineNum = 1152;BA.debugLine="DFrq(18) = INI.ReadInt(\"Last\", \"DAB18\", 0)";
+ //BA.debugLineNum = 1155;BA.debugLine="DFrq(18) = INI.ReadInt(\"Last\", \"DAB18\", 0)";
 _dfrq[(int) (18)] = mostCurrent._ini._v0(processBA,"Last","DAB18",(int) (0));
- //BA.debugLineNum = 1153;BA.debugLine="DFrq(19) = INI.ReadInt(\"Last\", \"DAB19\", 0)";
+ //BA.debugLineNum = 1156;BA.debugLine="DFrq(19) = INI.ReadInt(\"Last\", \"DAB19\", 0)";
 _dfrq[(int) (19)] = mostCurrent._ini._v0(processBA,"Last","DAB19",(int) (0));
- //BA.debugLineNum = 1154;BA.debugLine="DFrq(20) = INI.ReadInt(\"Last\", \"DAB20\", 0)";
+ //BA.debugLineNum = 1157;BA.debugLine="DFrq(20) = INI.ReadInt(\"Last\", \"DAB20\", 0)";
 _dfrq[(int) (20)] = mostCurrent._ini._v0(processBA,"Last","DAB20",(int) (0));
- //BA.debugLineNum = 1155;BA.debugLine="Frequenz = INI.ReadInt(\"Last\", \"Frequenz\", 88000)";
+ //BA.debugLineNum = 1158;BA.debugLine="Frequenz = INI.ReadInt(\"Last\", \"Frequenz\", 88000)";
 _frequenz = mostCurrent._ini._v0(processBA,"Last","Frequenz",(int) (88000));
- //BA.debugLineNum = 1156;BA.debugLine="Ebene = INI.ReadInt(\"Last\", \"Ebene\", 0)";
+ //BA.debugLineNum = 1159;BA.debugLine="Ebene = INI.ReadInt(\"Last\", \"Ebene\", 0)";
 _ebene = mostCurrent._ini._v0(processBA,"Last","Ebene",(int) (0));
- //BA.debugLineNum = 1158;BA.debugLine="Dim labLevelText As String";
+ //BA.debugLineNum = 1161;BA.debugLine="Dim labLevelText As String";
 _lableveltext = "";
- //BA.debugLineNum = 1159;BA.debugLine="Dim labProgram2Visible, isDABChecked As Boolean";
+ //BA.debugLineNum = 1162;BA.debugLine="Dim labProgram2Visible, isDABChecked As Boolean";
 _labprogram2visible = false;
 _isdabchecked = false;
- //BA.debugLineNum = 1161;BA.debugLine="Dim ArgList As List";
+ //BA.debugLineNum = 1164;BA.debugLine="Dim ArgList As List";
 _arglist = new anywheresoftware.b4a.objects.collections.List();
- //BA.debugLineNum = 1163;BA.debugLine="ArgList.Initialize()";
+ //BA.debugLineNum = 1166;BA.debugLine="ArgList.Initialize()";
 _arglist.Initialize();
- //BA.debugLineNum = 1165;BA.debugLine="labLevelText = \"L \" & Ebene";
+ //BA.debugLineNum = 1168;BA.debugLine="labLevelText = \"L \" & Ebene";
 _lableveltext = "L "+BA.NumberToString(_ebene);
- //BA.debugLineNum = 1166;BA.debugLine="If File.Exists(MyPath & \"/\",\"DAB.dat\") Then";
+ //BA.debugLineNum = 1169;BA.debugLine="If File.Exists(MyPath & \"/\",\"DAB.dat\") Then";
 if (anywheresoftware.b4a.keywords.Common.File.Exists(_mypath+"/","DAB.dat")) { 
- //BA.debugLineNum = 1167;BA.debugLine="Dim DatesFile As RandomAccessFile";
+ //BA.debugLineNum = 1170;BA.debugLine="Dim DatesFile As RandomAccessFile";
 _datesfile = new anywheresoftware.b4a.randomaccessfile.RandomAccessFile();
- //BA.debugLineNum = 1168;BA.debugLine="DatesFile.Initialize(MyPath,\"/DAB.dat\",False)";
+ //BA.debugLineNum = 1171;BA.debugLine="DatesFile.Initialize(MyPath,\"/DAB.dat\",False)";
 _datesfile.Initialize(_mypath,"/DAB.dat",anywheresoftware.b4a.keywords.Common.False);
- //BA.debugLineNum = 1169;BA.debugLine="lstDAB = DatesFile.ReadObject(0)";
+ //BA.debugLineNum = 1172;BA.debugLine="lstDAB = DatesFile.ReadObject(0)";
 _lstdab.setObject((java.util.List)(_datesfile.ReadObject((long) (0))));
- //BA.debugLineNum = 1170;BA.debugLine="DatesFile.Close";
+ //BA.debugLineNum = 1173;BA.debugLine="DatesFile.Close";
 _datesfile.Close();
  };
- //BA.debugLineNum = 1173;BA.debugLine="If (Frequenz < 87500) And DAB Then";
+ //BA.debugLineNum = 1176;BA.debugLine="If (Frequenz < 87500) And DAB Then";
 if ((_frequenz<87500) && _dab) { 
- //BA.debugLineNum = 1174;BA.debugLine="isDAB = True";
+ //BA.debugLineNum = 1177;BA.debugLine="isDAB = True";
 _isdab = anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 1175;BA.debugLine="labProgram2Visible = True";
+ //BA.debugLineNum = 1178;BA.debugLine="labProgram2Visible = True";
 _labprogram2visible = anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 1176;BA.debugLine="isDABChecked = True";
+ //BA.debugLineNum = 1179;BA.debugLine="isDABChecked = True";
 _isdabchecked = anywheresoftware.b4a.keywords.Common.True;
  }else {
- //BA.debugLineNum = 1178;BA.debugLine="If Frequenz < 87500 Then Frequenz = 87500";
+ //BA.debugLineNum = 1181;BA.debugLine="If Frequenz < 87500 Then Frequenz = 87500";
 if (_frequenz<87500) { 
 _frequenz = (int) (87500);};
- //BA.debugLineNum = 1179;BA.debugLine="isDAB = False";
+ //BA.debugLineNum = 1182;BA.debugLine="isDAB = False";
 _isdab = anywheresoftware.b4a.keywords.Common.False;
- //BA.debugLineNum = 1180;BA.debugLine="labProgram2Visible = False";
+ //BA.debugLineNum = 1183;BA.debugLine="labProgram2Visible = False";
 _labprogram2visible = anywheresoftware.b4a.keywords.Common.False;
- //BA.debugLineNum = 1181;BA.debugLine="isDABChecked = False";
+ //BA.debugLineNum = 1184;BA.debugLine="isDABChecked = False";
 _isdabchecked = anywheresoftware.b4a.keywords.Common.False;
  };
- //BA.debugLineNum = 1184;BA.debugLine="ArgList.Add(labLevelText)";
+ //BA.debugLineNum = 1187;BA.debugLine="ArgList.Add(labLevelText)";
 _arglist.Add((Object)(_lableveltext));
- //BA.debugLineNum = 1185;BA.debugLine="ArgList.Add(isDABChecked)";
+ //BA.debugLineNum = 1188;BA.debugLine="ArgList.Add(isDABChecked)";
 _arglist.Add((Object)(_isdabchecked));
- //BA.debugLineNum = 1186;BA.debugLine="ArgList.Add(labProgram2Visible)";
+ //BA.debugLineNum = 1189;BA.debugLine="ArgList.Add(labProgram2Visible)";
 _arglist.Add((Object)(_labprogram2visible));
- //BA.debugLineNum = 1188;BA.debugLine="CallSub2(Main, \"SetTextValuesFromSettings\", ArgLi";
+ //BA.debugLineNum = 1191;BA.debugLine="CallSub2(Main, \"SetTextValuesFromSettings\", ArgLi";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(processBA,(Object)(mostCurrent._main.getObject()),"SetTextValuesFromSettings",(Object)(_arglist));
- //BA.debugLineNum = 1191;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1194;BA.debugLine="End Sub";
 return "";
 }
 public static boolean  _media_onbutton(int _keycode) throws Exception{
- //BA.debugLineNum = 1091;BA.debugLine="Sub Media_OnButton(KeyCode As Int) As Boolean";
- //BA.debugLineNum = 1092;BA.debugLine="Select(KeyCode)";
+ //BA.debugLineNum = 1094;BA.debugLine="Sub Media_OnButton(KeyCode As Int) As Boolean";
+ //BA.debugLineNum = 1095;BA.debugLine="Select(KeyCode)";
 switch (BA.switchObjectToInt((_keycode),(anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_MEDIA_NEXT),(anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_MEDIA_PREVIOUS))) {
 case 0:
- //BA.debugLineNum = 1095;BA.debugLine="RadioChannelUp";
+ //BA.debugLineNum = 1098;BA.debugLine="RadioChannelUp";
 _radiochannelup();
  break;
 case 1:
- //BA.debugLineNum = 1098;BA.debugLine="RadioChannelDown";
+ //BA.debugLineNum = 1101;BA.debugLine="RadioChannelDown";
 _radiochanneldown();
  break;
 }
 ;
- //BA.debugLineNum = 1102;BA.debugLine="Return True";
+ //BA.debugLineNum = 1105;BA.debugLine="Return True";
 if (true) return anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 1103;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1106;BA.debugLine="End Sub";
 return false;
 }
 public static String  _media_oncommand(String _command) throws Exception{
- //BA.debugLineNum = 1087;BA.debugLine="Sub Media_OnCommand(Command As String)";
- //BA.debugLineNum = 1089;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1090;BA.debugLine="Sub Media_OnCommand(Command As String)";
+ //BA.debugLineNum = 1092;BA.debugLine="End Sub";
 return "";
 }
 public static String  _muteaudio() throws Exception{
- //BA.debugLineNum = 715;BA.debugLine="Sub MuteAudio";
- //BA.debugLineNum = 716;BA.debugLine="Log(\"Muting\")";
+ //BA.debugLineNum = 718;BA.debugLine="Sub MuteAudio";
+ //BA.debugLineNum = 719;BA.debugLine="Log(\"Muting\")";
 anywheresoftware.b4a.keywords.Common.Log("Muting");
- //BA.debugLineNum = 717;BA.debugLine="LastVolume = Volume";
+ //BA.debugLineNum = 720;BA.debugLine="LastVolume = Volume";
 _lastvolume = (int) (_volume);
- //BA.debugLineNum = 718;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,";
+ //BA.debugLineNum = 721;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x0c),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0xfd)});
- //BA.debugLineNum = 719;BA.debugLine="End Sub";
+ //BA.debugLineNum = 722;BA.debugLine="End Sub";
 return "";
 }
 public static String  _mytimer_tick() throws Exception{
@@ -1673,36 +1678,36 @@ _enterclickedreturnvalue = false;
 return "";
 }
 public static String  _radiochanneldown() throws Exception{
- //BA.debugLineNum = 866;BA.debugLine="Sub RadioChannelDown";
- //BA.debugLineNum = 867;BA.debugLine="If isDAB And DAB Then";
+ //BA.debugLineNum = 869;BA.debugLine="Sub RadioChannelDown";
+ //BA.debugLineNum = 870;BA.debugLine="If isDAB And DAB Then";
 if (_isdab && _dab) { 
- //BA.debugLineNum = 868;BA.debugLine="If Frequenz > 0 Then";
+ //BA.debugLineNum = 871;BA.debugLine="If Frequenz > 0 Then";
 if (_frequenz>0) { 
- //BA.debugLineNum = 869;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
+ //BA.debugLineNum = 872;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_frequenz-1),(byte) (0xfd)});
- //BA.debugLineNum = 870;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", Frequenz -";
+ //BA.debugLineNum = 873;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", Frequenz -";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(processBA,(Object)(mostCurrent._main.getObject()),"SelectedDABChannel",(Object)(_frequenz-1));
  };
  }else {
- //BA.debugLineNum = 873;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x02,0x01,0x00";
+ //BA.debugLineNum = 876;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x02,0x01,0x00";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x02),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0xfd)});
  };
- //BA.debugLineNum = 875;BA.debugLine="End Sub";
+ //BA.debugLineNum = 878;BA.debugLine="End Sub";
 return "";
 }
 public static String  _radiochannelup() throws Exception{
- //BA.debugLineNum = 857;BA.debugLine="Sub RadioChannelUp";
- //BA.debugLineNum = 858;BA.debugLine="If isDAB And DAB Then";
+ //BA.debugLineNum = 860;BA.debugLine="Sub RadioChannelUp";
+ //BA.debugLineNum = 861;BA.debugLine="If isDAB And DAB Then";
 if (_isdab && _dab) { 
- //BA.debugLineNum = 859;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
+ //BA.debugLineNum = 862;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_frequenz+1),(byte) (0xfd)});
- //BA.debugLineNum = 860;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", Frequenz +";
+ //BA.debugLineNum = 863;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", Frequenz +";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(processBA,(Object)(mostCurrent._main.getObject()),"SelectedDABChannel",(Object)(_frequenz+1));
  }else {
- //BA.debugLineNum = 862;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x02,0x01,0x00";
+ //BA.debugLineNum = 865;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x02,0x01,0x00";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x02),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x01),(byte) (0xfd)});
  };
- //BA.debugLineNum = 864;BA.debugLine="End Sub";
+ //BA.debugLineNum = 867;BA.debugLine="End Sub";
 return "";
 }
 public static String  _rts(boolean _bool) throws Exception{
@@ -1748,110 +1753,110 @@ return "";
 }
 public static String  _savesettings() throws Exception{
 anywheresoftware.b4a.randomaccessfile.RandomAccessFile _datesfile = null;
- //BA.debugLineNum = 1193;BA.debugLine="Sub SaveSettings";
- //BA.debugLineNum = 1194;BA.debugLine="INI.Name(MyPath & \"/config.ini\")";
+ //BA.debugLineNum = 1196;BA.debugLine="Sub SaveSettings";
+ //BA.debugLineNum = 1197;BA.debugLine="INI.Name(MyPath & \"/config.ini\")";
 mostCurrent._ini._v5(processBA,_mypath+"/config.ini");
- //BA.debugLineNum = 1195;BA.debugLine="INI.WriteInt(\"Last\", \"Frequenz\", Frequenz)";
+ //BA.debugLineNum = 1198;BA.debugLine="INI.WriteInt(\"Last\", \"Frequenz\", Frequenz)";
 mostCurrent._ini._vv4(processBA,"Last","Frequenz",_frequenz);
- //BA.debugLineNum = 1196;BA.debugLine="INI.WriteInt(\"Last\", \"Volume\", Volume)";
+ //BA.debugLineNum = 1199;BA.debugLine="INI.WriteInt(\"Last\", \"Volume\", Volume)";
 mostCurrent._ini._vv4(processBA,"Last","Volume",(int) (_volume));
- //BA.debugLineNum = 1197;BA.debugLine="INI.WriteInt(\"Last\", \"Frq0\", Frq(0))";
+ //BA.debugLineNum = 1200;BA.debugLine="INI.WriteInt(\"Last\", \"Frq0\", Frq(0))";
 mostCurrent._ini._vv4(processBA,"Last","Frq0",_frq[(int) (0)]);
- //BA.debugLineNum = 1198;BA.debugLine="INI.WriteInt(\"Last\", \"Frq1\", Frq(1))";
+ //BA.debugLineNum = 1201;BA.debugLine="INI.WriteInt(\"Last\", \"Frq1\", Frq(1))";
 mostCurrent._ini._vv4(processBA,"Last","Frq1",_frq[(int) (1)]);
- //BA.debugLineNum = 1199;BA.debugLine="INI.WriteInt(\"Last\", \"Frq2\", Frq(2))";
+ //BA.debugLineNum = 1202;BA.debugLine="INI.WriteInt(\"Last\", \"Frq2\", Frq(2))";
 mostCurrent._ini._vv4(processBA,"Last","Frq2",_frq[(int) (2)]);
- //BA.debugLineNum = 1200;BA.debugLine="INI.WriteInt(\"Last\", \"Frq3\", Frq(3))";
+ //BA.debugLineNum = 1203;BA.debugLine="INI.WriteInt(\"Last\", \"Frq3\", Frq(3))";
 mostCurrent._ini._vv4(processBA,"Last","Frq3",_frq[(int) (3)]);
- //BA.debugLineNum = 1201;BA.debugLine="INI.WriteInt(\"Last\", \"Frq4\", Frq(4))";
+ //BA.debugLineNum = 1204;BA.debugLine="INI.WriteInt(\"Last\", \"Frq4\", Frq(4))";
 mostCurrent._ini._vv4(processBA,"Last","Frq4",_frq[(int) (4)]);
- //BA.debugLineNum = 1202;BA.debugLine="INI.WriteInt(\"Last\", \"Frq5\", Frq(5))";
+ //BA.debugLineNum = 1205;BA.debugLine="INI.WriteInt(\"Last\", \"Frq5\", Frq(5))";
 mostCurrent._ini._vv4(processBA,"Last","Frq5",_frq[(int) (5)]);
- //BA.debugLineNum = 1203;BA.debugLine="INI.WriteInt(\"Last\", \"Frq6\", Frq(6))";
+ //BA.debugLineNum = 1206;BA.debugLine="INI.WriteInt(\"Last\", \"Frq6\", Frq(6))";
 mostCurrent._ini._vv4(processBA,"Last","Frq6",_frq[(int) (6)]);
- //BA.debugLineNum = 1204;BA.debugLine="INI.WriteInt(\"Last\", \"Frq7\", Frq(7))";
+ //BA.debugLineNum = 1207;BA.debugLine="INI.WriteInt(\"Last\", \"Frq7\", Frq(7))";
 mostCurrent._ini._vv4(processBA,"Last","Frq7",_frq[(int) (7)]);
- //BA.debugLineNum = 1205;BA.debugLine="INI.WriteInt(\"Last\", \"Frq8\", Frq(8))";
+ //BA.debugLineNum = 1208;BA.debugLine="INI.WriteInt(\"Last\", \"Frq8\", Frq(8))";
 mostCurrent._ini._vv4(processBA,"Last","Frq8",_frq[(int) (8)]);
- //BA.debugLineNum = 1206;BA.debugLine="INI.WriteInt(\"Last\", \"Frq9\", Frq(9))";
+ //BA.debugLineNum = 1209;BA.debugLine="INI.WriteInt(\"Last\", \"Frq9\", Frq(9))";
 mostCurrent._ini._vv4(processBA,"Last","Frq9",_frq[(int) (9)]);
- //BA.debugLineNum = 1207;BA.debugLine="INI.WriteInt(\"Last\", \"Frq10\", Frq(10))";
+ //BA.debugLineNum = 1210;BA.debugLine="INI.WriteInt(\"Last\", \"Frq10\", Frq(10))";
 mostCurrent._ini._vv4(processBA,"Last","Frq10",_frq[(int) (10)]);
- //BA.debugLineNum = 1208;BA.debugLine="INI.WriteInt(\"Last\", \"Frq11\", Frq(11))";
+ //BA.debugLineNum = 1211;BA.debugLine="INI.WriteInt(\"Last\", \"Frq11\", Frq(11))";
 mostCurrent._ini._vv4(processBA,"Last","Frq11",_frq[(int) (11)]);
- //BA.debugLineNum = 1209;BA.debugLine="INI.WriteInt(\"Last\", \"Frq12\", Frq(12))";
+ //BA.debugLineNum = 1212;BA.debugLine="INI.WriteInt(\"Last\", \"Frq12\", Frq(12))";
 mostCurrent._ini._vv4(processBA,"Last","Frq12",_frq[(int) (12)]);
- //BA.debugLineNum = 1210;BA.debugLine="INI.WriteInt(\"Last\", \"Frq13\", Frq(13))";
+ //BA.debugLineNum = 1213;BA.debugLine="INI.WriteInt(\"Last\", \"Frq13\", Frq(13))";
 mostCurrent._ini._vv4(processBA,"Last","Frq13",_frq[(int) (13)]);
- //BA.debugLineNum = 1211;BA.debugLine="INI.WriteInt(\"Last\", \"Frq14\", Frq(14))";
+ //BA.debugLineNum = 1214;BA.debugLine="INI.WriteInt(\"Last\", \"Frq14\", Frq(14))";
 mostCurrent._ini._vv4(processBA,"Last","Frq14",_frq[(int) (14)]);
- //BA.debugLineNum = 1212;BA.debugLine="INI.WriteInt(\"Last\", \"Frq15\", Frq(15))";
+ //BA.debugLineNum = 1215;BA.debugLine="INI.WriteInt(\"Last\", \"Frq15\", Frq(15))";
 mostCurrent._ini._vv4(processBA,"Last","Frq15",_frq[(int) (15)]);
- //BA.debugLineNum = 1213;BA.debugLine="INI.WriteInt(\"Last\", \"Frq16\", Frq(16))";
+ //BA.debugLineNum = 1216;BA.debugLine="INI.WriteInt(\"Last\", \"Frq16\", Frq(16))";
 mostCurrent._ini._vv4(processBA,"Last","Frq16",_frq[(int) (16)]);
- //BA.debugLineNum = 1214;BA.debugLine="INI.WriteInt(\"Last\", \"Frq17\", Frq(17))";
+ //BA.debugLineNum = 1217;BA.debugLine="INI.WriteInt(\"Last\", \"Frq17\", Frq(17))";
 mostCurrent._ini._vv4(processBA,"Last","Frq17",_frq[(int) (17)]);
- //BA.debugLineNum = 1215;BA.debugLine="INI.WriteInt(\"Last\", \"Frq18\", Frq(18))";
+ //BA.debugLineNum = 1218;BA.debugLine="INI.WriteInt(\"Last\", \"Frq18\", Frq(18))";
 mostCurrent._ini._vv4(processBA,"Last","Frq18",_frq[(int) (18)]);
- //BA.debugLineNum = 1216;BA.debugLine="INI.WriteInt(\"Last\", \"Frq19\", Frq(19))";
+ //BA.debugLineNum = 1219;BA.debugLine="INI.WriteInt(\"Last\", \"Frq19\", Frq(19))";
 mostCurrent._ini._vv4(processBA,"Last","Frq19",_frq[(int) (19)]);
- //BA.debugLineNum = 1217;BA.debugLine="INI.WriteInt(\"Last\", \"Frq20\", Frq(20))";
+ //BA.debugLineNum = 1220;BA.debugLine="INI.WriteInt(\"Last\", \"Frq20\", Frq(20))";
 mostCurrent._ini._vv4(processBA,"Last","Frq20",_frq[(int) (20)]);
- //BA.debugLineNum = 1218;BA.debugLine="INI.WriteInt(\"Last\", \"DAB0\", DFrq(0))";
+ //BA.debugLineNum = 1221;BA.debugLine="INI.WriteInt(\"Last\", \"DAB0\", DFrq(0))";
 mostCurrent._ini._vv4(processBA,"Last","DAB0",_dfrq[(int) (0)]);
- //BA.debugLineNum = 1219;BA.debugLine="INI.WriteInt(\"Last\", \"DAB1\", DFrq(1))";
+ //BA.debugLineNum = 1222;BA.debugLine="INI.WriteInt(\"Last\", \"DAB1\", DFrq(1))";
 mostCurrent._ini._vv4(processBA,"Last","DAB1",_dfrq[(int) (1)]);
- //BA.debugLineNum = 1220;BA.debugLine="INI.WriteInt(\"Last\", \"DAB2\", DFrq(2))";
+ //BA.debugLineNum = 1223;BA.debugLine="INI.WriteInt(\"Last\", \"DAB2\", DFrq(2))";
 mostCurrent._ini._vv4(processBA,"Last","DAB2",_dfrq[(int) (2)]);
- //BA.debugLineNum = 1221;BA.debugLine="INI.WriteInt(\"Last\", \"DAB3\", DFrq(3))";
+ //BA.debugLineNum = 1224;BA.debugLine="INI.WriteInt(\"Last\", \"DAB3\", DFrq(3))";
 mostCurrent._ini._vv4(processBA,"Last","DAB3",_dfrq[(int) (3)]);
- //BA.debugLineNum = 1222;BA.debugLine="INI.WriteInt(\"Last\", \"DAB4\", DFrq(4))";
+ //BA.debugLineNum = 1225;BA.debugLine="INI.WriteInt(\"Last\", \"DAB4\", DFrq(4))";
 mostCurrent._ini._vv4(processBA,"Last","DAB4",_dfrq[(int) (4)]);
- //BA.debugLineNum = 1223;BA.debugLine="INI.WriteInt(\"Last\", \"DAB5\", DFrq(5))";
+ //BA.debugLineNum = 1226;BA.debugLine="INI.WriteInt(\"Last\", \"DAB5\", DFrq(5))";
 mostCurrent._ini._vv4(processBA,"Last","DAB5",_dfrq[(int) (5)]);
- //BA.debugLineNum = 1224;BA.debugLine="INI.WriteInt(\"Last\", \"DAB6\", DFrq(6))";
+ //BA.debugLineNum = 1227;BA.debugLine="INI.WriteInt(\"Last\", \"DAB6\", DFrq(6))";
 mostCurrent._ini._vv4(processBA,"Last","DAB6",_dfrq[(int) (6)]);
- //BA.debugLineNum = 1225;BA.debugLine="INI.WriteInt(\"Last\", \"DAB7\", DFrq(7))";
+ //BA.debugLineNum = 1228;BA.debugLine="INI.WriteInt(\"Last\", \"DAB7\", DFrq(7))";
 mostCurrent._ini._vv4(processBA,"Last","DAB7",_dfrq[(int) (7)]);
- //BA.debugLineNum = 1226;BA.debugLine="INI.WriteInt(\"Last\", \"DAB8\", DFrq(8))";
+ //BA.debugLineNum = 1229;BA.debugLine="INI.WriteInt(\"Last\", \"DAB8\", DFrq(8))";
 mostCurrent._ini._vv4(processBA,"Last","DAB8",_dfrq[(int) (8)]);
- //BA.debugLineNum = 1227;BA.debugLine="INI.WriteInt(\"Last\", \"DAB9\", DFrq(9))";
+ //BA.debugLineNum = 1230;BA.debugLine="INI.WriteInt(\"Last\", \"DAB9\", DFrq(9))";
 mostCurrent._ini._vv4(processBA,"Last","DAB9",_dfrq[(int) (9)]);
- //BA.debugLineNum = 1228;BA.debugLine="INI.WriteInt(\"Last\", \"DAB10\", DFrq(10))";
+ //BA.debugLineNum = 1231;BA.debugLine="INI.WriteInt(\"Last\", \"DAB10\", DFrq(10))";
 mostCurrent._ini._vv4(processBA,"Last","DAB10",_dfrq[(int) (10)]);
- //BA.debugLineNum = 1229;BA.debugLine="INI.WriteInt(\"Last\", \"DAB11\", DFrq(11))";
+ //BA.debugLineNum = 1232;BA.debugLine="INI.WriteInt(\"Last\", \"DAB11\", DFrq(11))";
 mostCurrent._ini._vv4(processBA,"Last","DAB11",_dfrq[(int) (11)]);
- //BA.debugLineNum = 1230;BA.debugLine="INI.WriteInt(\"Last\", \"DAB12\", DFrq(12))";
+ //BA.debugLineNum = 1233;BA.debugLine="INI.WriteInt(\"Last\", \"DAB12\", DFrq(12))";
 mostCurrent._ini._vv4(processBA,"Last","DAB12",_dfrq[(int) (12)]);
- //BA.debugLineNum = 1231;BA.debugLine="INI.WriteInt(\"Last\", \"DAB13\", DFrq(13))";
+ //BA.debugLineNum = 1234;BA.debugLine="INI.WriteInt(\"Last\", \"DAB13\", DFrq(13))";
 mostCurrent._ini._vv4(processBA,"Last","DAB13",_dfrq[(int) (13)]);
- //BA.debugLineNum = 1232;BA.debugLine="INI.WriteInt(\"Last\", \"DAB14\", DFrq(14))";
+ //BA.debugLineNum = 1235;BA.debugLine="INI.WriteInt(\"Last\", \"DAB14\", DFrq(14))";
 mostCurrent._ini._vv4(processBA,"Last","DAB14",_dfrq[(int) (14)]);
- //BA.debugLineNum = 1233;BA.debugLine="INI.WriteInt(\"Last\", \"DAB15\", DFrq(15))";
+ //BA.debugLineNum = 1236;BA.debugLine="INI.WriteInt(\"Last\", \"DAB15\", DFrq(15))";
 mostCurrent._ini._vv4(processBA,"Last","DAB15",_dfrq[(int) (15)]);
- //BA.debugLineNum = 1234;BA.debugLine="INI.WriteInt(\"Last\", \"DAB16\", DFrq(16))";
+ //BA.debugLineNum = 1237;BA.debugLine="INI.WriteInt(\"Last\", \"DAB16\", DFrq(16))";
 mostCurrent._ini._vv4(processBA,"Last","DAB16",_dfrq[(int) (16)]);
- //BA.debugLineNum = 1235;BA.debugLine="INI.WriteInt(\"Last\", \"DAB17\", DFrq(17))";
+ //BA.debugLineNum = 1238;BA.debugLine="INI.WriteInt(\"Last\", \"DAB17\", DFrq(17))";
 mostCurrent._ini._vv4(processBA,"Last","DAB17",_dfrq[(int) (17)]);
- //BA.debugLineNum = 1236;BA.debugLine="INI.WriteInt(\"Last\", \"DAB18\", DFrq(18))";
+ //BA.debugLineNum = 1239;BA.debugLine="INI.WriteInt(\"Last\", \"DAB18\", DFrq(18))";
 mostCurrent._ini._vv4(processBA,"Last","DAB18",_dfrq[(int) (18)]);
- //BA.debugLineNum = 1237;BA.debugLine="INI.WriteInt(\"Last\", \"DAB19\", DFrq(19))";
+ //BA.debugLineNum = 1240;BA.debugLine="INI.WriteInt(\"Last\", \"DAB19\", DFrq(19))";
 mostCurrent._ini._vv4(processBA,"Last","DAB19",_dfrq[(int) (19)]);
- //BA.debugLineNum = 1238;BA.debugLine="INI.WriteInt(\"Last\", \"DAB20\", DFrq(20))";
+ //BA.debugLineNum = 1241;BA.debugLine="INI.WriteInt(\"Last\", \"DAB20\", DFrq(20))";
 mostCurrent._ini._vv4(processBA,"Last","DAB20",_dfrq[(int) (20)]);
- //BA.debugLineNum = 1239;BA.debugLine="INI.WriteInt(\"Last\", \"Ebene\", Ebene)";
+ //BA.debugLineNum = 1242;BA.debugLine="INI.WriteInt(\"Last\", \"Ebene\", Ebene)";
 mostCurrent._ini._vv4(processBA,"Last","Ebene",_ebene);
- //BA.debugLineNum = 1240;BA.debugLine="INI.Store";
+ //BA.debugLineNum = 1243;BA.debugLine="INI.Store";
 mostCurrent._ini._vv2(processBA);
- //BA.debugLineNum = 1241;BA.debugLine="Dim DatesFile As RandomAccessFile";
+ //BA.debugLineNum = 1244;BA.debugLine="Dim DatesFile As RandomAccessFile";
 _datesfile = new anywheresoftware.b4a.randomaccessfile.RandomAccessFile();
- //BA.debugLineNum = 1242;BA.debugLine="DatesFile.Initialize(MyPath,\"/DAB.dat\",False)";
+ //BA.debugLineNum = 1245;BA.debugLine="DatesFile.Initialize(MyPath,\"/DAB.dat\",False)";
 _datesfile.Initialize(_mypath,"/DAB.dat",anywheresoftware.b4a.keywords.Common.False);
- //BA.debugLineNum = 1243;BA.debugLine="DatesFile.WriteObject(lstDAB,True,0)";
+ //BA.debugLineNum = 1246;BA.debugLine="DatesFile.WriteObject(lstDAB,True,0)";
 _datesfile.WriteObject((Object)(_lstdab.getObject()),anywheresoftware.b4a.keywords.Common.True,(long) (0));
- //BA.debugLineNum = 1244;BA.debugLine="DatesFile.Close";
+ //BA.debugLineNum = 1247;BA.debugLine="DatesFile.Close";
 _datesfile.Close();
- //BA.debugLineNum = 1245;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1248;BA.debugLine="End Sub";
 return "";
 }
 public static String  _selectchannel(int _channelnum) throws Exception{
@@ -1860,61 +1865,61 @@ String _d2 = "";
 String _d3 = "";
 String _d = "";
 int _i = 0;
- //BA.debugLineNum = 806;BA.debugLine="Sub SelectChannel(ChannelNum As Int)";
- //BA.debugLineNum = 807;BA.debugLine="Dim d1,d2,d3,D As String";
+ //BA.debugLineNum = 809;BA.debugLine="Sub SelectChannel(ChannelNum As Int)";
+ //BA.debugLineNum = 810;BA.debugLine="Dim d1,d2,d3,D As String";
 _d1 = "";
 _d2 = "";
 _d3 = "";
 _d = "";
- //BA.debugLineNum = 808;BA.debugLine="Dim I As Int";
+ //BA.debugLineNum = 811;BA.debugLine="Dim I As Int";
 _i = 0;
- //BA.debugLineNum = 810;BA.debugLine="Select Ebene";
+ //BA.debugLineNum = 813;BA.debugLine="Select Ebene";
 switch (_ebene) {
 case 0:
- //BA.debugLineNum = 812;BA.debugLine="I = 1";
+ //BA.debugLineNum = 815;BA.debugLine="I = 1";
 _i = (int) (1);
  break;
 case 1:
- //BA.debugLineNum = 814;BA.debugLine="I = 8";
+ //BA.debugLineNum = 817;BA.debugLine="I = 8";
 _i = (int) (8);
  break;
 case 2:
- //BA.debugLineNum = 816;BA.debugLine="I = 15";
+ //BA.debugLineNum = 819;BA.debugLine="I = 15";
 _i = (int) (15);
  break;
 }
 ;
- //BA.debugLineNum = 819;BA.debugLine="I = I+ChannelNum-1";
+ //BA.debugLineNum = 822;BA.debugLine="I = I+ChannelNum-1";
 _i = (int) (_i+_channelnum-1);
- //BA.debugLineNum = 820;BA.debugLine="If isDAB And DAB Then";
+ //BA.debugLineNum = 823;BA.debugLine="If isDAB And DAB Then";
 if (_isdab && _dab) { 
- //BA.debugLineNum = 821;BA.debugLine="If Not(DABSearch) Then";
+ //BA.debugLineNum = 824;BA.debugLine="If Not(DABSearch) Then";
 if (anywheresoftware.b4a.keywords.Common.Not(_dabsearch)) { 
- //BA.debugLineNum = 822;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
+ //BA.debugLineNum = 825;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_dfrq[_i]),(byte) (0xfd)});
- //BA.debugLineNum = 823;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", DFrq(I))";
+ //BA.debugLineNum = 826;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", DFrq(I))";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(processBA,(Object)(mostCurrent._main.getObject()),"SelectedDABChannel",(Object)(_dfrq[_i]));
  };
  }else {
- //BA.debugLineNum = 827;BA.debugLine="D =  Bit.ToHexString(Frq(I))";
+ //BA.debugLineNum = 830;BA.debugLine="D =  Bit.ToHexString(Frq(I))";
 _d = anywheresoftware.b4a.keywords.Common.Bit.ToHexString(_frq[_i]);
- //BA.debugLineNum = 828;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
+ //BA.debugLineNum = 831;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
 _d1 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (0),(int) (1)),(int) (16)));
- //BA.debugLineNum = 829;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
+ //BA.debugLineNum = 832;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
 _d2 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (1),(int) (3)),(int) (16)));
- //BA.debugLineNum = 830;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
+ //BA.debugLineNum = 833;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
 _d3 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (3),(int) (5)),(int) (16)));
- //BA.debugLineNum = 831;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
+ //BA.debugLineNum = 834;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x01),(byte) (0x00),(byte)(Double.parseDouble(_d1)),(byte)(Double.parseDouble(_d2)),(byte)(Double.parseDouble(_d3)),(byte) (0xfd)});
  };
- //BA.debugLineNum = 833;BA.debugLine="End Sub";
+ //BA.debugLineNum = 836;BA.debugLine="End Sub";
 return "";
 }
 public static String  _selectdabitem(int _position) throws Exception{
- //BA.debugLineNum = 933;BA.debugLine="Sub SelectDABItem (Position As Int)";
- //BA.debugLineNum = 934;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00,";
+ //BA.debugLineNum = 936;BA.debugLine="Sub SelectDABItem (Position As Int)";
+ //BA.debugLineNum = 937;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00,";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_position),(byte) (0xfd)});
- //BA.debugLineNum = 935;BA.debugLine="End Sub";
+ //BA.debugLineNum = 938;BA.debugLine="End Sub";
 return "";
 }
 public static String  _sendradio(byte[] _buffer) throws Exception{
@@ -1926,224 +1931,224 @@ _astreams.Write(_buffer);};
 return "";
 }
 public static String  _service_create() throws Exception{
- //BA.debugLineNum = 1004;BA.debugLine="Sub Service_Create";
- //BA.debugLineNum = 1005;BA.debugLine="RadioNotification.Initialize";
+ //BA.debugLineNum = 1007;BA.debugLine="Sub Service_Create";
+ //BA.debugLineNum = 1008;BA.debugLine="RadioNotification.Initialize";
 _radionotification.Initialize(processBA);
- //BA.debugLineNum = 1006;BA.debugLine="Broadcast.Initialize(\"BroadcastReceiver\")";
+ //BA.debugLineNum = 1009;BA.debugLine="Broadcast.Initialize(\"BroadcastReceiver\")";
 _broadcast.Initialize(processBA,"BroadcastReceiver");
- //BA.debugLineNum = 1008;BA.debugLine="Broadcast.addAction(\"com.freshollie.radioapp.inte";
+ //BA.debugLineNum = 1011;BA.debugLine="Broadcast.addAction(\"com.freshollie.radioapp.inte";
 _broadcast.addAction("com.freshollie.radioapp.intent.close");
- //BA.debugLineNum = 1009;BA.debugLine="Broadcast.addAction(\"com.freshollie.radioapp.inte";
+ //BA.debugLineNum = 1012;BA.debugLine="Broadcast.addAction(\"com.freshollie.radioapp.inte";
 _broadcast.addAction("com.freshollie.radioapp.intent.mute");
- //BA.debugLineNum = 1010;BA.debugLine="Broadcast.addAction(\"com.freshollie.radioapp.inte";
+ //BA.debugLineNum = 1013;BA.debugLine="Broadcast.addAction(\"com.freshollie.radioapp.inte";
 _broadcast.addAction("com.freshollie.radioapp.intent.unmute");
- //BA.debugLineNum = 1011;BA.debugLine="Broadcast.registerReceiver(\"\")";
+ //BA.debugLineNum = 1014;BA.debugLine="Broadcast.registerReceiver(\"\")";
 _broadcast.registerReceiver("");
- //BA.debugLineNum = 1012;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1015;BA.debugLine="End Sub";
 return "";
 }
 public static String  _service_destroy() throws Exception{
- //BA.debugLineNum = 1063;BA.debugLine="Sub Service_Destroy";
- //BA.debugLineNum = 1064;BA.debugLine="Service.StopForeground(1)";
+ //BA.debugLineNum = 1066;BA.debugLine="Sub Service_Destroy";
+ //BA.debugLineNum = 1067;BA.debugLine="Service.StopForeground(1)";
 mostCurrent._service.StopForeground((int) (1));
- //BA.debugLineNum = 1065;BA.debugLine="Broadcast.unregisterReceiver";
+ //BA.debugLineNum = 1068;BA.debugLine="Broadcast.unregisterReceiver";
 _broadcast.unregisterReceiver();
- //BA.debugLineNum = 1066;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1069;BA.debugLine="End Sub";
 return "";
 }
 public static String  _service_start(anywheresoftware.b4a.objects.IntentWrapper _startingintent) throws Exception{
 String _intentextra = "";
- //BA.debugLineNum = 1030;BA.debugLine="Sub Service_Start (StartingIntent As Intent)";
- //BA.debugLineNum = 1031;BA.debugLine="Dim intentExtra As String";
+ //BA.debugLineNum = 1033;BA.debugLine="Sub Service_Start (StartingIntent As Intent)";
+ //BA.debugLineNum = 1034;BA.debugLine="Dim intentExtra As String";
 _intentextra = "";
- //BA.debugLineNum = 1033;BA.debugLine="If MuteResponse = \"0\" And Connected = True Then";
+ //BA.debugLineNum = 1036;BA.debugLine="If MuteResponse = \"0\" And Connected = True Then";
 if ((_muteresponse).equals("0") && _connected==anywheresoftware.b4a.keywords.Common.True) { 
- //BA.debugLineNum = 1034;BA.debugLine="RunCloseProcesses";
+ //BA.debugLineNum = 1037;BA.debugLine="RunCloseProcesses";
 _runcloseprocesses();
  };
- //BA.debugLineNum = 1037;BA.debugLine="If StartingIntent.HasExtra(\"Notification_Action_T";
+ //BA.debugLineNum = 1040;BA.debugLine="If StartingIntent.HasExtra(\"Notification_Action_T";
 if (_startingintent.HasExtra("Notification_Action_Tag")) { 
- //BA.debugLineNum = 1038;BA.debugLine="intentExtra = StartingIntent.GetExtra(\"Notificat";
+ //BA.debugLineNum = 1041;BA.debugLine="intentExtra = StartingIntent.GetExtra(\"Notificat";
 _intentextra = BA.ObjectToString(_startingintent.GetExtra("Notification_Action_Tag"));
- //BA.debugLineNum = 1039;BA.debugLine="Log(\"Notification intent to \" & intentExtra)";
+ //BA.debugLineNum = 1042;BA.debugLine="Log(\"Notification intent to \" & intentExtra)";
 anywheresoftware.b4a.keywords.Common.Log("Notification intent to "+_intentextra);
- //BA.debugLineNum = 1040;BA.debugLine="If intentExtra = \"Stop\" Then";
+ //BA.debugLineNum = 1043;BA.debugLine="If intentExtra = \"Stop\" Then";
 if ((_intentextra).equals("Stop")) { 
- //BA.debugLineNum = 1041;BA.debugLine="ExitApp";
+ //BA.debugLineNum = 1044;BA.debugLine="ExitApp";
 _exitapp();
  }else if((_intentextra).equals("Previous Channel")) { 
- //BA.debugLineNum = 1043;BA.debugLine="RadioChannelDown";
+ //BA.debugLineNum = 1046;BA.debugLine="RadioChannelDown";
 _radiochanneldown();
  }else if((_intentextra).equals("Next Channel")) { 
- //BA.debugLineNum = 1045;BA.debugLine="RadioChannelUp";
+ //BA.debugLineNum = 1048;BA.debugLine="RadioChannelUp";
 _radiochannelup();
  };
  }else if(_connected==anywheresoftware.b4a.keywords.Common.False) { 
- //BA.debugLineNum = 1049;BA.debugLine="ServiceStarted = True";
+ //BA.debugLineNum = 1052;BA.debugLine="ServiceStarted = True";
 _servicestarted = anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 1051;BA.debugLine="If Not(File.Exists(MyPath, \"\")) Then File.MakeDi";
+ //BA.debugLineNum = 1054;BA.debugLine="If Not(File.Exists(MyPath, \"\")) Then File.MakeDi";
 if (anywheresoftware.b4a.keywords.Common.Not(anywheresoftware.b4a.keywords.Common.File.Exists(_mypath,""))) { 
 anywheresoftware.b4a.keywords.Common.File.MakeDir(anywheresoftware.b4a.keywords.Common.File.getDirRootExternal(),"dabmonkey");};
- //BA.debugLineNum = 1053;BA.debugLine="MyPath = File.DirRootExternal & \"/dabmonkey\"";
+ //BA.debugLineNum = 1056;BA.debugLine="MyPath = File.DirRootExternal & \"/dabmonkey\"";
 _mypath = anywheresoftware.b4a.keywords.Common.File.getDirRootExternal()+"/dabmonkey";
- //BA.debugLineNum = 1055;BA.debugLine="Connected = False";
+ //BA.debugLineNum = 1058;BA.debugLine="Connected = False";
 _connected = anywheresoftware.b4a.keywords.Common.False;
- //BA.debugLineNum = 1057;BA.debugLine="OpenRadio";
+ //BA.debugLineNum = 1060;BA.debugLine="OpenRadio";
 _openradio();
  };
- //BA.debugLineNum = 1061;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1064;BA.debugLine="End Sub";
 return "";
 }
 public static String  _setchannel(int _channelnum) throws Exception{
 int _i = 0;
- //BA.debugLineNum = 835;BA.debugLine="Sub SetChannel(ChannelNum As Int)";
- //BA.debugLineNum = 836;BA.debugLine="Dim I As Int";
+ //BA.debugLineNum = 838;BA.debugLine="Sub SetChannel(ChannelNum As Int)";
+ //BA.debugLineNum = 839;BA.debugLine="Dim I As Int";
 _i = 0;
- //BA.debugLineNum = 838;BA.debugLine="Select Ebene";
+ //BA.debugLineNum = 841;BA.debugLine="Select Ebene";
 switch (_ebene) {
 case 0:
- //BA.debugLineNum = 840;BA.debugLine="I = 1";
+ //BA.debugLineNum = 843;BA.debugLine="I = 1";
 _i = (int) (1);
  break;
 case 1:
- //BA.debugLineNum = 842;BA.debugLine="I = 8";
+ //BA.debugLineNum = 845;BA.debugLine="I = 8";
 _i = (int) (8);
  break;
 case 2:
- //BA.debugLineNum = 844;BA.debugLine="I = 15";
+ //BA.debugLineNum = 847;BA.debugLine="I = 15";
 _i = (int) (15);
  break;
 }
 ;
- //BA.debugLineNum = 847;BA.debugLine="I = I+ChannelNum-1";
+ //BA.debugLineNum = 850;BA.debugLine="I = I+ChannelNum-1";
 _i = (int) (_i+_channelnum-1);
- //BA.debugLineNum = 848;BA.debugLine="If isDAB And DAB Then";
+ //BA.debugLineNum = 851;BA.debugLine="If isDAB And DAB Then";
 if (_isdab && _dab) { 
- //BA.debugLineNum = 849;BA.debugLine="DFrq(I) = Frequenz";
+ //BA.debugLineNum = 852;BA.debugLine="DFrq(I) = Frequenz";
 _dfrq[_i] = _frequenz;
- //BA.debugLineNum = 850;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", I)";
+ //BA.debugLineNum = 853;BA.debugLine="CallSub2(Main, \"SelectedDABChannel\", I)";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(processBA,(Object)(mostCurrent._main.getObject()),"SelectedDABChannel",(Object)(_i));
  }else {
- //BA.debugLineNum = 853;BA.debugLine="Frq(I) = Frequenz";
+ //BA.debugLineNum = 856;BA.debugLine="Frq(I) = Frequenz";
 _frq[_i] = _frequenz;
  };
- //BA.debugLineNum = 855;BA.debugLine="End Sub";
+ //BA.debugLineNum = 858;BA.debugLine="End Sub";
 return "";
 }
 public static String  _setupnotfication() throws Exception{
- //BA.debugLineNum = 1014;BA.debugLine="Sub SetUpNotfication";
- //BA.debugLineNum = 1015;BA.debugLine="RadioNotification.AddAction2(\"ic_skip_previous_bl";
+ //BA.debugLineNum = 1017;BA.debugLine="Sub SetUpNotfication";
+ //BA.debugLineNum = 1018;BA.debugLine="RadioNotification.AddAction2(\"ic_skip_previous_bl";
 _radionotification.AddAction2(processBA,"ic_skip_previous_black_24dp","","Previous Channel",radioservice.getObject());
- //BA.debugLineNum = 1016;BA.debugLine="RadioNotification.AddAction2(\"ic_stop_black_24dp\"";
+ //BA.debugLineNum = 1019;BA.debugLine="RadioNotification.AddAction2(\"ic_stop_black_24dp\"";
 _radionotification.AddAction2(processBA,"ic_stop_black_24dp","","Stop",radioservice.getObject());
- //BA.debugLineNum = 1017;BA.debugLine="RadioNotification.AddAction2(\"ic_skip_next_black_";
+ //BA.debugLineNum = 1020;BA.debugLine="RadioNotification.AddAction2(\"ic_skip_next_black_";
 _radionotification.AddAction2(processBA,"ic_skip_next_black_24dp","","Next Channel",radioservice.getObject());
- //BA.debugLineNum = 1018;BA.debugLine="RadioNotification.DefaultLight = True";
+ //BA.debugLineNum = 1021;BA.debugLine="RadioNotification.DefaultLight = True";
 _radionotification.setDefaultLight(anywheresoftware.b4a.keywords.Common.True);
- //BA.debugLineNum = 1019;BA.debugLine="RadioNotification.DefaultVibrate = False";
+ //BA.debugLineNum = 1022;BA.debugLine="RadioNotification.DefaultVibrate = False";
 _radionotification.setDefaultVibrate(anywheresoftware.b4a.keywords.Common.False);
- //BA.debugLineNum = 1020;BA.debugLine="RadioNotification.DefaultSound = False";
+ //BA.debugLineNum = 1023;BA.debugLine="RadioNotification.DefaultSound = False";
 _radionotification.setDefaultSound(anywheresoftware.b4a.keywords.Common.False);
- //BA.debugLineNum = 1021;BA.debugLine="RadioNotification.setActivity(Main)";
+ //BA.debugLineNum = 1024;BA.debugLine="RadioNotification.setActivity(Main)";
 _radionotification.setActivity(processBA,(Object)(mostCurrent._main.getObject()));
- //BA.debugLineNum = 1022;BA.debugLine="RadioNotification.SmallIcon = \"ic_radio_black_24d";
+ //BA.debugLineNum = 1025;BA.debugLine="RadioNotification.SmallIcon = \"ic_radio_black_24d";
 _radionotification.setSmallIcon("ic_radio_black_24dp");
- //BA.debugLineNum = 1023;BA.debugLine="RadioNotification.ContentTitle = \"Radio Running\"";
+ //BA.debugLineNum = 1026;BA.debugLine="RadioNotification.ContentTitle = \"Radio Running\"";
 _radionotification.setContentTitle("Radio Running");
- //BA.debugLineNum = 1024;BA.debugLine="RadioNotification.AutoCancel = False";
+ //BA.debugLineNum = 1027;BA.debugLine="RadioNotification.AutoCancel = False";
 _radionotification.setAutoCancel(anywheresoftware.b4a.keywords.Common.False);
- //BA.debugLineNum = 1026;BA.debugLine="Service.StartForeground(1, RadioNotification.GetN";
+ //BA.debugLineNum = 1029;BA.debugLine="Service.StartForeground(1, RadioNotification.GetN";
 mostCurrent._service.StartForeground((int) (1),_radionotification.GetNotification(processBA));
- //BA.debugLineNum = 1028;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1031;BA.debugLine="End Sub";
 return "";
 }
 public static String  _setvolume(int _volume1) throws Exception{
- //BA.debugLineNum = 919;BA.debugLine="Sub SetVolume(Volume1 As Int)";
- //BA.debugLineNum = 920;BA.debugLine="Log(\"Setting Volume \" & Volume1)";
+ //BA.debugLineNum = 922;BA.debugLine="Sub SetVolume(Volume1 As Int)";
+ //BA.debugLineNum = 923;BA.debugLine="Log(\"Setting Volume \" & Volume1)";
 anywheresoftware.b4a.keywords.Common.Log("Setting Volume "+BA.NumberToString(_volume1));
- //BA.debugLineNum = 921;BA.debugLine="Volume = Volume1";
+ //BA.debugLineNum = 924;BA.debugLine="Volume = Volume1";
 _volume = (byte) (_volume1);
- //BA.debugLineNum = 922;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,";
+ //BA.debugLineNum = 925;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x0c),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (_volume1),(byte) (0xfd)});
- //BA.debugLineNum = 923;BA.debugLine="Mute = False";
+ //BA.debugLineNum = 926;BA.debugLine="Mute = False";
 _mute = anywheresoftware.b4a.keywords.Common.False;
- //BA.debugLineNum = 924;BA.debugLine="End Sub";
+ //BA.debugLineNum = 927;BA.debugLine="End Sub";
 return "";
 }
 public static String  _startchannelsearch(boolean _shouldclean) throws Exception{
- //BA.debugLineNum = 938;BA.debugLine="Sub StartChannelSearch(ShouldClean As Boolean)";
- //BA.debugLineNum = 939;BA.debugLine="If isDAB And DAB Then";
+ //BA.debugLineNum = 941;BA.debugLine="Sub StartChannelSearch(ShouldClean As Boolean)";
+ //BA.debugLineNum = 942;BA.debugLine="If isDAB And DAB Then";
 if (_isdab && _dab) { 
- //BA.debugLineNum = 940;BA.debugLine="If Not(DABSearch) Then";
+ //BA.debugLineNum = 943;BA.debugLine="If Not(DABSearch) Then";
 if (anywheresoftware.b4a.keywords.Common.Not(_dabsearch)) { 
- //BA.debugLineNum = 941;BA.debugLine="If ShouldClean Then";
+ //BA.debugLineNum = 944;BA.debugLine="If ShouldClean Then";
 if (_shouldclean) { 
- //BA.debugLineNum = 942;BA.debugLine="MyTimer.Enabled = False";
+ //BA.debugLineNum = 945;BA.debugLine="MyTimer.Enabled = False";
 _mytimer.setEnabled(anywheresoftware.b4a.keywords.Common.False);
- //BA.debugLineNum = 943;BA.debugLine="SendRadio(Array As Byte(0xFE,0x00,0x01,0x01,0x";
+ //BA.debugLineNum = 946;BA.debugLine="SendRadio(Array As Byte(0xFE,0x00,0x01,0x01,0x";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x00),(byte) (0x01),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x01),(byte) (0xfd)});
- //BA.debugLineNum = 944;BA.debugLine="ClearDatabase = True";
+ //BA.debugLineNum = 947;BA.debugLine="ClearDatabase = True";
 _cleardatabase = anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 945;BA.debugLine="SysReady.Enabled = True";
+ //BA.debugLineNum = 948;BA.debugLine="SysReady.Enabled = True";
 _sysready.setEnabled(anywheresoftware.b4a.keywords.Common.True);
  }else {
- //BA.debugLineNum = 947;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x03,0x01,0x";
+ //BA.debugLineNum = 950;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x03,0x01,0x";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x03),(byte) (0x01),(byte) (0x00),(byte) (0x02),(byte) (0x00),(byte) (0x47),(byte) (0xfd)});
- //BA.debugLineNum = 948;BA.debugLine="DABSearch = True";
+ //BA.debugLineNum = 951;BA.debugLine="DABSearch = True";
 _dabsearch = anywheresoftware.b4a.keywords.Common.True;
  };
  };
  };
- //BA.debugLineNum = 952;BA.debugLine="End Sub";
+ //BA.debugLineNum = 955;BA.debugLine="End Sub";
 return "";
 }
 public static String  _startmediakeys() throws Exception{
 anywheresoftware.b4j.object.JavaObject _context = null;
 anywheresoftware.b4j.object.JavaObject _cb = null;
- //BA.debugLineNum = 1068;BA.debugLine="Sub StartMediaKeys()";
- //BA.debugLineNum = 1069;BA.debugLine="Dim context As JavaObject";
+ //BA.debugLineNum = 1071;BA.debugLine="Sub StartMediaKeys()";
+ //BA.debugLineNum = 1072;BA.debugLine="Dim context As JavaObject";
 _context = new anywheresoftware.b4j.object.JavaObject();
- //BA.debugLineNum = 1070;BA.debugLine="context.InitializeContext";
+ //BA.debugLineNum = 1073;BA.debugLine="context.InitializeContext";
 _context.InitializeContext(processBA);
- //BA.debugLineNum = 1071;BA.debugLine="session.InitializeNewInstance(\"android.media.sess";
+ //BA.debugLineNum = 1074;BA.debugLine="session.InitializeNewInstance(\"android.media.sess";
 _session.InitializeNewInstance("android.media.session.MediaSession",new Object[]{(Object)(_context.getObject()),(Object)("tag")});
- //BA.debugLineNum = 1073;BA.debugLine="Dim cb As JavaObject";
+ //BA.debugLineNum = 1076;BA.debugLine="Dim cb As JavaObject";
 _cb = new anywheresoftware.b4j.object.JavaObject();
- //BA.debugLineNum = 1074;BA.debugLine="cb.InitializeNewInstance(Application.PackageName";
+ //BA.debugLineNum = 1077;BA.debugLine="cb.InitializeNewInstance(Application.PackageName";
 _cb.InitializeNewInstance(anywheresoftware.b4a.keywords.Common.Application.getPackageName()+".radioservice.MyCallback",(Object[])(anywheresoftware.b4a.keywords.Common.Null));
- //BA.debugLineNum = 1075;BA.debugLine="session.RunMethod(\"setCallback\", Array(cb))";
+ //BA.debugLineNum = 1078;BA.debugLine="session.RunMethod(\"setCallback\", Array(cb))";
 _session.RunMethod("setCallback",new Object[]{(Object)(_cb.getObject())});
- //BA.debugLineNum = 1077;BA.debugLine="session.RunMethod(\"setFlags\",Array(3))";
+ //BA.debugLineNum = 1080;BA.debugLine="session.RunMethod(\"setFlags\",Array(3))";
 _session.RunMethod("setFlags",new Object[]{(Object)(3)});
- //BA.debugLineNum = 1078;BA.debugLine="session.RunMethod(\"setActive\", Array(True))";
+ //BA.debugLineNum = 1081;BA.debugLine="session.RunMethod(\"setActive\", Array(True))";
 _session.RunMethod("setActive",new Object[]{(Object)(anywheresoftware.b4a.keywords.Common.True)});
- //BA.debugLineNum = 1079;BA.debugLine="Log(\"Accquired media session\")";
+ //BA.debugLineNum = 1082;BA.debugLine="Log(\"Accquired media session\")";
 anywheresoftware.b4a.keywords.Common.Log("Accquired media session");
- //BA.debugLineNum = 1080;BA.debugLine="End Sub";
+ //BA.debugLineNum = 1083;BA.debugLine="End Sub";
 return "";
 }
 public static String  _switchtodab() throws Exception{
- //BA.debugLineNum = 782;BA.debugLine="Sub SwitchToDAB";
- //BA.debugLineNum = 783;BA.debugLine="If Not(DABSearch) And DAB Then";
+ //BA.debugLineNum = 785;BA.debugLine="Sub SwitchToDAB";
+ //BA.debugLineNum = 786;BA.debugLine="If Not(DABSearch) And DAB Then";
 if (anywheresoftware.b4a.keywords.Common.Not(_dabsearch) && _dab) { 
- //BA.debugLineNum = 784;BA.debugLine="Select Ebene";
+ //BA.debugLineNum = 787;BA.debugLine="Select Ebene";
 switch (_ebene) {
 case 0:
- //BA.debugLineNum = 786;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
+ //BA.debugLineNum = 789;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_dfrq[(int) (0)]),(byte) (0xfd)});
  break;
 case 1:
- //BA.debugLineNum = 788;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
+ //BA.debugLineNum = 791;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_dfrq[(int) (7)]),(byte) (0xfd)});
  break;
 case 2:
- //BA.debugLineNum = 790;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
+ //BA.debugLineNum = 793;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x0";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (0x00),(byte) (_dfrq[(int) (14)]),(byte) (0xfd)});
  break;
 }
 ;
  };
- //BA.debugLineNum = 793;BA.debugLine="End Sub";
+ //BA.debugLineNum = 796;BA.debugLine="End Sub";
 return "";
 }
 public static String  _switchtofm() throws Exception{
@@ -2151,39 +2156,39 @@ String _d1 = "";
 String _d2 = "";
 String _d3 = "";
 String _d = "";
- //BA.debugLineNum = 752;BA.debugLine="Sub SwitchToFM";
- //BA.debugLineNum = 753;BA.debugLine="Dim d1,d2,d3,D As String";
+ //BA.debugLineNum = 755;BA.debugLine="Sub SwitchToFM";
+ //BA.debugLineNum = 756;BA.debugLine="Dim d1,d2,d3,D As String";
 _d1 = "";
 _d2 = "";
 _d3 = "";
 _d = "";
- //BA.debugLineNum = 754;BA.debugLine="Select Ebene";
+ //BA.debugLineNum = 757;BA.debugLine="Select Ebene";
 switch (_ebene) {
 case 0:
- //BA.debugLineNum = 756;BA.debugLine="D =  Bit.ToHexString(Frq(0))";
+ //BA.debugLineNum = 759;BA.debugLine="D =  Bit.ToHexString(Frq(0))";
 _d = anywheresoftware.b4a.keywords.Common.Bit.ToHexString(_frq[(int) (0)]);
  break;
 case 1:
- //BA.debugLineNum = 758;BA.debugLine="D =  Bit.ToHexString(Frq(7))";
+ //BA.debugLineNum = 761;BA.debugLine="D =  Bit.ToHexString(Frq(7))";
 _d = anywheresoftware.b4a.keywords.Common.Bit.ToHexString(_frq[(int) (7)]);
  break;
 case 2:
- //BA.debugLineNum = 760;BA.debugLine="D =  Bit.ToHexString(Frq(14))";
+ //BA.debugLineNum = 763;BA.debugLine="D =  Bit.ToHexString(Frq(14))";
 _d = anywheresoftware.b4a.keywords.Common.Bit.ToHexString(_frq[(int) (14)]);
  break;
 }
 ;
- //BA.debugLineNum = 762;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
+ //BA.debugLineNum = 765;BA.debugLine="d1 = Bit.ParseInt(D.SubString2(0,1), 16)";
 _d1 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (0),(int) (1)),(int) (16)));
- //BA.debugLineNum = 763;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
+ //BA.debugLineNum = 766;BA.debugLine="d2 = Bit.ParseInt(D.SubString2(1,3), 16)";
 _d2 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (1),(int) (3)),(int) (16)));
- //BA.debugLineNum = 764;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
+ //BA.debugLineNum = 767;BA.debugLine="d3 = Bit.ParseInt(D.SubString2(3,5), 16)";
 _d3 = BA.NumberToString(anywheresoftware.b4a.keywords.Common.Bit.ParseInt(_d.substring((int) (3),(int) (5)),(int) (16)));
- //BA.debugLineNum = 765;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00,";
+ //BA.debugLineNum = 768;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x00,0x01,0x00,";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (0x00),(byte) (0x05),(byte) (0x01),(byte) (0x00),(byte)(Double.parseDouble(_d1)),(byte)(Double.parseDouble(_d2)),(byte)(Double.parseDouble(_d3)),(byte) (0xfd)});
- //BA.debugLineNum = 766;BA.debugLine="isDAB = False";
+ //BA.debugLineNum = 769;BA.debugLine="isDAB = False";
 _isdab = anywheresoftware.b4a.keywords.Common.False;
- //BA.debugLineNum = 767;BA.debugLine="End Sub";
+ //BA.debugLineNum = 770;BA.debugLine="End Sub";
 return "";
 }
 public static String  _sysready_tick() throws Exception{
@@ -2194,20 +2199,20 @@ _sendradio(new byte[]{(byte) (0xfe),(byte) (0x00),(byte) (0x00),(byte) (0x01),(b
 return "";
 }
 public static String  _togglemute() throws Exception{
- //BA.debugLineNum = 705;BA.debugLine="Sub ToggleMute";
- //BA.debugLineNum = 706;BA.debugLine="If Mute Then";
+ //BA.debugLineNum = 708;BA.debugLine="Sub ToggleMute";
+ //BA.debugLineNum = 709;BA.debugLine="If Mute Then";
 if (_mute) { 
- //BA.debugLineNum = 707;BA.debugLine="Mute = False";
+ //BA.debugLineNum = 710;BA.debugLine="Mute = False";
 _mute = anywheresoftware.b4a.keywords.Common.False;
- //BA.debugLineNum = 708;BA.debugLine="UnmuteAudio";
+ //BA.debugLineNum = 711;BA.debugLine="UnmuteAudio";
 _unmuteaudio();
  }else {
- //BA.debugLineNum = 710;BA.debugLine="Mute = True";
+ //BA.debugLineNum = 713;BA.debugLine="Mute = True";
 _mute = anywheresoftware.b4a.keywords.Common.True;
- //BA.debugLineNum = 711;BA.debugLine="MuteAudio";
+ //BA.debugLineNum = 714;BA.debugLine="MuteAudio";
 _muteaudio();
  };
- //BA.debugLineNum = 713;BA.debugLine="End Sub";
+ //BA.debugLineNum = 716;BA.debugLine="End Sub";
 return "";
 }
 public static String  _tryagain_tick() throws Exception{
@@ -2225,14 +2230,14 @@ _tryagain.setEnabled(anywheresoftware.b4a.keywords.Common.False);
 return "";
 }
 public static String  _unmuteaudio() throws Exception{
- //BA.debugLineNum = 721;BA.debugLine="Sub UnmuteAudio";
- //BA.debugLineNum = 722;BA.debugLine="Log(\"Unmuting\")";
+ //BA.debugLineNum = 724;BA.debugLine="Sub UnmuteAudio";
+ //BA.debugLineNum = 725;BA.debugLine="Log(\"Unmuting\")";
 anywheresoftware.b4a.keywords.Common.Log("Unmuting");
- //BA.debugLineNum = 723;BA.debugLine="Volume = LastVolume";
+ //BA.debugLineNum = 726;BA.debugLine="Volume = LastVolume";
 _volume = (byte) (_lastvolume);
- //BA.debugLineNum = 724;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,";
+ //BA.debugLineNum = 727;BA.debugLine="SendRadio(Array As Byte(0xFE,0x01,0x0C,0x01,0x00,";
 _sendradio(new byte[]{(byte) (0xfe),(byte) (0x01),(byte) (0x0c),(byte) (0x01),(byte) (0x00),(byte) (0x01),(byte) (_lastvolume),(byte) (0xfd)});
- //BA.debugLineNum = 725;BA.debugLine="End Sub";
+ //BA.debugLineNum = 728;BA.debugLine="End Sub";
 return "";
 }
 public static String  _usbtimer_tick() throws Exception{
@@ -2246,27 +2251,27 @@ _openradio();};
 return "";
 }
 public static String  _volumedown() throws Exception{
- //BA.debugLineNum = 912;BA.debugLine="Sub VolumeDown";
- //BA.debugLineNum = 913;BA.debugLine="If Volume > 0 Then";
+ //BA.debugLineNum = 915;BA.debugLine="Sub VolumeDown";
+ //BA.debugLineNum = 916;BA.debugLine="If Volume > 0 Then";
 if (_volume>0) { 
- //BA.debugLineNum = 914;BA.debugLine="Volume = Volume - 1";
+ //BA.debugLineNum = 917;BA.debugLine="Volume = Volume - 1";
 _volume = (byte) (_volume-1);
- //BA.debugLineNum = 915;BA.debugLine="SetVolume(Volume)";
+ //BA.debugLineNum = 918;BA.debugLine="SetVolume(Volume)";
 _setvolume((int) (_volume));
  };
- //BA.debugLineNum = 917;BA.debugLine="End Sub";
+ //BA.debugLineNum = 920;BA.debugLine="End Sub";
 return "";
 }
 public static String  _volumeup() throws Exception{
- //BA.debugLineNum = 905;BA.debugLine="Sub VolumeUp";
- //BA.debugLineNum = 906;BA.debugLine="If Volume < 16 Then";
+ //BA.debugLineNum = 908;BA.debugLine="Sub VolumeUp";
+ //BA.debugLineNum = 909;BA.debugLine="If Volume < 16 Then";
 if (_volume<16) { 
- //BA.debugLineNum = 907;BA.debugLine="Volume = Volume + 1";
+ //BA.debugLineNum = 910;BA.debugLine="Volume = Volume + 1";
 _volume = (byte) (_volume+1);
- //BA.debugLineNum = 908;BA.debugLine="SetVolume(Volume)";
+ //BA.debugLineNum = 911;BA.debugLine="SetVolume(Volume)";
 _setvolume((int) (_volume));
  };
- //BA.debugLineNum = 910;BA.debugLine="End Sub";
+ //BA.debugLineNum = 913;BA.debugLine="End Sub";
 return "";
 }
 public static String  _wait(int _sekunden) throws Exception{
