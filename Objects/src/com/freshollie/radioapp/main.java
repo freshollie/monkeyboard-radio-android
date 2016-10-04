@@ -409,22 +409,22 @@ anywheresoftware.b4a.keywords.Common.StartService(mostCurrent.activityBA,(Object
 _updatestationlist();
  };
  };
- //BA.debugLineNum = 466;BA.debugLine="End Sub";
+ //BA.debugLineNum = 465;BA.debugLine="lvDAB.RequestFocus";
+mostCurrent._lvdab.RequestFocus();
+ //BA.debugLineNum = 467;BA.debugLine="End Sub";
 return "";
 }
 public static boolean  _activity_keypress(int _keycode) throws Exception{
 Object[] _args = null;
- //BA.debugLineNum = 492;BA.debugLine="Sub Activity_KeyPress (KeyCode As Int) As Boolean";
- //BA.debugLineNum = 493;BA.debugLine="Dim thread As Thread";
+ //BA.debugLineNum = 495;BA.debugLine="Sub Activity_KeyPress (KeyCode As Int) As Boolean";
+ //BA.debugLineNum = 496;BA.debugLine="Dim thread As Thread";
 mostCurrent._thread = new anywheresoftware.b4a.agraham.threading.Threading();
- //BA.debugLineNum = 494;BA.debugLine="Select KeyCode";
+ //BA.debugLineNum = 497;BA.debugLine="Select KeyCode";
 switch (BA.switchObjectToInt(_keycode,anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_TAB,anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_DPAD_UP,anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_ENTER)) {
 case 0:
- //BA.debugLineNum = 496;BA.debugLine="lvDAB.RequestFocus";
-mostCurrent._lvdab.RequestFocus();
- //BA.debugLineNum = 497;BA.debugLine="thread.Initialise(\"PressKey\")";
+ //BA.debugLineNum = 500;BA.debugLine="thread.Initialise(\"PressKey\")";
 mostCurrent._thread.Initialise(processBA,"PressKey");
- //BA.debugLineNum = 498;BA.debugLine="Dim args(1) As Object";
+ //BA.debugLineNum = 501;BA.debugLine="Dim args(1) As Object";
 _args = new Object[(int) (1)];
 {
 int d0 = _args.length;
@@ -433,66 +433,68 @@ _args[i0] = new Object();
 }
 }
 ;
- //BA.debugLineNum = 499;BA.debugLine="args(0) = KeyCodes.KEYCODE_DPAD_DOWN";
+ //BA.debugLineNum = 502;BA.debugLine="args(0) = KeyCodes.KEYCODE_DPAD_DOWN";
 _args[(int) (0)] = (Object)(anywheresoftware.b4a.keywords.Common.KeyCodes.KEYCODE_DPAD_DOWN);
- //BA.debugLineNum = 500;BA.debugLine="thread.Start(\"PressKey\", args)";
+ //BA.debugLineNum = 503;BA.debugLine="thread.Start(\"PressKey\", args)";
 mostCurrent._thread.Start("PressKey",_args);
- //BA.debugLineNum = 501;BA.debugLine="Return True";
+ //BA.debugLineNum = 504;BA.debugLine="Return True";
 if (true) return anywheresoftware.b4a.keywords.Common.True;
  break;
 case 1:
- //BA.debugLineNum = 503;BA.debugLine="Log(StationListPosition)";
+ //BA.debugLineNum = 507;BA.debugLine="Log(StationListPosition)";
 anywheresoftware.b4a.keywords.Common.Log(BA.NumberToString(_stationlistposition));
- //BA.debugLineNum = 504;BA.debugLine="If StationListPosition - 1 >= 0 Then";
+ //BA.debugLineNum = 508;BA.debugLine="If StationListPosition - 1 >= 0 Then";
 if (_stationlistposition-1>=0) { 
- //BA.debugLineNum = 505;BA.debugLine="StationListPosition = StationListPosition - 1";
+ //BA.debugLineNum = 509;BA.debugLine="StationListPosition = StationListPosition - 1";
 _stationlistposition = (int) (_stationlistposition-1);
- //BA.debugLineNum = 506;BA.debugLine="lvDAB.SetSelection(StationListPosition)";
+ //BA.debugLineNum = 510;BA.debugLine="lvDAB.SetSelection(StationListPosition)";
 mostCurrent._lvdab.SetSelection(_stationlistposition);
  };
- //BA.debugLineNum = 508;BA.debugLine="Return True";
+ //BA.debugLineNum = 512;BA.debugLine="Return True";
 if (true) return anywheresoftware.b4a.keywords.Common.True;
  break;
 case 2:
- //BA.debugLineNum = 510;BA.debugLine="lvDAB_ItemClick(StationListPosition, Null)";
+ //BA.debugLineNum = 515;BA.debugLine="lvDAB_ItemClick(StationListPosition, Null)";
 _lvdab_itemclick(_stationlistposition,anywheresoftware.b4a.keywords.Common.Null);
- //BA.debugLineNum = 511;BA.debugLine="Return True";
+ //BA.debugLineNum = 516;BA.debugLine="Return True";
 if (true) return anywheresoftware.b4a.keywords.Common.True;
  break;
 default:
- //BA.debugLineNum = 513;BA.debugLine="Return False";
+ //BA.debugLineNum = 519;BA.debugLine="Return False";
 if (true) return anywheresoftware.b4a.keywords.Common.False;
  break;
 }
 ;
- //BA.debugLineNum = 515;BA.debugLine="End Sub";
+ //BA.debugLineNum = 521;BA.debugLine="End Sub";
 return false;
 }
 public static String  _activity_pause(boolean _userclosed) throws Exception{
- //BA.debugLineNum = 483;BA.debugLine="Sub Activity_Pause (UserClosed As Boolean)";
- //BA.debugLineNum = 484;BA.debugLine="End Sub";
+ //BA.debugLineNum = 486;BA.debugLine="Sub Activity_Pause (UserClosed As Boolean)";
+ //BA.debugLineNum = 487;BA.debugLine="End Sub";
 return "";
 }
 public static String  _activity_resume() throws Exception{
- //BA.debugLineNum = 468;BA.debugLine="Sub Activity_Resume";
- //BA.debugLineNum = 469;BA.debugLine="RadioService.DuckVolume = manager.GetString(\"Duck";
+ //BA.debugLineNum = 469;BA.debugLine="Sub Activity_Resume";
+ //BA.debugLineNum = 470;BA.debugLine="RadioService.DuckVolume = manager.GetString(\"Duck";
 mostCurrent._radioservice._duckvolume = (int)(Double.parseDouble(_manager.GetString("DuckVolume")));
- //BA.debugLineNum = 470;BA.debugLine="RadioService.DefaultVolume = manager.GetString(\"D";
+ //BA.debugLineNum = 471;BA.debugLine="RadioService.DefaultVolume = manager.GetString(\"D";
 mostCurrent._radioservice._defaultvolume = (int)(Double.parseDouble(_manager.GetString("DefaultVolume")));
- //BA.debugLineNum = 472;BA.debugLine="If RadioService.Mute = False And RadioService.Duc";
+ //BA.debugLineNum = 473;BA.debugLine="If RadioService.Mute = False And RadioService.Duc";
 if (mostCurrent._radioservice._mute==anywheresoftware.b4a.keywords.Common.False && mostCurrent._radioservice._ducked==anywheresoftware.b4a.keywords.Common.False) { 
- //BA.debugLineNum = 473;BA.debugLine="CallSub2(RadioService, \"SetVolume\", RadioService";
+ //BA.debugLineNum = 474;BA.debugLine="CallSub2(RadioService, \"SetVolume\", RadioService";
 anywheresoftware.b4a.keywords.Common.CallSubNew2(mostCurrent.activityBA,(Object)(mostCurrent._radioservice.getObject()),"SetVolume",(Object)(mostCurrent._radioservice._defaultvolume));
  }else {
- //BA.debugLineNum = 475;BA.debugLine="RadioService.LastVolume = RadioService.DefaultVo";
+ //BA.debugLineNum = 476;BA.debugLine="RadioService.LastVolume = RadioService.DefaultVo";
 mostCurrent._radioservice._lastvolume = mostCurrent._radioservice._defaultvolume;
  };
- //BA.debugLineNum = 478;BA.debugLine="If RadioService.ServiceStarted Then";
-if (mostCurrent._radioservice._servicestarted) { 
- //BA.debugLineNum = 479;BA.debugLine="updateStationList";
+ //BA.debugLineNum = 479;BA.debugLine="If RadioService.ServiceStarted = True Then";
+if (mostCurrent._radioservice._servicestarted==anywheresoftware.b4a.keywords.Common.True) { 
+ //BA.debugLineNum = 480;BA.debugLine="updateStationList";
 _updatestationlist();
  };
- //BA.debugLineNum = 481;BA.debugLine="End Sub";
+ //BA.debugLineNum = 483;BA.debugLine="lvDAB.RequestFocus";
+mostCurrent._lvdab.RequestFocus();
+ //BA.debugLineNum = 484;BA.debugLine="End Sub";
 return "";
 }
 public static String  _btn0_click() throws Exception{
@@ -1136,10 +1138,10 @@ anywheresoftware.b4a.keywords.Common.CallSubNew2(mostCurrent.activityBA,(Object)
 return "";
 }
 public static String  _presskey(int _keycode) throws Exception{
- //BA.debugLineNum = 487;BA.debugLine="private Sub PressKey(Keycode As Int)";
- //BA.debugLineNum = 488;BA.debugLine="KeyGen.keygenerator(Keycode)";
+ //BA.debugLineNum = 490;BA.debugLine="private Sub PressKey(Keycode As Int)";
+ //BA.debugLineNum = 491;BA.debugLine="KeyGen.keygenerator(Keycode)";
 _keygen.keygenerator(_keycode);
- //BA.debugLineNum = 489;BA.debugLine="End Sub";
+ //BA.debugLineNum = 492;BA.debugLine="End Sub";
 return "";
 }
 
@@ -1247,8 +1249,8 @@ int _i = 0;
  //BA.debugLineNum = 357;BA.debugLine="Try";
 try { //BA.debugLineNum = 358;BA.debugLine="Dim i As Int";
 _i = 0;
- //BA.debugLineNum = 359;BA.debugLine="lvDAB.SingleLineLayout.Label.TextSize = 20dip";
-mostCurrent._lvdab.getSingleLineLayout().Label.setTextSize((float) (anywheresoftware.b4a.keywords.Common.DipToCurrent((int) (20))));
+ //BA.debugLineNum = 359;BA.debugLine="lvDAB.SingleLineLayout.Label.TextSize = 18dip";
+mostCurrent._lvdab.getSingleLineLayout().Label.setTextSize((float) (anywheresoftware.b4a.keywords.Common.DipToCurrent((int) (18))));
  //BA.debugLineNum = 362;BA.debugLine="lvDAB.Clear";
 mostCurrent._lvdab.Clear();
  //BA.debugLineNum = 363;BA.debugLine="For i = 0 To RadioService.lstDAB.Size - 1";

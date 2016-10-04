@@ -39,6 +39,9 @@ Sub Process_Globals
 	Dim Mediakey As MediaController
 	Dim DuckVolume, DefaultVolume, LastVolume, part As Int
 	Dim MuteResponse As String
+	Dim StationCopyResponse As Int
+	
+	Dim CloseAfterStop as Boolean
 	
 	Private session As JavaObject
 	
@@ -100,11 +103,14 @@ Sub Evaluate(index As Int)
 		
 		labEventText = Status
 			
-		Case 0x07
+		Case 0x07 ' Stream_GetPlayIndex()
 			If Ack(6) = 0 Then 		
 				Frequenz = Bit.ParseInt(Bit.ToHexString(Ack(7)) &  Bit.ToHexString(Ack(8)) &  Bit.ToHexString(Ack(9)), 16)
 				If isDAB And DAB Then
 					labFreqText = Frequenz
+					If FillList Then
+						StationCopyResponse = StationCopyResponse + 1
+					End If 
 				Else
 					If Frequenz < 108100 And Frequenz > 87400 Then labFreqText = Frequenz / 1000
 				End If	
@@ -457,6 +463,7 @@ Sub OpenRadio
 						Start = True
 						MuteResponse = "Null"
 						ForceClosing = False
+						CloseAfterStop = False
 						Wait(1)	
 						
 	   					MyTimer.Enabled = True
@@ -499,8 +506,9 @@ Sub MyTimer_Tick
 			If FillList Then
 				If iStep < AllDAB Then
 					Log(iStep)
+					StationCopyResponse = 0
 					SendRadio(Array As Byte(0xFE,0x01,0x1A,0x01,0x00,0x05,0x00,0x00,0x00,iStep,0x01,0xFD)) ' Get the service name of the dab program STREAM_GetServiceName(Frequenz, iStep) long name
-				
+					SendRadio(Array As Byte(0xFE,0x01,0x07,0x01,0x00,0x00,0xFD)) 'Get the channel id
 				Else
 					iStep = 0
 					FillList = False
@@ -689,12 +697,11 @@ Sub ExitApp 'Close the whole app
 		End If
 		
 		If MuteResponse = "1" Or ForceClosing = True Then 'CLose the radio if power has been disconnected
-			Log("What the fuck")
 				
 			RunCloseProcesses
 
 			
-			If IsPaused(Main) = False Then
+			If IsPaused(Main) = False Or CloseAfterStop = True Then
 				ExitApplication
 			End If
 		End If
@@ -985,6 +992,7 @@ End Sub
 
 Sub AudioFocusManager_onFocusLost
 	Log("Focus Lost, closing")
+	CloseAfterStop = True
 	ExitApp
 End Sub
 
