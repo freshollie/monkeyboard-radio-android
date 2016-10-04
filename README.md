@@ -10,4 +10,6 @@ This project is written in B4A as that is what was supplied from the beginning,
 
 I have tried to comment some of the confusing parts of the source code which can mostly be found in RadioSerivce.bas
 
+FM functionality has been Depricated, I do not have an FM arial connected to my board and as such have no way of using it.
+
 Any contributions bug fixes welcome.
