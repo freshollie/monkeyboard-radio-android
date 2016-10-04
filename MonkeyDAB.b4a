@@ -386,7 +386,7 @@ End Sub
 Sub updateStationList
 	Try
 		Dim i As Int
-		lvDAB.SingleLineLayout.Label.TextSize = 20dip
+		lvDAB.SingleLineLayout.Label.TextSize = 18dip
 		'lvDAB.SingleLineLayout.ItemHeight = 30
 		
 		lvDAB.Clear
@@ -492,6 +492,7 @@ Sub Activity_Create(FirstTime As Boolean)
 			updateStationList
 		End If
 	End If
+	lvDAB.RequestFocus
 
 End Sub
 
@@ -505,9 +506,11 @@ Sub Activity_Resume
 		RadioService.LastVolume = RadioService.DefaultVolume
 	End If
 	
-	If RadioService.ServiceStarted Then
+	If RadioService.ServiceStarted = True Then
 		updateStationList
 	End If
+	
+	lvDAB.RequestFocus
 End Sub
 
 Sub Activity_Pause (UserClosed As Boolean)
@@ -522,13 +525,14 @@ End Sub
 Sub Activity_KeyPress (KeyCode As Int) As Boolean
 	Dim thread As Thread
 	Select KeyCode
+	
    	Case KeyCodes.KEYCODE_TAB
-		lvDAB.RequestFocus
 		thread.Initialise("PressKey")
 		Dim args(1) As Object
 		args(0) = KeyCodes.KEYCODE_DPAD_DOWN
 		thread.Start("PressKey", args)
 		Return True
+		
 	Case KeyCodes.KEYCODE_DPAD_UP
 		Log(StationListPosition)
 	  	If StationListPosition - 1 >= 0 Then
@@ -536,9 +540,11 @@ Sub Activity_KeyPress (KeyCode As Int) As Boolean
 	  		lvDAB.SetSelection(StationListPosition)
 		End If
 	  	Return True
+		
 	Case KeyCodes.KEYCODE_ENTER
 		lvDAB_ItemClick(StationListPosition, Null)
 		Return True
+		
 	Case Else
 		Return False
 	End Select
