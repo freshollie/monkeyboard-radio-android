@@ -17,20 +17,37 @@ Any contributions bug fixes welcome.
 # Required libraries
 
 core
+
 audio
+
 broadcastreceiver
+
 preferenceactivity
+
 serial
+
 usbserial
+
 mediacontroller
+
 phone
+
 esclicksoundgen
+
 reflection
+
 inifiles
+
 randomaccessfile
+
 usb
+
 audiofocus
+
 notificationbuilder
+
 javaobject
+
 keygen
+
 threading
