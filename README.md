@@ -8,8 +8,29 @@ I have so far updated the app to run the radio connection as a service and behav
 
 This project is written in B4A as that is what was supplied from the beginning,
 
-I have tried to comment some of the confusing parts of the source code which can mostly be found in RadioSerivce.bas
+I have tried to comment some of the confusing parts of the source code which can mostly be found in RadioService.bas
 
 FM functionality has been Depricated, I do not have an FM arial connected to my board and as such have no way of using it.
 
 Any contributions bug fixes welcome.
+
+# Required libraries
+
+core
+audio
+broadcastreceiver
+preferenceactivity
+serial
+usbserial
+mediacontroller
+phone
+esclicksoundgen
+reflection
+inifiles
+randomaccessfile
+usb
+audiofocus
+notificationbuilder
+javaobject
+keygen
+threading
