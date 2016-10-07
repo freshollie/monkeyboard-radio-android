@@ -364,7 +364,6 @@ public anywheresoftware.b4a.objects.ProgressBarWrapper _pbstrength = null;
 public anywheresoftware.b4a.agraham.threading.Threading _thread = null;
 public wal.INIFiles.ini _ini = null;
 public com.freshollie.radioapp.radioservice _radioservice = null;
-public com.freshollie.radioapp.slideshow _slideshow = null;
 
 public static boolean isAnyActivityVisible() {
     boolean vis = false;
@@ -1153,7 +1152,6 @@ public static void initializeProcessGlobals() {
 		        wal.INIFiles.ini._process_globals();
 main._process_globals();
 radioservice._process_globals();
-slideshow._process_globals();
 		
         } catch (Exception e) {
 			throw new RuntimeException(e);

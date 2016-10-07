@@ -163,7 +163,6 @@ public static anywheresoftware.b4j.object.JavaObject _session = null;
 public static boolean _enterclickedreturnvalue = false;
 public wal.INIFiles.ini _ini = null;
 public com.freshollie.radioapp.main _main = null;
-public com.freshollie.radioapp.slideshow _slideshow = null;
 public static boolean  _application_error(anywheresoftware.b4a.objects.B4AException _error,String _stacktrace) throws Exception{
  //BA.debugLineNum = 1094;BA.debugLine="Sub Application_Error (Error As Exception, StackTr";
  //BA.debugLineNum = 1095;BA.debugLine="Return True";
@@ -1685,7 +1684,7 @@ _part = 0;
 _muteresponse = "";
  //BA.debugLineNum = 37;BA.debugLine="Dim StationCopyResponse As Int";
 _stationcopyresponse = 0;
- //BA.debugLineNum = 39;BA.debugLine="Dim CloseAfterStop as Boolean";
+ //BA.debugLineNum = 39;BA.debugLine="Dim CloseAfterStop As Boolean";
 _closeafterstop = false;
  //BA.debugLineNum = 41;BA.debugLine="Private session As JavaObject";
 _session = new anywheresoftware.b4j.object.JavaObject();
@@ -2309,24 +2308,25 @@ return "";
 }
 
 public static class MyCallback extends Callback {
-   public MyCallback() {
-   }
-   
-   public void onCommand(String command, Bundle args, ResultReceiver cb) {
-   BA.Log(command);
-     processBA.raiseEventFromUI(null, "media_oncommand", command);
-   }
-   
-   public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-   	KeyEvent event = (KeyEvent)mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-    IntentWrapper baIntent = new IntentWrapper();
-    baIntent.setObject(mediaButtonIntent);
-	if (event.getAction() == KeyEvent.ACTION_UP){
-   		Boolean b = (Boolean) processBA.raiseEvent(null, "media_onbutton", event.getKeyCode());
-    	return b == null ? false : b;
-	} else {
-	return false;
+	public MyCallback() {
 	}
-   }
+   
+	public void onCommand(String command, Bundle args, ResultReceiver cb) {
+		BA.Log(command);
+		processBA.raiseEventFromUI(null, "media_oncommand", command);
+	}
+   
+	public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
+		KeyEvent event = (KeyEvent)mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+		IntentWrapper baIntent = new IntentWrapper();
+		baIntent.setObject(mediaButtonIntent);
+		if (event.getAction() == KeyEvent.ACTION_UP){
+			Boolean b = (Boolean) processBA.raiseEvent(null, "media_onbutton", event.getKeyCode());
+			return b == null ? false : b;
+		} else {
+			return false;
+		}
+	}
 }
+
 }
