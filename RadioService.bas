@@ -1273,7 +1273,7 @@ public static class MyCallback extends Callback {
 	public MyCallback() {
 	}
    
-	public void onCommand(String command, Bundle args, ResultReceiver cb) {
+	public void onCommand(String command, Bundle args, ResultReceiver cb)
 		BA.Log(command);
 		processBA.raiseEventFromUI(null, "media_oncommand", command);
 	}
