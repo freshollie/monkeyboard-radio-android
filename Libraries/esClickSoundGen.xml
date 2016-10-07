@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.01</doclet-version-NOT-library-version>
+    <class>
+        <name>edsmith.click.sound.ClickSound</name>
+        <shortname>esClickSound</shortname>
+        <owner>process</owner>
+        <method>
+            <name>navUpFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Common initialisations</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>navLeftFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>returnFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>keyclickFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>navRightFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>deleteFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>spacebarFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>navDownFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>standardFx</name>
+            <comment>
+SoundVol:: This should be a float with a value between 0 and 1</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>SoundVol</name>
+                <type>float</type>
+            </parameter>
+        </method>
+    </class>
+    <version>1.0</version>
+    <author>Edward Smith</author>
+</root>

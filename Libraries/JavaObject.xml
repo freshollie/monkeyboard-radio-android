@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.04</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4j.object.JavaObject</name>
+        <shortname>JavaObject</shortname>
+        <objectwrapper>java.lang.Object</objectwrapper>
+        <owner>process</owner>
+        <event>Event (MethodName As String, Args() As Object) As Object</event>
+        <method>
+            <name>InitializeContext</name>
+            <comment>&lt;b&gt;B4A only method.&lt;/b&gt;
+Initializes the object with the current context (current Activity or Service).</comment>
+            <returntype>anywheresoftware.b4j.object.JavaObject</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>InitializeNewInstance</name>
+            <comment>Creates a new instance of the given class.
+ClassName - The full class name.
+Params - An array of objects to pass to the constructor (or Null).</comment>
+            <returntype>anywheresoftware.b4j.object.JavaObject</returntype>
+            <parameter>
+                <name>ClassName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Params</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>InitializeStatic</name>
+            <comment>Initializes the object. The object will wrap the given class (for static access).
+ClassName - The full class name.</comment>
+            <returntype>anywheresoftware.b4j.object.JavaObject</returntype>
+            <parameter>
+                <name>ClassName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetField</name>
+            <comment>Gets the value of the given field.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>Field</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>CreateEvent</name>
+            <comment>Creates an instance of the interface and binds it to the object.
+Interface - The full interface name.
+EventName - The prefix of the event sub.
+DefaultReturnValue - This value will be returned if no value was returned from the event sub. This can happen if the Activity is paused for example.
+
+For example:&lt;code&gt;
+Sub Activity_Create(FirstTime As Boolean)
+   Dim b As Button
+   b.Initialize("")
+   Activity.AddView(b, 0, 0, 200dip, 200dip)
+   Dim jo As JavaObject = b
+   Dim e As Object = jo.CreateEvent("android.view.View.OnTouchListener", "btouch", False)
+   jo.RunMethod("setOnTouchListener", Array As Object(e))
+End Sub
+
+Sub btouch_Event (MethodName As String, Args() As Object) As Object
+   Dim motion As JavaObject = Args(1) 'args(0) is View
+   Dim x As Float = motion.RunMethod("getX", Null)
+   Dim y As Float = motion.RunMethod("getY", Null)
+   Log(x &amp; ", " &amp; y)
+   Return True
+End Sub&lt;/code&gt;</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Interface</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>DefaultReturnValue</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetFieldJO</name>
+            <comment>Similar to GetField. Returns a JavaObject instead of Object.</comment>
+            <returntype>anywheresoftware.b4j.object.JavaObject</returntype>
+            <parameter>
+                <name>Field</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunMethodJO</name>
+            <comment>Similar to RunMethod. Returns a JavaObject instead of Object.</comment>
+            <returntype>anywheresoftware.b4j.object.JavaObject</returntype>
+            <parameter>
+                <name>MethodName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Params</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>InitializeArray</name>
+            <comment>Creates an array with the given class and values.</comment>
+            <returntype>anywheresoftware.b4j.object.JavaObject</returntype>
+            <parameter>
+                <name>ClassName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Values</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetField</name>
+            <comment>Sets the value of the given field.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>FieldName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Value</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunMethod</name>
+            <comment>Runs the given method and returns the method return value.
+MethodName - The case-sensitive method name.
+Params - Method paramters (or Null).</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>MethodName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Params</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>CreateEventFromUI</name>
+            <comment>Similar to CreateEvent. The event will be sent to the message queue and then be processed (similar to CallSubDelayed).</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Interface</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>ReturnValue</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+    </class>
+    <version>2.02</version>
+</root>

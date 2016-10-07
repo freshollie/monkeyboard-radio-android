@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.02</doclet-version-NOT-library-version>
+    <class>
+        <name>com.rootsoft.broadcastreceiver.BroadCastReceiver</name>
+        <shortname>BroadCastReceiver</shortname>
+        <owner>process</owner>
+        <permission>android.permission.ACCESS_COARSE_LOCATION</permission>
+        <permission>android.permission.ACCESS_NETWORK_STATE</permission>
+        <permission>android.permission.CHANGE_NETWORK_STATE</permission>
+        <permission>android.permission.ACCESS_COARSE_UPDATES</permission>
+        <permission>android.permission.READ_PHONE_STATE</permission>
+        <method>
+            <name>SetPriority</name>
+            <comment>Sets the priority.
+ The higher the value, the more important the receiver will be thus the first it will be called.
+ max: 2147483647
+ rec: 999 to -999
+Priority: </comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Priority</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the BroadcastReceiver.
+ EventName - Events subs prefix.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>deleteMessage</name>
+            <comment>Deletes the whole conversation of the first message.
+ You can call this anytime, when a new message arrives or with onReceive.
+ Note that if you call AbortBroadcast with a higher priority than your message application, the message won't show too.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>addCategory</name>
+            <comment>Adds a category to the receiver
+Category: </comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Category</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>registerReceiver</name>
+            <comment>Registers a Broadcast Receiver.
+ Action: the intent to listen for.
+ GoAsync: Allow it to keep the broadcast active after returning from onreceive
+Action: </comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Action</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>unregisterReceiver</name>
+            <comment>Unregisters the current Broadcast Receiver.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>AbortBroadcast</name>
+            <comment>Sets the flag indicating that this receiver should abort the current broadcast; only works with broadcasts sent through 
+ sendOrderedBroadcast. This will prevent any other broadcast receivers from receiving the broadcast.
+ It will still call onReceive() of the BroadcastReceiver that the caller of sendOrderedBroadcast passed in.
+ This method does not work with non-ordered broadcasts such as those sent with sendBroadcast</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>isRegistered</name>
+            <comment>Returns a boolean that shows if the receiver is registered.
+Return type: @return:</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>addAction</name>
+            <comment>The intent to listen for.
+Action: the Intent to listen for.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Action</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>isOrderedBroadcast</name>
+            <comment>checks if it's an ordered broadcast.
+Return type: @return:</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>sendBroadcast</name>
+            <comment>Sends a broadcast with the intent Action.
+Action: </comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Action</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>sendOrderedBroadcast</name>
+            <comment>Broadcast the given intent to all interested BroadcastReceivers, 
+ delivering them one at a time to allow more preferred receivers to consume the broadcast before it 
+ is delivered to less preferred receivers. This call is asynchronous; it returns immediately, and you 
+ will continue executing while the receivers are run.
+Action: The Intent to broadcast; all receivers matching this Intent will receive the broadcast.
+Action: receiverPermission	(optional) String naming a permissions that a receiver must hold in order to receive your broadcast. If null, no permission is required.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Action</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>receiverPermission</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <property>
+            <name>ResultData</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Retrieve the current result data, as set by the previous receiver.</comment>
+        </property>
+        <property>
+            <name>ResultCode</name>
+            <returntype>int</returntype>
+            <comment>Retrieve the current result code, as set by the previous receiver.</comment>
+        </property>
+        <field>
+            <name>SMS_RECEIVED</name>
+            <comment></comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+    </class>
+    <version>1.0</version>
+    <author>XverhelstX</author>
+</root>

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.04</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4a.objects.UsbSerial</name>
+        <shortname>UsbSerial</shortname>
+        <comment>UsbSerial supports various popular chips that support serial emulation over a USB connection
+and provides a common API to communicate with them all.
+The devices recognised by this library include:
+
+Various Prolific PL2303 based USB serial devices.
+
+Various FTDI FT232 based devices including Arduinos that use FTDI USB serial chips.
+The FTDI "status byte" bug on reading input in version 1.0 of this library is fixed.
+
+Various Arduinos that use an Atmel 8U2 or 16U2 programmed as a CDC ACM Virtual Comport.
+USB versions of the Roboclaw controller which act as an CDC ACM Virtual Comport in mode 15. 
+
+Silicon Labs CP2102 and possibly others of that series of USB to UART Bridges.
+
+The above chips are all slave USB devices and need host capabilities in the Android device.
+This usually implies that an On The Go (OTG) or "Camera" cable is needed to switch the
+Android hardware into host mode. Note that access to the modem control signals is not implemented for
+any of the above devices owing to the lack of technical data about the actual chips which the manufacturers
+deem proprietary information made available only to their OEM customers.
+
+Supported devices are recongised by the combination of their VendorID and Product ID, a list of which is
+precomiled into the library. A device that is compatible with one of the four device drivers listed above
+but that is not recognised may be supported using the SetCustomDevice method. this is most likely to be useful
+for devices implementing the USB CDC (Communications Device Class) ACM (Abstract Control Model) which is a
+vendor-independent publicly documented protocol.
+
+For convenience this library also supports Android Accessory devices that implement the AOA protocol
+(Android Open Accessory) using the same common API as the slave devices listed above.
+
+Accessories are host mode devices and can connect directly to an Android device using the same cable
+that is used to connect the Android device to a PC for program development or direct file transfer.
+
+There is a bug in the Android USB Accessory handling when trying to reconnect to a disconnected Accessory.
+In order to reliably connect to an Accessory with your program it is necessary to ensure that
+the process of any previous instance of your program that communicated with the Arduino has been killed.
+This is the reason why there is an Exit button that calls ExitApplication in the UsbSerial demo program 
+that you should use to kill the program. It is also necessary before restarting the program
+or downloading and running a modified version again to physically disconnect and reconnect the Accessory again
+If it is an Arduino ADK then pressing its Reset button will also work and will maintain the Accessory permission.</comment>
+        <owner>process</owner>
+        <method>
+            <name>Open</name>
+            <comment>Searches for a valid USB device or Accessory and tries to open it.
+Returns USB_DEVICE if a device was opened successfully.
+Returns USB_ACCESSORY if an accessory was opened successfully.
+Returns USB_NONE if neither a device nor an accessory was found.
+The BaudRate parameter is ignored if the connected device is an Accessory	
+
+ADDED: Ver_2.4 DevNum = 1 to n
+MODDED: Ver_2.4 Code changed to support DevNum</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>BaudRate</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>DevNum</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetCustomDevice</name>
+            <comment>If a device might be supported by an existing driver in this library but is not recognised
+then it can be added by this method.
+
+The driverID parameter can be one of
+
+DRIVER_PROLIFIC for a device that is compatible with the Prolific PL2303.
+DRIVER_SILABS for a device that is compatible with the Silicon Labs CP2102
+DRIVER_CDCACM for a device that is compatible with the CDC ACM model.
+DRIVER_FTDI for a device that is compatible with the FTDI FT232.
+
+DRIVER_NONE can be used in the unlikely event of needing to unrecongise a device
+
+The vendorID and productID parameters are those of the device in question.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>driverID</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>vendorID</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>productID</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RequestPermission</name>
+            <comment>Shows a dialog that asks the user to allow your application to access the USB device or Accessory.
+Note that this dialog is non-modal so your code that invokes it will carry on running and not wait for the dialog to close.
+ADDED: Ver_2.4 DevNum = 1 to n
+MODDED: Ver_2.4 Code changed to support DevNum</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>DevNum</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>HasPermission</name>
+            <comment>Tests whether your application has permission to access this device or Accessory.
+Call RequestPermission to receive such permission.
+Returns True if the user already has permission.
+
+ADDED: Ver_2.4 DevNum = 1 to n, DevCount (Count devices)
+MODDED: Ver_2.4 Code changed to support DevNum and DevCount</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>DevNum</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Close</name>
+            <comment>Closes the USB device or Accessory.
+There seems to be a bug in the Android USB Accessory handling when trying to reconnect to a disconnected Accessory.
+In order to reliably connect to an Accessory with your program it is necessary to ensure that
+the process of any previous instance of your program that communicated with the Arduino has been killed.
+This is the reason why there is an Exit button that calls ExitApplication in the UsbSerial demo program 
+that you should use to kill the program. It is also necessary before restarting the program
+or downloading and running a modified version again to physically disconnect and reconnect the Accessory again
+If it is an Arduino ADK then pressing its Reset button will also work and will maintain the Accessry permission.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>DeviceInfo</name>
+            <comment>Returns a multi-line string containing the details for the connected device.
+You need to have obtained permission before calling this method. 
+
+ADDED: Ver_2.4 DevNum = 1 to n
+MODDED: Ver_2.4 Code changed to support DevNum</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>DevNum</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>UsbPresent</name>
+            <comment>Checks is there is a supported device or Accessory connected to the USB port.
+Returns USB_DEVICE if a supported slave device is present
+Returns USB_ACCESSORY if an Accessory that supports is present
+Returns USB_NONE if neither a recognised device nor an accessory was found.
+
+ADDED: Ver_2.4 DevNum = 1 to n
+MODDED: Ver_2.4 Code changed to support DevNum</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>DevNum</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetOutputStream</name>
+            <comment>Returns an OutputStream for working with AsyncStreams from the RandomAccessFile library.</comment>
+            <returntype>java.io.OutputStream</returntype>
+        </method>
+        <method>
+            <name>SetParameters</name>
+            <comment>Sets the parameters of the serial port.
+This must be called after the permission is obtained and the port has been opened.
+This method is ignored if the connected device is an Accessory which doesn't need these parameters.
+
+baudRate baud rate is an integer, for example 115200.
+dataBits is one of DATABITS_5, DATABITS_6, DATABITS_7, or DATABITS_8.
+stopBits is one of STOPBITS_1, STOPBITS_1_5, or STOPBITS_2.
+parity is one of PARITY_NONE, PARITY_ODD, PARITY_EVEN, PARITY_MARK, or PARITY_SPACE.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>baudRate</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>dataBits</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>stopBits</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>parity</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetInputStream</name>
+            <comment>Returns an InputStream for working with AsyncStreams from the RandomAccessFile library.</comment>
+            <returntype>java.io.InputStream</returntype>
+        </method>
+        <property>
+            <name>UsbTimeout</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>mSecs</name>
+                <type>int</type>
+            </parameter>
+            <comment>This is exposed for dignostic purpose. It sets the timeout that USB reads and writes wait.
+The default value of 200mS will probably not need to be changed in normal use.
+If you seem to be losing data at high baud rates try reducing or increasing this value</comment>
+        </property>
+        <property>
+            <name>Version</name>
+            <returntype>double</returntype>
+            <comment>Returns the version of the library.</comment>
+        </property>
+        <field>
+            <name>PARITY_NONE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>STOPBITS_2</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>STOPBITS_1</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PARITY_SPACE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DATABITS_5</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DATABITS_6</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DRIVER_PROLIFIC</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DATABITS_7</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DATABITS_8</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PARITY_ODD</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DRIVER_CDCACM</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ACCESSORY</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_DEVICE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PARITY_EVEN</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_NONE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>STOPBITS_1_5</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DRIVER_FTDI</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PARITY_MARK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DRIVER_SILABS</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <version>2.4</version>
+    <comment>This library is based on the usb-serial-for-android library with support added
+for Prolific PL2303  and Android Accessory (ADK) devices. 
+&lt;link&gt;https://code.google.com/p/usb-serial-for-android/|https://code.google.com/p/usb-serial-for-android/&lt;/link&gt;
+
+Unlike version 1.0 of this library it does not need a separate usb-serial-for-android jar file as this
+is now incopoprated into the library.
+
+usb-serial-for-android and therefore also this library is licensed under the GNU Lesser General Public License v3.
+&lt;link&gt;http://www.gnu.org/licenses/lgpl.html|http://www.gnu.org/licenses/lgpl.html&lt;/link&gt;
+Copies of both the General Public License and Lesser General Public License are in the provided archive.</comment>
+</root>

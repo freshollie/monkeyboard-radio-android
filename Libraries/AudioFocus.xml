@@ -23,6 +23,11 @@
             </parameter>
         </method>
         <method>
+            <name>isMusicActive</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
             <name>abandonAudioFocus</name>
             <comment></comment>
             <returntype>void</returntype>
@@ -32,6 +37,14 @@
             <comment></comment>
             <returntype>boolean</returntype>
         </method>
+        <property>
+            <name>Volume</name>
+            <parameter>
+                <name>volume</name>
+                <type>int</type>
+            </parameter>
+            <comment></comment>
+        </property>
     </class>
     <version>1.0</version>
     <author>Freshollie</author>

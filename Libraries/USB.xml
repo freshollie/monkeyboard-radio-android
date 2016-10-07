@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.04</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.UsbManagerWrapper</name>
+        <shortname>UsbManager</shortname>
+        <comment>UsbManager gives access to the connected Usb devices. It also holds the related constants.
+This library requires Android SDK 12 or above (Android 3.1 or above).
+You should configure Basic4android to use android.jar from android-12 or above.</comment>
+        <owner>process</owner>
+        <method>
+            <name>OpenDevice</name>
+            <comment>Connects to the given device and claims exclusive access to the given interface.
+ForceClaim - Whether the system should disconnect kernel drivers if necessary.</comment>
+            <returntype>anywheresoftware.b4a.objects.usb.UsbDeviceConnectionWrapper</returntype>
+            <parameter>
+                <name>Device</name>
+                <type>android.hardware.usb.UsbDevice</type>
+            </parameter>
+            <parameter>
+                <name>Interface</name>
+                <type>android.hardware.usb.UsbInterface</type>
+            </parameter>
+            <parameter>
+                <name>ForceClaim</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>OpenAccessory</name>
+            <comment>Connects to the given accessory</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Accessory</name>
+                <type>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbAccessoryWrapper</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>RequestAccessoryPermission</name>
+            <comment>Shows a dialog that asks the user to allow your application to access the USB accessory.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Accessory</name>
+                <type>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbAccessoryWrapper</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetDevices</name>
+            <comment>Returns an array of UsbDevices with all the connected USB devices.</comment>
+            <returntype>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbDeviceWrapper[]</returntype>
+        </method>
+        <method>
+            <name>HasPermission</name>
+            <comment>Tests whether your application has permission to access this device.
+Call RequestPermission to receive such permission.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>Device</name>
+                <type>android.hardware.usb.UsbDevice</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RequestPermission</name>
+            <comment>Shows a dialog that asks the user to allow your application to access the USB device.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Device</name>
+                <type>android.hardware.usb.UsbDevice</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetAccessories</name>
+            <comment>Returns an array of UsbAccessories with all the connected USB accessories.</comment>
+            <returntype>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbAccessoryWrapper[]</returntype>
+        </method>
+        <method>
+            <name>HasAccessoryPermission</name>
+            <comment>Tests whether your application has permission to access this accessory.
+Call RequestAccessoryPermission to receive such permission.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>Accessory</name>
+                <type>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbAccessoryWrapper</type>
+            </parameter>
+        </method>
+        <field>
+            <name>USB_INTERFACE_SUBCLASS_BOOT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_CSCID</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_MISC</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_STILL_IMAGE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_DIR_OUT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ENDPOINT_NUMBER_MASK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_PER_INTERFACE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_TYPE_CLASS</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_TYPE_VENDOR</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_CDC_DATA</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ENDPOINT_XFER_INT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_TYPE_MASK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_VENDOR_SPEC</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_SUBCLASS_VENDOR_SPEC</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_WIRELESS_CONTROLLER</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ENDPOINT_XFER_CONTROL</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_PHYSICA</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ENDPOINT_XFER_BULK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_PRINTER</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_HUB</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_CONTENT_SEC</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_AUDIO</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_APP_SPEC</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_TYPE_STANDARD</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_COMM</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ENDPOINT_DIR_MASK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ENDPOINT_XFERTYPE_MASK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_HID</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_DIR_IN</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_ENDPOINT_XFER_ISOC</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_MASS_STORAGE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_CLASS_VIDEO</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>USB_TYPE_RESERVED</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbDeviceWrapper</name>
+        <shortname>UsbDevice</shortname>
+        <comment>Represents a Usb device.</comment>
+        <objectwrapper>android.hardware.usb.UsbDevice</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>GetInterface</name>
+            <comment>Gets the interface at the given index.</comment>
+            <returntype>android.hardware.usb.UsbInterface</returntype>
+            <parameter>
+                <name>Index</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>DeviceId</name>
+            <returntype>int</returntype>
+            <comment>Gets the device id.</comment>
+        </property>
+        <property>
+            <name>DeviceName</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Gets the device name.</comment>
+        </property>
+        <property>
+            <name>InterfaceCount</name>
+            <returntype>int</returntype>
+            <comment>Gets the number of interfaces.</comment>
+        </property>
+        <property>
+            <name>VendorId</name>
+            <returntype>int</returntype>
+            <comment>Gets the vendor id.</comment>
+        </property>
+        <property>
+            <name>DeviceClass</name>
+            <returntype>int</returntype>
+            <comment>Gets the device class.</comment>
+        </property>
+        <property>
+            <name>DeviceSubclass</name>
+            <returntype>int</returntype>
+            <comment>Gets the device subclass.</comment>
+        </property>
+        <property>
+            <name>ProductId</name>
+            <returntype>int</returntype>
+            <comment>Gets the product id.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbInterfaceWrapper</name>
+        <shortname>UsbInterface</shortname>
+        <comment>Represents a Usb interface on a specific device.</comment>
+        <objectwrapper>android.hardware.usb.UsbInterface</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>GetEndpoint</name>
+            <comment>Gets the endpoint at the given index.</comment>
+            <returntype>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbEndpointWrapper</returntype>
+            <parameter>
+                <name>Index</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>InterfaceClass</name>
+            <returntype>int</returntype>
+            <comment>Gets the interface class.</comment>
+        </property>
+        <property>
+            <name>EndpointCount</name>
+            <returntype>int</returntype>
+            <comment>Gets the number of endpoints available in this interface.</comment>
+        </property>
+        <property>
+            <name>InterfaceProtocol</name>
+            <returntype>int</returntype>
+            <comment>Gets the interface protocol.</comment>
+        </property>
+        <property>
+            <name>InterfaceSubclass</name>
+            <returntype>int</returntype>
+            <comment>Gets the interface subclass.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbEndpointWrapper</name>
+        <shortname>UsbEndpoint</shortname>
+        <comment>Represents an endpoint in a specific interface.</comment>
+        <objectwrapper>android.hardware.usb.UsbEndpoint</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>EndpointNumber</name>
+            <returntype>int</returntype>
+            <comment>Gets the endpoint number.</comment>
+        </property>
+        <property>
+            <name>Attributes</name>
+            <returntype>int</returntype>
+            <comment>Gets the endpoint attributes.</comment>
+        </property>
+        <property>
+            <name>Interval</name>
+            <returntype>int</returntype>
+            <comment>Gets the interval field.</comment>
+        </property>
+        <property>
+            <name>MaxPacketSize</name>
+            <returntype>int</returntype>
+            <comment>Gets the maximum packet size.</comment>
+        </property>
+        <property>
+            <name>Type</name>
+            <returntype>int</returntype>
+            <comment>Gets the endpoint type.</comment>
+        </property>
+        <property>
+            <name>Address</name>
+            <returntype>int</returntype>
+            <comment>Gets the endpoint address.</comment>
+        </property>
+        <property>
+            <name>Direction</name>
+            <returntype>int</returntype>
+            <comment>Gets the endpoint direction. Can be UsbManager.USB_DIR_IN or UsbManager.USB_DIR_OUT.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbAccessoryWrapper</name>
+        <shortname>UsbAccessory</shortname>
+        <comment>Represents a Usb accessory.</comment>
+        <owner>process</owner>
+        <method>
+            <name>Close</name>
+            <comment>Closes the accessory.
+The accessory input and output streams should be individually closed first.</comment>
+            <returntype>void</returntype>
+        </method>
+        <property>
+            <name>Serial</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Gets the unique serial number for the accessory.</comment>
+        </property>
+        <property>
+            <name>Manufacturer</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Gets the manufacturer of the accessory.</comment>
+        </property>
+        <property>
+            <name>Description</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Gets the description of the accessory.</comment>
+        </property>
+        <property>
+            <name>Model</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Gets the model name of the accessory.</comment>
+        </property>
+        <property>
+            <name>Uri</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Gets the URI for the website of the accessory.</comment>
+        </property>
+        <property>
+            <name>InputStream</name>
+            <returntype>anywheresoftware.b4a.objects.streams.File.InputStreamWrapper</returntype>
+            <comment>Gets the input stream for the accessory.
+When reading data from an accessory ensure that the buffer that you use is
+big enough to store the USB packet data. The Android accessory protocol supports
+packet buffers up to 16384 bytes, so you can choose to always declare your buffer
+to be of this size for simplicity.</comment>
+        </property>
+        <property>
+            <name>Version</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Gets the version of the accessory.</comment>
+        </property>
+        <property>
+            <name>OutputStream</name>
+            <returntype>anywheresoftware.b4a.objects.streams.File.OutputStreamWrapper</returntype>
+            <comment>Gets the output stream for the accessory.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.UsbDeviceConnectionWrapper</name>
+        <shortname>UsbDeviceConnection</shortname>
+        <comment>Represents a connection between the host and a client.
+UsbDeviceConnection is created by calling UsbManager.OpenDevice.
+Once connected you should call StartListening to start listening for completed requests.
+Sending requests is done with UsbRequest.Queue.
+The NewData event is raised when a request completes. The request is passed as a parameter.
+You should call ContinueListening to allow the listener to listen to the next completed request (after another IN request is sent).
+Calling StopListening will close the connection.
+ControlTransfer method sends requests to endpoint zero which is the control endpoint.
+ControlTransfer is a blocking method (unlike UsbRequest.Queue which is asynchronous).</comment>
+        <owner>process</owner>
+        <event>NewData (Request As UsbRequest, InDirection As Boolean)</event>
+        <method>
+            <name>GetRawDescriptors</name>
+            <comment>Returns the raw descriptors as an array of bytes.
+&lt;b&gt;This method is only available in Android 3.2 or above.&lt;/b&gt;It will return an empty array in Android 3.1.</comment>
+            <returntype>byte[]</returntype>
+        </method>
+        <method>
+            <name>StartListening</name>
+            <comment>Starts listening for completed requests. When such are available the NewData event will be raised.
+EventName - The name of the sub that will handle the events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StopListening</name>
+            <comment>Stops listening to requests and closes the connection.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>ContinueListening</name>
+            <comment>Notifies the listener to continue listening for completed requests.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>CloseSynchronous</name>
+            <comment>Closes the connection. StopListening also closes the connection.
+This method should only be used when the asynchronous listener was not started.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>BulkTransfer</name>
+            <comment>Sends a synchronous request.
+Endpoint - The endpoint for this transaction. The transfer direction is determined by this endpoint.
+Buffer - Buffer for data to send or receive.
+Length - The length of the data.
+Timeout - Request timeout in milliseconds.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Endpoint</name>
+                <type>android.hardware.usb.UsbEndpoint</type>
+            </parameter>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>Length</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Timeout</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ControlTransfer</name>
+            <comment>Performs a control transaction on endpoint zero. Returns the number of bytes transferred.
+RequestType - The request type. It should combine USB_DIR_IN or USB_DIR_OUT to set the request direction.
+Request - Request Id.
+Value - Value field.
+Index - Index field.
+Buffer - Buffer for data portion. Pass Null if not needed.
+Length - The length of the data to send or receive.
+Timeout - Timeout in milliseconds.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>RequestType</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Request</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Value</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Index</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>Length</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Timeout</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment>Tests whether the object was initialized.</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>Serial</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Returns the connected device serial number.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.UsbDeviceConnectionWrapper.UsbRequestWrapper</name>
+        <shortname>UsbRequest</shortname>
+        <comment>This object represents a USB request packet.
+ Queue method sends the request.</comment>
+        <objectwrapper>android.hardware.usb.UsbRequest</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the request. The request will be binded to the given connection and endpoint.
+Note that for control transactions you should use UsbDeviceConnection.ControlTransfer.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Connection</name>
+                <type>anywheresoftware.b4a.objects.usb.UsbDeviceConnectionWrapper</type>
+            </parameter>
+            <parameter>
+                <name>Endpoint</name>
+                <type>android.hardware.usb.UsbEndpoint</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Queue</name>
+            <comment>Queues the request for sending. UsbDeviceConnection_NewData event will be raised when the transaction completes.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>Length</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>Name</name>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>n</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Gets or sets an arbitrary string that can be used to identify the request.</comment>
+        </property>
+        <property>
+            <name>UsbEndpoint</name>
+            <returntype>anywheresoftware.b4a.objects.usb.UsbManagerWrapper.UsbEndpointWrapper</returntype>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Buffer</name>
+            <returntype>byte[]</returntype>
+            <comment>Returns the buffer associated with the request.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.objects.usb.MtpDeviceWrapper</name>
+        <shortname>MtpDevice</shortname>
+        <objectwrapper>android.mtp.MtpDevice</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>Initialize</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>UsbDevice</name>
+                <type>android.hardware.usb.UsbDevice</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Open</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Connection</name>
+                <type>anywheresoftware.b4a.objects.usb.UsbDeviceConnectionWrapper</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Close</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>test</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+    </class>
+    <version>0.98</version>
+    <comment>A complete working example with a tutorial is available &lt;link&gt;here|http://www.basic4ppc.com/forum/basic4android-getting-started-tutorials/11289-android-usb-host-tutorial-adbtest.html&lt;/link&gt;.</comment>
+</root>

@@ -1,0 +1,1098 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.04</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4a.audio.VideoViewWrapper</name>
+        <shortname>VideoView</shortname>
+        <comment>VideoView is a view that allows you to play video media inside your application.
+The VideoView optionally shows a media controller when the user touches the view.
+The Completed event is raised when playback is completed.
+Simple example of using VideoView:&lt;code&gt;
+Sub Globals
+	Dim vv As VideoView
+End Sub
+Sub Activity_Create(FirstTime As Boolean)
+	vv.Initialize("vv")
+	Activity.AddView(vv, 10dip, 10dip, 250dip, 250dip)
+	vv.LoadVideo(File.DirRootExternal, "somefile.mp4")
+	vv.Play
+End Sub
+Sub vv_Complete
+	Log("Playing completed")
+End Sub&lt;/code&gt;</comment>
+        <objectwrapper>android.widget.VideoView</objectwrapper>
+        <owner>activity</owner>
+        <event>Complete</event>
+        <method>
+            <name>IsPlaying</name>
+            <comment>Tests whether the video is currently playing.</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>BringToFront</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>RequestFocus</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>RemoveView</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>SetBackgroundImage</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>android.graphics.Bitmap</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Stop</name>
+            <comment>Stops the playback.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Invalidate3</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>arg1</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>arg2</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>arg3</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Invalidate2</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>android.graphics.Rect</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initialize the objects and sets the name of the subs that will handle the events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Play</name>
+            <comment>Starts or resumes playing.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Invalidate</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>SetLayout</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type Pixel="true">int</type>
+            </parameter>
+            <parameter>
+                <name>arg1</name>
+                <type Pixel="true">int</type>
+            </parameter>
+            <parameter>
+                <name>arg2</name>
+                <type Pixel="true">int</type>
+            </parameter>
+            <parameter>
+                <name>arg3</name>
+                <type Pixel="true">int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>LoadVideo</name>
+            <comment>Loads a video file and prepares it for playing.
+It is not possible to load files from the assets folder.
+Advanced: you can pass "http" to the Dir parameter and then a full URL (including http) to the FileName.
+In this case the online video will be streamed. Note that you need to add the INTERNET permission for this to work.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>FileName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Pause</name>
+            <comment>Pauses the playback.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>toString</name>
+            <comment></comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>SendToBack</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <property>
+            <name>Top</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type Pixel="true">int</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Enabled</name>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>boolean</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Visible</name>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>boolean</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Background</name>
+            <returntype>android.graphics.drawable.Drawable</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>android.graphics.drawable.Drawable</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Height</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type Pixel="true">int</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Left</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type Pixel="true">int</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Color</name>
+            <parameter>
+                <name>arg0</name>
+                <type>int</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Tag</name>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>java.lang.Object</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Duration</name>
+            <returntype>int</returntype>
+            <comment>Gets the video duration in milliseconds.</comment>
+        </property>
+        <property>
+            <name>Position</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>v</name>
+                <type>int</type>
+            </parameter>
+            <comment>Gets or sets the playing position (in milliseconds).</comment>
+        </property>
+        <property>
+            <name>Width</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type Pixel="true">int</type>
+            </parameter>
+            <comment></comment>
+        </property>
+        <property>
+            <name>MediaControllerEnabled</name>
+            <parameter>
+                <name>v</name>
+                <type>boolean</type>
+            </parameter>
+            <comment>Sets whether the media controller is enabled. It is enabled by default.
+Note that the media player gets attached to the VideoView parent.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.audio.SoundPoolWrapper</name>
+        <shortname>SoundPool</shortname>
+        <comment>SoundPool holds a collection of short sounds which can be played with low latency.
+Each sound has two Id values which you should work with. The first is the LoadId which is returned when loading the sound with Load.
+The second is the PlayId which is returned when you call Play.
+When working with SoundPool it is useful to watch the unfiltered LogCat for messages (for example when the sound is too long).</comment>
+        <objectwrapper>android.media.SoundPool</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the SoundPool and sets the maximum number of simultaneous streams.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>MaxStreams</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Unload</name>
+            <comment>Unloads the stream with the given LoadId.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>LoadId</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Play</name>
+            <comment>Plays the sound with the matching LoadId and returns the PlayId. Returns 0 if there was an error.
+LoadId - The value returned when loading the file.
+LeftVolume / RightVolume - The volume value (0 - 1)
+Priority - A priority value which you assign to this sound. The higher the value the higher the priority.
+When the number of simultaneous streams is higher than the value set in Initialize the lowest priority stream will be stopped.
+Loop - Number of times to repeat. Pass -1 to repeat indefinitely.
+Rate - Playback rate (0 - 2).</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>LoadId</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>LeftVolume</name>
+                <type>float</type>
+            </parameter>
+            <parameter>
+                <name>RightVolume</name>
+                <type>float</type>
+            </parameter>
+            <parameter>
+                <name>Priority</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Loop</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Rate</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Load</name>
+            <comment>Loads a sound file and returns the sound LoadId.
+Example:&lt;code&gt;
+Dim LoadId As Int
+LoadId = SP.Load(File.DirAssets, "sound.wav")&lt;/code&gt;</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>File</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetRate</name>
+            <comment>Sets the rate of the stream with the given PlayId. Value is between 0 to 2.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>PlayId</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Rate</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Stop</name>
+            <comment>Stops the stream with the given PlayId.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>PlayId</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Release</name>
+            <comment>Releases all resources allocated to this object.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>SetVolume</name>
+            <comment>Sets the volume of the stream with the given PlayId. Values are between 0 to 1.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>PlayId</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Left</name>
+                <type>float</type>
+            </parameter>
+            <parameter>
+                <name>Right</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Resume</name>
+            <comment>Resumes the stream with the given PlayId.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>PlayId</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Pause</name>
+            <comment>Pauses the stream with the given PlayId.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>PlayId</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.audio.MediaPlayerStreamWrapper</name>
+        <shortname>MediaPlayerStream</shortname>
+        <comment>MediaPlayerStream is similar to MediaPlayer. Unlike MediaPlayer which plays local files MediaPlayerStream plays audio streams
+which are available online. Another difference between the objects is that in this case the Load method is asynchronous.
+Only when the file is ready, the StreamReady event will be fired and you can start playing.
+According to the native documentation the online resource must support progressive download.
+Example:&lt;code&gt;
+Sub Process_Globals
+	Dim mp As MediaPlayerStream
+End Sub
+
+Sub Globals
+
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	If FirstTime Then
+		mp.Initialize("mp")
+	End If
+	mp.Load("http://www...")
+End Sub
+Sub mp_StreamReady
+	Log("starts playing")
+	mp.Play
+End Sub
+Sub mp_StreamError (ErrorCode As String, ExtraData As Int)
+	Log("Error: " &amp; ErrorCode &amp; ", " &amp; ExtraData)
+	ToastMessageShow("Error: " &amp; ErrorCode &amp; ", " &amp; ExtraData, True)
+End Sub
+Sub mp_StreamBuffer(Percentage As Int)
+	Log(Percentage)
+End Sub&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <event>StreamReady</event>
+        <event>StreamError (ErrorCode As String, ExtraData As Int)</event>
+        <event>StreamBuffer(Percentage As Int)</event>
+        <event>Complete</event>
+        <permission>android.permission.INTERNET</permission>
+        <method>
+            <name>Release</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object.
+EventName - Name of Subs that will handle the events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsPlaying</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Play</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>SetVolume</name>
+            <comment>Sets the playing volume for each channel. The value should be between 0 to 1.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Right</name>
+                <type>float</type>
+            </parameter>
+            <parameter>
+                <name>Left</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Load</name>
+            <comment>Starts loading the resource from the given URL.
+StreamReady event will be raised when the stream is ready.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>URL</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Pause</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Stop</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <property>
+            <name>Duration</name>
+            <returntype>int</returntype>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Looping</name>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>boolean</type>
+            </parameter>
+            <comment></comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.audio.JetPlayerWrapper</name>
+        <shortname>JetPlayer</shortname>
+        <objectwrapper>android.media.JetPlayer</objectwrapper>
+        <owner>process</owner>
+        <event>QueuedSegmentsCountChanged (Count As Int)</event>
+        <event>CurrentUserIdChanged (UserId As Int, RepeatCount As Int)</event>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and sets the Subs that will handle the JetPlayer events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetTrackMute</name>
+            <comment>Similar to SetMute but only changes the state of a single track.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Track</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Mute</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>Sync</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Play</name>
+            <comment>Starts playing the segments queue.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>ClearQueue</name>
+            <comment>Clears the segments queue.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>CloseFile</name>
+            <comment>Closes the resources related to the loaded file.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>LoadFile</name>
+            <comment>Loads a jet file.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>File</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Release</name>
+            <comment>Releases all resources allocated for the JetPlayer.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>SetMute</name>
+            <comment>Sets the tracks mute state.
+MuteArray - An array of booleans that sets the mute state of each track. The array length must be equal to MaxTracks value.
+Sync - If false the change will be applied as soon as possible, otherwise the change will be applied at the start of the next segment or next repeat.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>MuteArray</name>
+                <type>boolean[]</type>
+            </parameter>
+            <parameter>
+                <name>Sync</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>QueueSegment</name>
+            <comment>Adds a segment to the queue. No more than 3 segments are allowed.
+SegmentNum - The segment identifier.
+LibNum - The index of the sound bank associated with this segment. Pass -1 if there is no sound bank.
+RepeatCount - Number of times the segment will be repeated. 0 means that it will be played once. Pass -1 to repeat indefinitely.
+Transpose - The pitch transition. Should be between -12 to 12.
+MuteArray - An array of booleans that sets the mute value of each track. The array length must be equal to MaxTracks value.
+UserId - An id given to this segment. When the current segment changes the CurrentUserIdChanged event is raised with this id
+(assuming that the id of the previous segment was different).</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>SegmentNum</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>LibNum</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>RepeatCount</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Transpose</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>MuteArray</name>
+                <type>boolean[]</type>
+            </parameter>
+            <parameter>
+                <name>UserId</name>
+                <type>byte</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Pause</name>
+            <comment>Pauses playback.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>MaxTracks</name>
+            <returntype>int</returntype>
+            <comment>Returns the maximum number of simultaneous tracks.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.audio.Beeper</name>
+        <shortname>Beeper</shortname>
+        <comment>Plays a "beep" sound with the given duration and frequency.
+Example:&lt;code&gt;
+Dim b As Beeper
+b.Initialize(300, 500)
+b.Beep&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <method>
+            <name>Release</name>
+            <comment>Releases the resources used by this beeper.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object with the given duration measured in milliseconds and the given frequency measured in Hertz.
+The music volume channel will be used.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Duration</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Frequency</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize2</name>
+            <comment>Similar to Initialize. Allows you to set the volume channel.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Duration</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Frequency</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>VoiceChannel</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Beep</name>
+            <comment>Plays the sound.</comment>
+            <returntype>void</returntype>
+        </method>
+        <field>
+            <name>VOLUME_NOTIFICATION</name>
+            <comment>Notifications channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_RING</name>
+            <comment>Phone ring channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_VOICE_CALL</name>
+            <comment>Voice calls channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_SYSTEM</name>
+            <comment>System sounds channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_MUSIC</name>
+            <comment>Music channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_ALARM</name>
+            <comment>Alarms channel.</comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.audio.AudioStreamer</name>
+        <shortname>AudioStreamer</shortname>
+        <owner>process</owner>
+        <event>RecordBuffer (Data() As Byte)</event>
+        <event>PlaybackComplete</event>
+        <event>Error</event>
+        <permission>android.permission.RECORD_AUDIO</permission>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object.
+EventName - Sets the subs that will handle the events.
+SampleRate - Sample rate in Hz. Common values: 44100, 22050 and 11025.
+Mono - True for mono false for stereo.
+Encoding - 8 for 8 bit or 16 for 16 bit. &lt;b&gt;Only 16 bit is supported for now.&lt;/b&gt;
+ValueChannel - The output channel. One of the VOLUME constants.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>SampleRate</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Mono</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>Encoding</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>VolumeChannel</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StopPlaying</name>
+            <comment>Stops playing.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>StopRecording</name>
+            <comment>Stops recording.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Write</name>
+            <comment>Writes the data to the player queue. The array size must be smaller than PlayerBufferSize.
+Returns False if the internal queue is full. In that case the data was not written.
+Writing Null to the queue will stop the player when the message is processed and then raise the PlaybackComplete event.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>Data</name>
+                <type>byte[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize2</name>
+            <comment>Similar to Initialize. Allows you to set the audio source.
+The values are listed &lt;link&gt;here|http://developer.android.com/reference/android/media/MediaRecorder.AudioSource.html&lt;/link&gt;.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>AudioSource</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>SampleRate</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Mono</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>Encoding</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>VolumeChannel</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StartRecording</name>
+            <comment>Starts recording. The RecordBuffer event will be raised during the record.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>StartPlaying</name>
+            <comment>Starts playing. You should call Write to write the PCM data while playing is in progress.</comment>
+            <returntype>void</returntype>
+        </method>
+        <property>
+            <name>PlayerBufferSize</name>
+            <returntype>int</returntype>
+            <comment>Returns the player buffer size. This is the maximum size that can be written at once.</comment>
+        </property>
+        <field>
+            <name>VOLUME_NOTIFICATION</name>
+            <comment>Notifications channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_RING</name>
+            <comment>Phone ring channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_VOICE_CALL</name>
+            <comment>Voice calls channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_SYSTEM</name>
+            <comment>System sounds channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_MUSIC</name>
+            <comment>Music channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_ALARM</name>
+            <comment>Alarms channel.</comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.audio.AudioRecordApp</name>
+        <shortname>AudioRecordApp</shortname>
+        <comment>AudioRecordApp lets you use the default audio recorder application to record audio.
+After initializing the object you should call Record to start recording.
+The RecordComplete event will be raised when record completes.
+Example:&lt;code&gt;
+Sub Process_Globals
+	Dim audioRecorder As AudioRecordApp
+	Dim videoRecorder As VideoRecordApp
+End Sub
+
+Sub Globals
+	Dim vv As VideoView
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+   If FirstTime Then
+   		audioRecorder.Initialize("audioRecorder")
+		videoRecorder.Initialize("videoRecorder")
+	End If
+	vv.Initialize("vv")
+	Activity.AddView(vv, 0, 0, 100%x, 100%y)
+	Activity.AddMenuItem("Record Video", "RecordVideo")
+	Activity.AddMenuItem("Record Audio", "RecordAudio")
+	ToastMessageShow("Press on Menu button...", True)
+End Sub
+
+Sub RecordVideo_Click
+	videoRecorder.Record(File.DirRootExternal, "1.mp4")
+End Sub
+Sub RecordAudio_Click
+	audioRecorder.Record(File.DirRootExternal, "1.3gpp")
+End Sub
+Sub videoRecorder_RecordComplete (Success As Boolean)
+	Log(Success)
+	If Success Then
+		vv.LoadVideo(File.DirRootExternal, "1.mp4")
+		vv.Play
+	End If
+End Sub
+Sub audioRecorder_RecordComplete (Success As Boolean)
+	Log(Success)
+	If Success Then
+		vv.LoadVideo(File.DirRootExternal, "1.3gpp")
+		vv.Play
+	End If
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <event>RecordComplete (Success As Boolean)</event>
+        <permission>android.permission.WRITE_EXTERNAL_STORAGE</permission>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and sets the sub that will handle the event.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Record</name>
+            <comment>Calls the recording application.
+Dir and FileName set the output file location.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>FileName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.audio.AudioRecordApp.VideoRecordApp</name>
+        <shortname>VideoRecordApp</shortname>
+        <comment>VideoRecordApp lets you use the default video recorder application to record video.
+After initializing the object you should call Record to start recording.
+The RecordComplete event will be raised when record completes.
+Example:&lt;code&gt;
+Sub Process_Globals
+	Dim audioRecorder As AudioRecordApp
+	Dim videoRecorder As VideoRecordApp
+End Sub
+
+Sub Globals
+	Dim vv As VideoView
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+   If FirstTime Then
+   		audioRecorder.Initialize("audioRecorder")
+		videoRecorder.Initialize("videoRecorder")
+	End If
+	vv.Initialize("vv")
+	Activity.AddView(vv, 0, 0, 100%x, 100%y)
+	Activity.AddMenuItem("Record Video", "RecordVideo")
+	Activity.AddMenuItem("Record Audio", "RecordAudio")
+	ToastMessageShow("Press on Menu button...", True)
+End Sub
+
+Sub RecordVideo_Click
+	videoRecorder.Record(File.DirRootExternal, "1.mp4")
+End Sub
+Sub RecordAudio_Click
+	audioRecorder.Record(File.DirRootExternal, "1.3gpp")
+End Sub
+Sub videoRecorder_RecordComplete (Success As Boolean)
+	Log(Success)
+	If Success Then
+		vv.LoadVideo(File.DirRootExternal, "1.mp4")
+		vv.Play
+	End If
+End Sub
+Sub audioRecorder_RecordComplete (Success As Boolean)
+	Log(Success)
+	If Success Then
+		vv.LoadVideo(File.DirRootExternal, "1.3gpp")
+		vv.Play
+	End If
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <event>RecordComplete (Success As Boolean)</event>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and sets the sub that will handle the event.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Record</name>
+            <comment>Calls the recording application.
+Dir and FileName set the output file location.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>FileName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Record2</name>
+            <comment>Calls the recording application.
+Dir and FileName set the output file location.
+                 MaxLengthSeconds - Sets the maximum duration (in seconds).</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>FileName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>MaxLengthSeconds</name>
+                <type>int</type>
+            </parameter>
+        </method>
+    </class>
+    <version>1.63</version>
+</root>
