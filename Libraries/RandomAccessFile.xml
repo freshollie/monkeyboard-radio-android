@@ -1,0 +1,843 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.04</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4a.randomaccessfile.RandomAccessFile</name>
+        <shortname>RandomAccessFile</shortname>
+        <comment>This object allows you to non-sequentially access files and bytes arrays.
+You can also use it to encode numbers to bytes (and vice versa).
+Note that assets files (files added with the file manager) cannot be opened with this object as those files are actually packed inside the APK file.
+A short tutorial about the encryption methods is available &lt;link&gt;here|http://www.basic4ppc.com/forum/basic4android-getting-started-tutorials/11565-encryptying-information-randomaccessfile-library.html&lt;/link&gt;.</comment>
+        <owner>process</owner>
+        <method>
+            <name>ReadLong</name>
+            <comment>Reads a Long value stored in the specified position.
+Reads 8 bytes.</comment>
+            <returntype>long</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Flush</name>
+            <comment>Flushes any cached data.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>WriteBytes</name>
+            <comment>Writes the given buffer to the stream. The first byte written is Buffer(StartOffset)
+and the last is Buffer(StartOffset + Length - 1).
+Returns the numbers of bytes written which is equal to Length.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>StartOffset</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Length</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteEncryptedObject</name>
+            <comment>Similar to WriteObject. The object is encrypted with AES-256 and then written to the stream.
+Note that it is faster to write a single large object compared to many smaller objects.
+Object - The object that will be written.
+Password - The password that protects the object.
+Position - The position in the file that this object will be written to.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Object</name>
+                <type>java.lang.Object</type>
+            </parameter>
+            <parameter>
+                <name>Password</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteInt</name>
+            <comment>Writes an Int value to the specified position.
+Writes 4 bytes.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Value</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Close</name>
+            <comment>Closes the stream.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>WriteObject</name>
+            <comment>Writes the given object to the stream.
+This method is capable of writing the following types of objects: Lists, Arrays, Maps, Strings, primitive types and user defined types.
+Combinations of these types are also supported. For example, a map with several lists of arrays can be written.
+The element type inside a collection must be a String or primitive type.
+Note that changing your package name may make older objects files unusable (requiring you to write them again).
+Object - The object that will be written.
+Compress - Whether to compress the data before writing it. Should be true in most cases.
+Position - The position in the file that this object will be written to.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Object</name>
+                <type>java.lang.Object</type>
+            </parameter>
+            <parameter>
+                <name>Compress</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteB4XObject</name>
+            <comment>Similar to WriteObject. This method writes the object in a format supported by B4i, B4A and B4J.
+ The following types are supported: Lists, Arrays of bytes and Arrays of objects, Maps, Strings, primitive types and user defined types.
+ Note that user defined types should be declared in the Main module.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Object</name>
+                <type>java.lang.Object</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize2</name>
+            <comment>Same as Initialize with the option to set the byte order to little endian instead of the
+default big endian. This can be useful when sharing files with Windows computers.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>File</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>ReadOnly</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>LittleEndian</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize3</name>
+            <comment>Treats the given buffer as a random access file with a constant size.
+This allows you to read and write values to an array of bytes.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>LittleEndian</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadInt</name>
+            <comment>Reads an Int value stored in the specified position.
+Reads 4 bytes.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Opens the specified file.
+Note that it is not possible to open a file saved in the assets folder with this object.
+If needed you can copy the file to another location and then open it.
+ReadOnly - Whether to open the file in read only mode (otherwise it will be readable and writable).
+Example:&lt;code&gt;
+Dim raf As RandomAccessFile
+raf.Initialize(File.DirInternal, "1.dat", false)&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>File</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>ReadOnly</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteShort</name>
+            <comment>Writes a Short value to the specified position.
+Writes 2 bytes.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Value</name>
+                <type>short</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteFloat</name>
+            <comment>Writes a Float value to the specified position.
+Writes 4 bytes.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Value</name>
+                <type>float</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadUnsignedByte</name>
+            <comment>Reads an unsigned bytes (0 - 255) stored in the specified position.
+The value returned is of type Int as Byte can only store values between -128 to 127.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadBytes</name>
+            <comment>Reads bytes from the stream and into to the given array.
+Buffer - Array of bytes where the data will be written to.
+StartOffset - The first byte read will be written to Buffer(StartOffset).
+Length - Number of bytes to read.
+Position - The position of the first byte to read.
+Returns the number of bytes read which is equal to Length (unless the file is smaller than the requested length).</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>StartOffset</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Length</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteDouble</name>
+            <comment>Writes a Double value to the specified position.
+Writes 8 bytes.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Value</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadSignedByte</name>
+            <comment>Reads a signed byte (-128 - 127) stored in the specified position.</comment>
+            <returntype>byte</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadEncryptedObject</name>
+            <comment>Reads an encrypted object from the stream.
+Password - The password used while writing the object.
+Position - Stream position.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>Password</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadDouble</name>
+            <comment>Reads a Double value stored in the specified position.
+Reads 8 bytes.</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadFloat</name>
+            <comment>Reads a Float value stored in the specified position.
+Reads 4 bytes.</comment>
+            <returntype>float</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadObject</name>
+            <comment>Reads an object from the stream.
+See WriteObject for supported types.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteLong</name>
+            <comment>Writes a Long value to the specified position.
+Writes 8 bytes.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Value</name>
+                <type>long</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadShort</name>
+            <comment>Reads a Short value stored in the specified position.
+Reads 2 bytes.</comment>
+            <returntype>short</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteByte</name>
+            <comment>Writes a Byte value to the specified position.
+Writes 1 byte.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Byte</name>
+                <type>byte</type>
+            </parameter>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReadB4XObject</name>
+            <comment>Reads an object previously written with WriteB4XObject.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>Position</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <property>
+            <name>Size</name>
+            <returntype>long</returntype>
+            <comment>Returns the file size.</comment>
+        </property>
+        <field>
+            <name>CurrentPosition</name>
+            <comment>Holds the current file position.
+This value is updated automatically after each read or write operation.</comment>
+            <returntype>long</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.randomaccessfile.CountingStreams.CountingInput</name>
+        <shortname>CountingInputStream</shortname>
+        <comment>CountingInputStream and CountingOutputStream allow you to monitor the reading or writing progress.
+Counting streams wrap the actual stream and provide a Count property which allows you to get the number of bytes read or written.
+Counting streams are useful when the reading or writing operations are done in the background. You can then use a timer to monitor the progress.
+This example logs the downloading progress:
+&lt;code&gt;
+Sub Process_Globals
+	Dim hc As HttpClient
+	Dim cout As CountingOutputStream
+	Dim length As Int
+	Dim timer1 As Timer
+End Sub
+Sub Globals
+
+End Sub
+Sub Activity_Create(FirstTime As Boolean)
+	If FirstTime Then
+		hc.Initialize("hc")
+		timer1.Initialize("Timer1", 500)
+	End If
+	Dim req As HttpRequest
+	req.InitializeGet("http://www.basic4ppc.com/android/files/b4a-trial.zip")
+	hc.Execute(req, 1)
+End Sub
+
+Sub hc_ResponseSuccess (Response As HttpResponse, TaskId As Int)
+	cout.Initialize(File.OpenOutput(File.DirRootExternal, "1.zip", False))
+	Timer1.Enabled = True
+	length = Response.ContentLength
+	Response.GetAsynchronously("response", cOut, True, TaskId)
+End Sub
+
+Sub hc_ResponseError (Response As HttpResponse, Reason As String, StatusCode As Int, TaskId As Int)
+	Log("Error: " &amp; Reason)
+	If Response &lt;&gt; Null Then
+		Log(Response.GetString("UTF8"))
+		Response.Release
+	End If
+End Sub
+
+Sub Response_StreamFinish (Success As Boolean, TaskId As Int)
+	timer1.Enabled = False
+	If Success Then
+		Timer1_Tick 'Show the current counter status
+		Log("Success!")
+	Else
+		Log("Error: " &amp; LastException.Message)
+	End If
+End Sub
+
+Sub Timer1_Tick
+	Log(cout.Count &amp; " out of " &amp; length)
+End Sub&lt;/code&gt;</comment>
+        <objectwrapper>java.io.InputStream</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the counting stream by wrapping the given input stream.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>InputStream</name>
+                <type>java.io.InputStream</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Close</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>BytesAvailable</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </method>
+        <method>
+            <name>ReadBytes</name>
+            <comment></comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>arg1</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>arg2</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>Count</name>
+            <returntype>long</returntype>
+            <parameter>
+                <name>v</name>
+                <type>long</type>
+            </parameter>
+            <comment>Gets or sets the number of bytes read.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.randomaccessfile.CountingStreams.CountingOutput</name>
+        <shortname>CountingOutputStream</shortname>
+        <comment>See CountingInputStream for more information.</comment>
+        <objectwrapper>java.io.OutputStream</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the counting stream by wrapping the given output stream.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>OutputStream</name>
+                <type>java.io.OutputStream</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Flush</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>WriteBytes</name>
+            <comment></comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>arg0</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>arg1</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>arg2</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ToBytesArray</name>
+            <comment></comment>
+            <returntype>byte[]</returntype>
+        </method>
+        <method>
+            <name>Close</name>
+            <comment></comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>Count</name>
+            <returntype>long</returntype>
+            <parameter>
+                <name>v</name>
+                <type>long</type>
+            </parameter>
+            <comment>Gets or sets the number of bytes written.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.randomaccessfile.CompressedStreams</name>
+        <shortname>CompressedStreams</shortname>
+        <comment>CompressedStreams object allows you to compress and decompress data using gzip or zlib compression methods.
+There are two options for working with CompressedStreams:
+Wrapping another stream by calling WrapInputStream or WrapOutputStream.
+Compressing or decompressing the data in memory.
+The following example demonstrates the usage of this object:&lt;code&gt;
+Sub Globals
+
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	Dim sb As StringBuilder
+	sb.Initialize
+	'Concatenation operations are much faster with StringBuilder than with String.
+	For i = 1 To 10000
+		sb.Append("Playing with compressed streams.").Append(CRLF)
+	Next
+	Dim out As OutputStream
+	Dim s As String
+	Dim compress As CompressedStreams
+	s = sb.ToString
+	'Write the string without compressing it (we could have used File.WriteString instead).
+	out = File.OpenOutput(File.DirRootExternal, "test.txt", False)
+	WriteStringToStream(out, s)
+	
+	'Write the string with gzip compression.
+	out = File.OpenOutput(File.DirRootExternal, "test.gz", False)
+	out = compress.WrapOutputStream(out, "gzip")
+	WriteStringToStream(out, s)
+	
+	'Write the string with zlib compression
+	out = File.OpenOutput(File.DirRootExternal, "test.zlib", False)
+	out = compress.WrapOutputStream(out, "zlib")
+	WriteStringToStream(out, s)
+	
+	'Show the files sizes
+	Msgbox("No compression: " &amp; File.Size(File.DirRootExternal, "test.txt") &amp; CRLF _
+		&amp; "Gzip: " &amp; File.Size(File.DirRootExternal, "test.gz") &amp; CRLF _
+		&amp; "zlib: " &amp; File.Size(File.DirRootExternal, "test.zlib"), "Files sizes")
+
+	'Read data from a compressed file
+	Dim in As InputStream
+	in = File.OpenInput(File.DirRootExternal, "test.zlib")
+	in = compress.WrapInputStream(in, "zlib")
+	Dim reader As TextReader
+	reader.Initialize(in)
+	Dim line As String
+	line = reader.ReadLine
+	Msgbox(line, "First line")
+	reader.Close
+	
+	'In memory compression / decompression
+	Dim data() As Byte
+	data = "Playing with in-memory compression.".GetBytes("UTF8")
+	Dim compressed(), decompressed() As Byte
+	compressed = compress.CompressBytes(data, "gzip")
+	decompressed = compress.DecompressBytes(compressed, "gzip")
+	'In this case the compressed data is longer than the decompressed data.
+	'The data is too short for the compression to be useful.
+	Log("Compressed: " &amp; compressed.Length) 
+	Log("Decompressed: " &amp; decompressed.Length)
+	Msgbox(BytesToString(decompressed,0, decompressed.Length, "UTF8"), "")
+End Sub
+Sub WriteStringToStream(Out As OutputStream, s As String)
+	Dim t As TextWriter
+	t.Initialize(Out)
+	t.Write(s)
+	t.Close 'Closes the internal stream as well
+End Sub&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <method>
+            <name>WrapOutputStream</name>
+            <comment>Wraps an output streams and returns an output stream that automatically compresses the data when it is written to the stream.
+Out - The original output stream.
+CompressMethod - The name of the compression method (gzip or zlib).</comment>
+            <returntype>anywheresoftware.b4a.objects.streams.File.OutputStreamWrapper</returntype>
+            <parameter>
+                <name>Out</name>
+                <type>java.io.OutputStream</type>
+            </parameter>
+            <parameter>
+                <name>CompressMethod</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WrapInputStream</name>
+            <comment>Wraps an input stream and returns an input stream that automatically decompresses the stream when it is read.
+In - The original input stream.
+CompressMethod - The name of the compression method (gzip or zlib).</comment>
+            <returntype>anywheresoftware.b4a.objects.streams.File.InputStreamWrapper</returntype>
+            <parameter>
+                <name>In</name>
+                <type>java.io.InputStream</type>
+            </parameter>
+            <parameter>
+                <name>CompressMethod</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>DecompressBytes</name>
+            <comment>Returns a byte array with the decompressed data.
+CompressedData - The compressed data that should be decompressed.
+CompressMethod - The name of the compression method (gzip or zlib).</comment>
+            <returntype>byte[]</returntype>
+            <parameter>
+                <name>CompressedData</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>CompressMethod</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>CompressBytes</name>
+            <comment>Returns a byte array with the compressed data.
+Data - Data to compress.
+CompressMethod - The name of the compression method (gzip or zlib).</comment>
+            <returntype>byte[]</returntype>
+            <parameter>
+                <name>Data</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>CompressMethod</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.randomaccessfile.AsyncStreams</name>
+        <shortname>AsyncStreams</shortname>
+        <comment>The AsyncStreams object allows you to read from an InputStream and write to an OutputStream in the background without blocking the main thread.
+See the &lt;link&gt;AsyncStreams Tutorial|http://www.basic4ppc.com/forum/basic4android-getting-started-tutorials/7669-asyncstreams-tutorial.html&lt;/link&gt;.
+NewData event is raised when new data is available.
+Error event is raised when an error was encountered. You should check LastException to find the error.
+Terminated event is raised when the other side has terminated the connection.
+NewStream event is only raised in prefix mode when the other side sends a stream with WriteStream. This event is raised after the complete stream was received successfully.
+The event includes the saved stream folder and name. Note that the file name is an arbitrary string.</comment>
+        <owner>process</owner>
+        <event>NewData (Buffer() As Byte)</event>
+        <event>Error</event>
+        <event>Terminated</event>
+        <event>NewStream (Dir As String, FileName As String)</event>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object. Unlike in prefix mode, the NewData event will be raised with new data as soon as it is available.
+In - The InputStream that will be read. Pass Null if you only want to write with this object.
+Out - The OutputStream that is used for writing the data. Pass Null if you only want to read with this object.
+EventName - Determines the Subs that handle the NewData and Error events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>In</name>
+                <type>java.io.InputStream</type>
+            </parameter>
+            <parameter>
+                <name>Out</name>
+                <type>java.io.OutputStream</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Close</name>
+            <comment>Closes the associated streams.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Write</name>
+            <comment>Adds the given bytes array to the output stream queue.
+If the object was initialized with InitializePrefix then the array length will be added before the array.
+Returns False if the queue is full and it is not possible to queue the data.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Write2</name>
+            <comment>Adds the given bytes array to the output stream queue.
+If the object was initialized with InitializePrefix then the array length will be added before the array.
+Returns False if the queue is full and it is not possible to queue the data.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>Buffer</name>
+                <type>byte[]</type>
+            </parameter>
+            <parameter>
+                <name>Start</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Length</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>WriteStream</name>
+            <comment>Writes the given stream. This method is only supported in prefix mode.
+The checksum will be calculated and sent to the other size. The NewStream event will be raised, in the receiving side, after the stream was received successfully.
+This method is more efficient than sending the same data in chunks. It can handle streams of any size.
+In - InputStream that will be read. Note that the InputStream will be closed after the stream is sent.
+Size - Number of bytes to read from the stream.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>In</name>
+                <type>java.io.InputStream</type>
+            </parameter>
+            <parameter>
+                <name>Size</name>
+                <type>java.lang.Long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>InitializePrefix</name>
+            <comment>Initializes the object and sets it in "prefix" mode. In this mode incoming data should adhere to the following protocol:
+Every message begins with the message length as an Int value (4 bytes). This length should not include the additional 4 bytes.
+The NewData event will be raised only with full messages (not including the 4 bytes length value).
+The prefix Int value will be added to the output messages automatically.
+This makes it easier as you do not need to deal with broken messages.
+In - The InputStream that will be read. Pass Null if you only want to write with this object.
+BigEndian - Whether the length value is encoded in BigEndian or LittleEndian. 
+Out - The OutputStream that is used for writing the data. Pass Null if you only want to read with this object.
+EventName - Determines the Subs that handle the NewData and Error events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>In</name>
+                <type>java.io.InputStream</type>
+            </parameter>
+            <parameter>
+                <name>BigEndian</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>Out</name>
+                <type>java.io.OutputStream</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment>Tests whether this object has been initialized.</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>StreamTotal</name>
+            <returntype>long</returntype>
+            <comment>Returns the total number of bytes of the currently received file. Only valid in prefix mode.</comment>
+        </property>
+        <property>
+            <name>StreamReceived</name>
+            <returntype>long</returntype>
+            <comment>Returns the number of bytes of the currently received file. Only valid in prefix mode.</comment>
+        </property>
+        <property>
+            <name>OutputQueueSize</name>
+            <returntype>int</returntype>
+            <comment>Returns the number of messages waiting in the output queue.</comment>
+        </property>
+        <field>
+            <name>StreamFolder</name>
+            <comment>Received streams will be saved in this folder.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+    </class>
+    <version>2.05</version>
+</root>

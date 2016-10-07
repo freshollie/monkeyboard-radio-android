@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.02</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4a.agraham.reflection.Reflection</name>
+        <shortname>Reflector</shortname>
+        <comment>This is the object that does the reflection. In order to use this successfully you will
+need an understanding of the use of Java classes and their fields and methods.
+ 
+'Full' (it is often lacking useful explanatory details) technical documentation is available
+on the Google Android website at http://developer.android.com.
+
+Java is case sensitive and as used for Android does not support properties. Properties as
+implemented in Basic4Android are actually methods with lower case prefixes 'set' and 'get'.
+'set' methods take a single parameter and return void, 'get' methods take no parameters and
+return the requested values. Any other method signatures are exposed by Basic4Android as
+normal methods. For example the Top property of a View is actually implemented in Java code as
+two methods, int getLeft() and void setLeft(int left). The Basic4Android compiler makes them
+look like a single property to the programmer.</comment>
+        <owner>process</owner>
+        <event>Click(ViewTag As Object)</event>
+        <event>LongClick(ViewTag As Object) As Boolean</event>
+        <event>Focus(ViewTag As Object, Focus As Boolean)</event>
+        <event>Key(ViewTag As Object, KeyCode As Int, KeyEvent As Object) As Boolean</event>
+        <event>Touch(ViewTag As Object, Action As Int, X As Float, Y As Float, MotionEvent As Object) As Boolean</event>
+        <method>
+            <name>GetArray</name>
+            <comment>Returns the Object at the position(s) in an array specified by the contents of indeces.
+indeces must be an integer array of the same rank as the Target array or an error will occur.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>indeces</name>
+                <type>int[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetStaticField</name>
+            <comment>Sets the specified static field of the specified class to the value provided.
+Protected and private fields may be accessed if allowed by any security manager
+which may be present.
+Static fields may also be accessed with SetField and an instance of the class.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>classname</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunMethod3</name>
+            <comment>Runs the specified method on the current object passing it the arguments provided.
+Protected and private methods may be accessed if allowed by any security manager
+which may be present.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>method</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>arg1</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type1</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>arg2</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type2</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunMethod2</name>
+            <comment>Runs the specified method on the current target passing it the argument provided.
+Protected and private methods may be accessed if allowed by any security manager
+which may be present.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>method</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>arg1</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type1</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetOnFocusListener</name>
+            <comment>Target must be a View of some sort.
+Sets the onFocusChangeListener of the view to a Sub that must have a signature of
+Sub Whatever(viewtag As Object, focus As Boolean).
+
+You should make sure not to call DoEvents, Msgbox or any modal Dialog inside this
+event as it will fail in Android 4.0.3 and above. 
+
+It may also fail if Debug is paused in the event in Android 4.0.3 and above.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetField4</name>
+            <comment>Sets the specified field of the current target to the value provided.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>fieldinfo</name>
+                <type>java.lang.reflect.Field</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunMethod4</name>
+            <comment>Runs the specified method on the current target passing it the arguments provided.
+Protected and private methods may be accessed if allowed by any security manager
+which may be present.
+
+The String array of type names is needed in order to find the correct method because
+primitives passed in the Args array are boxed and so RunMethod cannot tell whether to
+look for a target method that accepts a primitive parameter type or a boxed primitive
+object type.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>method</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>args</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+            <parameter>
+                <name>types</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetActivity</name>
+            <comment>Returns the current activity if any.
+To avoid memory leaks this should not be used by a Reflector that is a Process object.
+To use this requires a knowledge of the structure of a Basic4android application.</comment>
+            <returntype>android.app.Activity</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetStaticField</name>
+            <comment>Returns the value of the specified static field of the specified class.
+Protected and private fields may be accessed if allowed by any security manager
+which may be present.
+Static fields may also be accessed with GetField and an instance of the class.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>classname</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetArray2</name>
+            <comment>Set the position(s) in an array specified by the contents of indeces to the specified value.
+indeces must be an integer array of the same rank as the Target array or an error will occur.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>indeces</name>
+                <type>int[]</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetField2</name>
+            <comment>Sets the specified field of the current target to the value provided. Protected and
+private fields may be accessed if allowed by any security manager which may be present.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetField3</name>
+            <comment>Sets the specified field of the current target to the value provided.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>fieldinfo</name>
+                <type>java.lang.reflect.Field</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetOnTouchListener</name>
+            <comment>Target must be a View of some sort.
+Sets the onTouchListener of the view to a Sub that must have a signature of
+Sub Whatever (viewtag As Object, action As Int, X As Float, Y As Float, motionevent As Object) As Boolean.
+
+This Sub must return True if it wants to consume the event or False otherwise.
+
+You should make sure not to call DoEvents, Msgbox or any modal Dialog inside this
+event as it will fail in Android 4.0.3 and above. If you want to do so, put the code in another sub
+and call this sub with CallSubDelayed.
+
+It may also fail if Debug is paused in the event in Android 4.0.3 and above.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetPublicField</name>
+            <comment>Sets the specified field of the current target to the value provided.
+This is more efficient than SetField but can only access public fields.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>CreateObject</name>
+            <comment>Creates and returns a new object of the specified type using the default constructor.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>type</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>InvokeMethod</name>
+            <comment>Invoke the provided Method on the provided object instance and return the result.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>instance</name>
+                <type>java.lang.Object</type>
+            </parameter>
+            <parameter>
+                <name>method</name>
+                <type>java.lang.reflect.Method</type>
+            </parameter>
+            <parameter>
+                <name>args</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetField</name>
+            <comment>Returns the value of the field of the current target. Protected and private fields
+may be accessed if allowed by any security manager which may be present.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetStaticField2</name>
+            <comment>Sets the specified static field of the specified class to the value provided.
+Protected and private fields may be accessed if allowed by any security manager
+which may be present.
+Static fields may also be accessed with SetField and an instance of the class.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>classname</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetB4AClass</name>
+            <comment>Returns the Java Class for the specified B4A Activity, Service or Code module.
+To use this requires a knowledge of the structure of a Basic4android application.</comment>
+            <returntype>java.lang.Class</returntype>
+            <parameter>
+                <name>component</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetMethod</name>
+            <comment>Finding a method from its string representation is expensive so this method can be used
+to get the Method information object and save it for multiple invocations of the same method.
+ 
+The String array of type names is needed in order to find the correct variant of the method.</comment>
+            <returntype>java.lang.reflect.Method</returntype>
+            <parameter>
+                <name>method</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>types</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ToString</name>
+            <comment>Returns the result of running the "toString()" method of the current object.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>TargetRank</name>
+            <comment>Returns an int array whose length is the number of dimensions of the array and whose contents
+are the length of the first element of each array dimension.
+A zero length integer array is returned if Target is not an array.</comment>
+            <returntype>int[]</returntype>
+        </method>
+        <method>
+            <name>SetPublicField2</name>
+            <comment>Sets the specified field of the current target to the value provided.
+This is more efficient than SetField but can only access public fields.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.Object</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunMethod</name>
+            <comment>Runs the specified method on the current target. Protected and private methods
+may be accessed if allowed by any security manager which may be present.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>method</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetField2</name>
+            <comment>Returns the value of the field of the current target.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>fieldinfo</name>
+                <type>java.lang.reflect.Field</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetProcessBA</name>
+            <comment>Returns the processBA instance for the specified B4A Activity or Service module.
+To use this requires a knowledge of the structure of a Basic4android application.</comment>
+            <returntype>anywheresoftware.b4a.BA</returntype>
+            <parameter>
+                <name>component</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetContext</name>
+            <comment>Returns the Context of the Process to which the Reflection object belongs.
+This is the Application object returned from Activity.getApplicationContext().</comment>
+            <returntype>android.content.Context</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunStaticMethod</name>
+            <comment>Runs the specified static method of the specified class passing it the arguments provided.
+Protected and private methods may be accessed if allowed by any security manager
+which may be present.
+
+The String array of type names is needed in order to find the correct method because
+primitives passed in the Args array are boxed and so RunMethod cannot tell whether to
+look for a target method that accepts a primitive parameter type or a boxed primitive
+object type. For methods that take no parameters Null may passed for args and types.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>classname</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>method</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>args</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+            <parameter>
+                <name>types</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetActivityBA</name>
+            <comment>Returns the Activity BA of the current activity.
+To avoid memory leaks this should not be used by a Reflector that is a Process object.
+To use this requires a knowledge of the structure of a Basic4android application.</comment>
+            <returntype>anywheresoftware.b4a.BA</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetOnKeyListener</name>
+            <comment>Target must be a View of some sort.
+Sets the onKeyListener of the view to a Sub that must have a signature of
+Sub Whatever(viewtag As Object, keycode As Int, keyevent As Object) As Boolean.
+
+This Sub must return True if it wants to consume the event or False otherwise.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>RunPublicmethod</name>
+            <comment>Runs the specified method on the current target passing it the arguments provided.
+This is more efficient that RunMethd4 but the method must be public.
+
+The String array of type names is needed in order to find the correct method because
+primitives passed in the Args array are boxed and so RunMethod cannot tell whether to
+look for a target method that accepts a primitive parameter type or a boxed primitive
+object type.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>Method</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Args</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+            <parameter>
+                <name>types</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetMostCurrent</name>
+            <comment>Returns the current instance for the specified B4A Activity or Service module.
+This might return null if the Activity or Service is not instantiated.
+Note that Code modules do not have a current instance.
+To use this requires a knowledge of the structure of a Basic4android application.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>component</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetOnLongClickListener</name>
+            <comment>Target must be a View of some sort.
+In most cases Basic4Android will have already exposed this as a LongClick event.
+Sets the OnLongClickListener of the view to a Sub that must have a signature of
+Sub Whatever(viewtag As Object) As Boolean.
+
+This Sub must return True if it wants to consume the event or False otherwise.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetOnCreateContextMenuListener</name>
+            <comment>Target must be a View of some sort.
+This is included for completeness of all the Listeners that class View supports.
+Sets the OnCreateContextMenuListener of the view to a Sub that must have a signature of
+Sub Whatever(viewtag As Object, menu As Object, menuinfo As Object)</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetProxy</name>
+            <comment>In Java you can generate an interface at runtime and have it run a pre-compiled method.
+Many events in Android are handled by an interface that typically has an "onXxxxx" method
+that is called with some parameters relevant to the event. The interface is typically
+set on an object using that objects "setOnXxxxxListener" method.
+
+This GetProxy method dynamically creates a proxy instance that implements one or more
+specified interfaces and which contains the code to call a specified Basic4android Sub
+when any of the interface methods are called.
+
+Typically this instance will implement one or more listeners and will then be assigned
+to an object instance using RunMethod4 and its setOnXxxxxListener method.
+
+When a method of one of the specified interfaces is called the proxy will call the specified
+Basic4android Sub passing the method name as a string and any arguments in an object array.
+
+Note that interfaces declared as internal to a class will need a "$" instead of a "." as their
+final separator and all interfaces need to be fully qualified.
+e.g android.view.View$OnTouchListener
+
+The Basic4android Sub called must have the signature
+Sub WhateverName(method As String, anyargs() As Object) As Object</comment>
+            <returntype>java.lang.reflect.Proxy</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>interfacenames</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+            <parameter>
+                <name>b4asubname</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetArray</name>
+            <comment>Set the position(s) in an array specified by the contents of indeces to the spcified value.
+indeces must be an integer array of the same rank as the Target array or an error will occur.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>indeces</name>
+                <type>int[]</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetOnClickListener</name>
+            <comment>Target must be a View of some sort.
+In most cases Basic4Android will have already exposed this as a Click event.
+Sets the OnClickListener of the view to a Sub that must have a signature of
+Sub Whatever(viewtag As Object).</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetPublicField</name>
+            <comment>Returns the value of the public field of the current target.
+This is more efficient than GetField but can only access public fields.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetField</name>
+            <comment>Sets the specified field of the current target to the value provided. Protected and
+private fields may be accessed if allowed by any security manager which may be present.
+Target must be an instance of a Class, not a Class object.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>type</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetFieldInfo</name>
+            <comment>Finding a field from its string representation is expensive so this method can be used
+to get the Field information object and save it for multiple accesses of the same field.
+Protected and private fields may be accessed if allowed by any security manager which may be present.</comment>
+            <returntype>java.lang.reflect.Field</returntype>
+            <parameter>
+                <name>field</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>CreateObject2</name>
+            <comment>Creates and returns new object of the specified type using the constructor that matches
+the array of type names given and passing it the arguments provided.
+
+The array of type names is needed in order to find the correct constructor because
+primitives passed in the Args array are boxed and so CreateNew cannot tell whether
+to look for a target constructor that accepts a primitive parameter type or a boxed
+primitive object type.</comment>
+            <returntype>java.lang.Object</returntype>
+            <parameter>
+                <name>type</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>args</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+            <parameter>
+                <name>types</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+        </method>
+        <property>
+            <name>IsNull</name>
+            <returntype>boolean</returntype>
+            <comment>Returns True if the prsent value of Target is Null.</comment>
+        </property>
+        <property>
+            <name>TypeName</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Returns the name of the class of the current object.</comment>
+        </property>
+        <property>
+            <name>Version</name>
+            <returntype>double</returntype>
+            <comment>Returns the version number of the library.</comment>
+        </property>
+        <field>
+            <name>Target</name>
+            <comment>This field holds the object that is being reflected upon. The target object is
+assigned to this field where it can then be manipulated as required.</comment>
+            <returntype>java.lang.Object</returntype>
+        </field>
+    </class>
+    <version>2.4</version>
+    <comment>This library contains a Reflector object that allows access to methods and fields
+of Android objects that are not exposed to the Basic4Android language. It does this
+by means of a facility called "Reflection" that uses meta-data for objects that is
+included in the application package and allows dynamic access to fields and methods
+at runtime.
+
+GetActivity and GetActivityBA in this library only work for Basic4android 2.00 and higher.
+Use version 2.1 of this library for earlier versions of Basic4android.
+
+The specifications for the primitive Java types recognised by this object are
+"java.lang.boolean", "java.lang.byte", "java.lang.char", "java.lang.short",
+"java.lang.int", "java.lang.long", "java.lang.float", and "java.lang.double"
+Note the lower-cased names. The single uppercase letter representation, as
+listed for arrays below, is also recognised.
+
+The specifications for boxed primitive Java types which are true objects are
+"java.lang.Boolean", "java.lang.Byte", "java.lang.Char", "java.lang.Short",
+"java.lang.Int", "java.lang.Long", "java.lang.Float", and "java.lang.Double"
+Note the upper-cased names.
+
+The specifications for arrays of primitive types is a number of square left brackets
+corresponding to the rank of the array followed by a single letter indicating the type.
+  B represents the byte primitive type, S represents the short primitive type,
+  I represents the int primitive type, J represents the long primitive type,
+  F represents the float primitive type, D represents the double primitive type,
+  C represents the char primitive type, Z represents the boolean primitive type.
+So a two dimension integer array is represented by "[[I".
+
+The specifications for arrays of objects is similar but with the single letter replaced
+the letter "L", followed by the class name terminated by a semicolon ";".
+So a single dimension array of strings is represented by "[Ljava.lang.String;"</comment>
+    <author>Andrew Graham</author>
+</root>

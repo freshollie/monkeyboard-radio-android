@@ -1,0 +1,2021 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.04</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4a.phone.SmsWrapper</name>
+        <shortname>SmsMessages</shortname>
+        <comment>Provides access to the stored SMS messages.
+Note that you can use PhoneSms to send SMS messages.
+Example of printing all messages from the last week:&lt;code&gt;
+Dim SmsMessages1 As SmsMessages
+Dim List1 As List
+List1 = SmsMessages1.GetAllSince(DateTime.Add(DateTime.Now, 0, 0, -7))
+For i = 0 To List1.Size - 1
+	Dim Sms As Sms
+	Sms = List1.Get(i)
+	Log(Sms)
+Next&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <permission>android.permission.READ_SMS</permission>
+        <method>
+            <name>GetAll</name>
+            <comment>Returns all stored messages.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </method>
+        <method>
+            <name>GetByPersonId</name>
+            <comment>Returns a list with all messages received from the person with the given id.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>PersonId</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetByMessageId</name>
+            <comment></comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Id</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetByThreadId</name>
+            <comment>Returns a list with all messages with the given ThreadId.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>ThreadId</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetBetweenDates</name>
+            <comment>Returns all messages between the given dates. Start value is inclusive and end value is exclusive.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>StartDate</name>
+                <type>long</type>
+            </parameter>
+            <parameter>
+                <name>EndDate</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetByType</name>
+            <comment>Returns a list with all messages of the given type. The type should be one of the type constants.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Type</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetAllSince</name>
+            <comment>Returns all messages since the given date.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Date</name>
+                <type>long</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetUnreadMessages</name>
+            <comment>Returns all unread messages.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </method>
+        <field>
+            <name>TYPE_SENT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_UNKNOWN</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_QUEUED</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_FAILED</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_OUTBOX</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_DRAFT</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_INBOX</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.SmsWrapper.Sms</name>
+        <shortname>Sms</shortname>
+        <comment>Represents an SMS message.
+SMS messages are retrieved using SmsMessages object.</comment>
+        <owner>process</owner>
+        <field>
+            <name>Body</name>
+            <comment>Message body.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>PersonId</name>
+            <comment>The id of the person who sent the message.
+Will be -1 if this data is missing.
+You can find more information about this person by calling &lt;code&gt;Contacts.GetById&lt;/code&gt;.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>Date</name>
+            <comment>The date of this message.</comment>
+            <returntype>long</returntype>
+        </field>
+        <field>
+            <name>ThreadId</name>
+            <comment>Thread id.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>Type</name>
+            <comment>The message type. One of the SmsMessages constant values.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>Address</name>
+            <comment>The message address.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>Read</name>
+            <comment>Whether this message has been read.</comment>
+            <returntype>boolean</returntype>
+        </field>
+        <field>
+            <name>Id</name>
+            <comment>Message internal id.</comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.RingtoneManagerWrapper</name>
+        <shortname>RingtoneManager</shortname>
+        <comment>The RingtoneManager object allows you to set or get the default ringtone.
+It also provides access to the default ringtone picker.
+The RingtoneResult event will be raised when the picker is closed with the Uri of the selected ringtone.
+Note that an empty string will be returned if the "Silence" option was selected.
+Example of playing the selected ringtone with MediaPlayer:
+&lt;code&gt;
+Sub Process_Globals
+	Dim rm As RingtoneManager
+	Dim mp As MediaPlayer
+End Sub
+
+Sub Globals
+
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	mp.Initialize
+	rm.ShowRingtonePicker("rm", rm.TYPE_RINGTONE, True, "")
+End Sub
+
+Sub rm_PickerResult (Success As Boolean, Uri As String)
+	If Success Then
+		If Uri = "" Then
+			ToastMessageShow("Silent was chosen", True)
+		Else
+			mp.Load(rm.GetContentDir, Uri)
+			mp.Play
+		End If
+	Else
+		ToastMessageShow("Error loading ringtone.", True)
+	End If	
+End Sub&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <event>PickerResult (Success As Boolean, Uri As String)</event>
+        <permission>android.permission.WRITE_SETTINGS</permission>
+        <method>
+            <name>SetDefault</name>
+            <comment>Sets the default ringtone for the given type.
+In order to get the Uri you should use AddToMediaStore (for new sounds) or ShowRingtonePicker (for existing sounds).</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Type</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Uri</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetDefault</name>
+            <comment>Returns the Uri of the default ringtone of a specific type.
+Returns an empty string if no default is available.
+
+Example:&lt;code&gt;
+Dim mp As MediaPlayer
+mp.Initialize
+Dim r As RingtoneManager
+mp.Load(r.GetContentDir, r.GetDefault(r.TYPE_NOTIFICATION))
+mp.Play&lt;/code&gt;</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>Type</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ShowRingtonePicker</name>
+            <comment>Shows the ringtone picker activity.
+The PickerResult will be raised after the user selects a ringtone.
+EventName - Sets the sub that will handle the PickerResult event.
+Type - Defines the type(s) of sounds that will be listed. Multiple types can be set using Bit.Or.
+IncludeSilence - Whether to include the Silence option in the list.
+ChosenRingtone - The uri of the ringtone that will be selected when the dialog opens. Pass an empty string if not needed.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Type</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>IncludeSilence</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>ChosenRingtone</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>DeleteRingtone</name>
+            <comment>Deletes the given entry.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Uri</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>AddToMediaStore</name>
+            <comment>Adds a sound file to the internal media store and return the Uri to the new entry.
+Dir - The file folder. Should be a folder under the storage card (public folder).
+FileName - The file name.
+Title - The entry title.
+IsAlarm - Whether this entry should be added to the alarms sounds list.
+IsNotification - Whether this entry should be added to the notifications sounds list.
+IsRingtone - Whether this entry should be added to the ringtones sounds list.
+IsMusic - Whether this entry should be added to the music list.
+
+Example:&lt;code&gt;
+Dim r As RingtoneManager
+Dim u As String
+u = r.AddToMediaStore(File.DirRootExternal, "bounce.mp3", "Bounce!", True, True, True, True)
+r.SetDefault(r.TYPE_RINGTONE, u)&lt;/code&gt;</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>FileName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Title</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>IsAlarm</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IsNotification</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IsRingtone</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IsMusic</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetContentDir</name>
+            <comment>Returns a string that represents the virtual content folder. This can be used to play a Ringtone with MediaPlayer.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <field>
+            <name>TYPE_NOTIFICATION</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_RINGTONE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_ALARM</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.PhoneEvents</name>
+        <shortname>PhoneEvents</shortname>
+        <comment>The Android OS sends all kinds of messages to notify applications of changes in the system.
+The PhoneEvents object allows you to catch such messages and handle those events in your program.
+Usually you will want to add this object to a Service module instead of an Activity module in order not to miss events that happen while
+your activity is paused.
+Working with this object is quite simple. You should declare this object in Sub Process_Globals and initialize it in Sub Service_Create.
+From now on your declared sub events will handle the events.
+The Intent object which was sent by the system is passed as the last parameter.
+The events supported are:
+&lt;b&gt;AirplaneModeChanged&lt;/b&gt; - Raised when the "airplane mode" state changes.
+State - True when airplane mode is active.
+&lt;b&gt;BatteryChanged&lt;/b&gt; - Raised when the battery status changes.
+Level - The current level.
+Scale - The maximum level.
+Plugged - Whether the device is plugged to an electricity source.
+&lt;b&gt;ConnectivityChanged&lt;/b&gt; - There was a change in the state of the WIFI network or the MOBILE network (other network).
+NetworkType - WIFI or MOBILE.
+State - One of the following values: CONNECTING, CONNECTED, SUSPENDED, DISCONNECTING, DISCONNECTED, UNKNOWN.
+&lt;b&gt;DeviceStorageLow&lt;/b&gt; - The device internal memory condition is low.
+&lt;b&gt;DeviceStorageOk&lt;/b&gt; - The device internal low memory condition no longer exists.
+&lt;b&gt;PackageAdded&lt;/b&gt; - An application was installed.
+Package - The application package name.
+&lt;b&gt;PackageRemoved&lt;/b&gt; - An application was uninstalled.
+Package - The application package name.
+&lt;b&gt;PhoneStateChanged&lt;/b&gt; - The phone state has changed.
+State - One of the three values: IDLE, OFFHOOK, RINGING. OFFHOOK means that there is a call or that the phone is dialing.
+IncomingCall - Available when the State value is RINGING.
+&lt;b&gt;ScreenOff&lt;/b&gt; - The screen has turned off.
+&lt;b&gt;ScreenOn&lt;/b&gt; - The screen has turned on.
+&lt;b&gt;Shutdown&lt;/b&gt; - The phone is shutting down (turned off not just sleeping).
+&lt;b&gt;SmsDelivered&lt;/b&gt; - An Sms message sent by your application was delivered to the recipient.
+PhoneNumber - The target phone number.
+&lt;b&gt;SmsSentStatus&lt;/b&gt; - Raised after your application sends an Sms message.
+Success - Whether the message was sent successfully.
+ErrorMessage - One of the following values: GENERIC_FAILURE, NO_SERVICE, RADIO_OFF, NULL_PDU or OK.
+PhoneNumber - The target phone number.
+&lt;b&gt;TextToSpeechFinish&lt;/b&gt; - The Text To Speech engine has finished processing the messages in the queue.
+&lt;b&gt;UserPresent&lt;/b&gt; - The user has unlocked the keyguard screen.</comment>
+        <owner>process</owner>
+        <event>AirplaneModeChanged (State As Boolean, Intent As Intent)</event>
+        <event>BatteryChanged (Level As Int, Scale As Int, Plugged As Boolean, Intent As Intent)</event>
+        <event>ConnectivityChanged (NetworkType As String, State As String, Intent As Intent)</event>
+        <event>DeviceStorageLow (Intent As Intent)</event>
+        <event>DeviceStorageOk (Intent As Intent)</event>
+        <event>PackageAdded (Package As String, Intent As Intent)</event>
+        <event>PackageRemoved (Package As String, Intent As Intent)</event>
+        <event>PhoneStateChanged (State As String, IncomingNumber As String, Intent As Intent)</event>
+        <event>ScreenOff (Intent As Intent)</event>
+        <event>ScreenOn (Intent As Intent)</event>
+        <event>SmsDelivered (PhoneNumber As String, Intent As Intent)</event>
+        <event>SmsSentStatus (Success As Boolean, ErrorMessage As String, PhoneNumber As String, Intent As Intent)</event>
+        <event>Shutdown (Intent As Intent)</event>
+        <event>TextToSpeechFinish (Intent As Intent)</event>
+        <event>UserPresent (Intent As Intent)</event>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and starts listening for events.
+The PhoneStateEvent will not be raised. Use InitializeWithPhoneState instead if it is needed.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StopListening</name>
+            <comment>Stops listening for events. You can later call Initialize to start listening for events again.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>InitializeWithPhoneState</name>
+            <comment>Initializes the object and starts listening for events.
+The PhoneStateEvent will also be handled.
+Example:&lt;code&gt;
+Dim PhoneId As PhoneId
+Dim PE As PhoneEvents
+PE.InitializeWithPhoneState("PE", PhoneId)&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>PhoneId</name>
+                <type>anywheresoftware.b4a.phone.Phone.PhoneId</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.PhoneEvents.SMSInterceptor</name>
+        <shortname>SmsInterceptor</shortname>
+        <comment>Listens for incoming SMS messages.
+The MessageReceived event is raised when a new message arrives.
+Returning True from the MessageReceived event will cause the broadcasted message to be aborted.
+This can be used to prevent the message from reaching the standard SMS application.
+However in order for your application to receive the message before other applications you should use Initialize2 and set the priority value to a value larger than 0. It should be 999 according to the Android documentation.</comment>
+        <owner>process</owner>
+        <event>MessageReceived (From As String, Body As String) As Boolean</event>
+        <event>MessageSent (MessageId As Int)</event>
+        <permission>android.permission.RECEIVE_SMS</permission>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and starts listening for new messages.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StopListening</name>
+            <comment>Stops listening for events. You can later call Initialize to start listening again.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>ListenToOutgoingMessages</name>
+            <comment>Listens to outgoing messages. MessageSent event will be raised when a message is sent.
+You can call SmsMessages.GetByMessageId to retrieve the message.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Initialize2</name>
+            <comment>Initializes the object and starts listening for new messages.
+The last parameter defines the application priority compared to other applications that listen to incoming messages.
+You should set it to 999 according to the official Android documentation in order to receive the message first.
+It is however possible that a third party application has used a higher value.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Priority</name>
+                <type>int</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone</name>
+        <shortname>Phone</shortname>
+        <owner>process</owner>
+        <method>
+            <name>SetScreenBrightness</name>
+            <comment>Sets the brightness of the current activity. This method cannot be called from a service module.
+Value - A float between 0 to 1. Set -1 for automatic brightness.
+Example:&lt;code&gt;
+Sub Process_Globals
+	Dim phone1 As Phone
+End Sub
+
+Sub Globals
+	Dim sb As SeekBar
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	sb.Initialize("sb")
+	sb.Max = 100
+	sb.Value = 50
+	Activity.AddView(sb, 10dip, 10dip, 90%x, 30dip)
+End Sub
+Sub sb_ValueChanged (Value As Int, UserChanged As Boolean)
+	phone1.SetScreenBrightness(Max(Value, 5) / 100)
+End Sub&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Value</name>
+                <type>float</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetRingerMode</name>
+            <comment>Returns the phone ringer mode.
+Value will be one of the RINGER constants.</comment>
+            <returntype>int</returntype>
+        </method>
+        <method>
+            <name>GetSettings</name>
+            <comment>Returns the value of the phone settings based on the given key.
+The possible keys are listed &lt;link&gt;here|http://developer.android.com/intl/fr/reference/android/provider/Settings.Secure.html&lt;/link&gt;.
+The keys are lower cased.
+Example:&lt;code&gt;
+Dim p As Phone
+Log(GetSettings("android_id"))&lt;/code&gt;</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>Settings</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetDataState</name>
+            <comment>Returns the current cellular data connection state.
+Possible values: DISCONNECTED, CONNECTING, CONNECTED, SUSPENDED.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>SetScreenOrientation</name>
+            <comment>Changes the current activity orientation. This method cannot be called from a service module.
+Orientation - -1 for unspecified, 0 for landscape and 1 for portrait.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Orientation</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>HideKeyboard</name>
+            <comment>Hides the soft keyboard if it is displayed.
+Example:&lt;code&gt;
+Dim p As Phone
+p.HideKeyboard(Activity)&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Activity</name>
+                <type>anywheresoftware.b4a.objects.ActivityWrapper</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetMute</name>
+            <comment>Mutes or unmutes the given channel.
+Channel - One of the VOLUME constants.
+Mute - Whether to mute or unmute the channel.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Channel</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Mute</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetVolume</name>
+            <comment>Sets the volume of the specified channel.
+Channel - One of the VOLUME constants.
+VolumeIndex - The volume index. GetMaxVolume can be used to find the largest possible value.
+ShowUI - Whether to show the volume UI windows.
+Example:&lt;code&gt;
+Dim p As Phone
+p.SetVolume(p.VOLUME_MUSIC, 3, True)&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Channel</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>VolumeIndex</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>ShowUI</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetNetworkOperatorName</name>
+            <comment>Returns the name of current registered operator.
+Returns an empty string if it is not available.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>GetMaxVolume</name>
+            <comment>Gets the maximum volume index (value) for the given channel.
+Channel - One of the VOLUME constants.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Channel</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetSimOperator</name>
+            <comment>Returns the code of the SIM provider.
+Returns an empty string if it is not available.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>GetPhoneType</name>
+            <comment>Returns the phone radio type. Possible values: CDMA, GSM, NONE.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>GetVolume</name>
+            <comment>Returns the volume of the specified channel.
+Channel - One of the VOLUME constants.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Channel</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetResourceDrawable</name>
+            <comment>Returns an internal drawable object.
+See this &lt;link&gt;page|http://developer.android.com/intl/fr/reference/android/R.drawable.html&lt;/link&gt; for a list of available resources.
+Example:&lt;code&gt;
+Dim p As Phone
+Dim bd As BitmapDrawable
+bd = p.GetResourceDrawable(17301618)
+Activity.AddMenuItem2("Menu1", "Menu1", bd.Bitmap)&lt;/code&gt;</comment>
+            <returntype>android.graphics.drawable.Drawable</returntype>
+            <parameter>
+                <name>ResourceId</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Shell</name>
+            <comment>Runs a native shell command. Many commands are inaccessible because of OS security restrictions.
+Calling Shell will block the calling thread until the other process completes.
+Command - Command to run.
+Args - Additional arguments. Can be Null if not needed.
+StdOut - A StringBuilder that will hold the standard output value. Can be Null if not needed.
+StdErr - A StringBuilder that will hold the standard error value. Can be Null if not needed.
+Returns the process exit value.
+Example:&lt;code&gt;
+Dim p As Phone
+Dim sb As StringBuilder
+sb.Initialize
+p.Shell("df", Null, sb, Null)
+Msgbox(sb.ToString, "Free space:")&lt;/code&gt;</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Command</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Args</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+            <parameter>
+                <name>StdOut</name>
+                <type>java.lang.StringBuilder</type>
+            </parameter>
+            <parameter>
+                <name>StdErr</name>
+                <type>java.lang.StringBuilder</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsAirplaneModeOn</name>
+            <comment>Tests whether the phone "airplane mode" is on.</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>GetNetworkType</name>
+            <comment>Returns the currently used cellular network type.
+Possible values: 1xRTT, CDMA, EDGE, EHRPD, EVDO_0, EVDO_A, EVDO_B, GPRS, HSDPA, 
+HSPA, HSPAP, HSUPA, IDEN, LTE, UMTS, UNKNOWN.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>SendBroadcastIntent</name>
+            <comment>Sends an intent to all BroadcastReceivers that listen to this type of intents.
+Example of asking the media scanner to rescan a file:&lt;code&gt;
+Dim i As Intent
+i.Initialize("android.intent.action.MEDIA_SCANNER_SCAN_FILE", _
+	"file://" &amp; File.Combine(File.DirRootExternal, "pictures/1.jpg"))
+Dim p As Phone
+p.SendBroadcastIntent(i)&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Intent</name>
+                <type>android.content.Intent</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SetRingerMode</name>
+            <comment>Sets the phone ringer mode.
+Mode - One of the RINGER constants.
+Example:&lt;code&gt;
+Dim p As Phone
+p.SetRingerMode(p.RINGER_VIBRATE)&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>Mode</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsNetworkRoaming</name>
+            <comment>Returns true if the device is considered roaming on the current network.</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>Manufacturer</name>
+            <returntype>java.lang.String</returntype>
+            <comment></comment>
+        </property>
+        <property>
+            <name>SdkVersion</name>
+            <returntype>int</returntype>
+            <comment>Returns an integer describing the SDK version.</comment>
+        </property>
+        <property>
+            <name>Model</name>
+            <returntype>java.lang.String</returntype>
+            <comment></comment>
+        </property>
+        <property>
+            <name>Product</name>
+            <returntype>java.lang.String</returntype>
+            <comment></comment>
+        </property>
+        <field>
+            <name>VOLUME_NOTIFICATION</name>
+            <comment>Notifications channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>RINGER_SILENT</name>
+            <comment>Phone ringer will be silent and it will not vibrate.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>RINGER_NORMAL</name>
+            <comment>Normal phone ringer mode.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_RING</name>
+            <comment>Phone ring channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_VOICE_CALL</name>
+            <comment>Voice calls channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_SYSTEM</name>
+            <comment>System sounds channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_MUSIC</name>
+            <comment>Music channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>VOLUME_ALARM</name>
+            <comment>Alarms channel.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>RINGER_VIBRATE</name>
+            <comment>Phone ringer will vibrate and silent.</comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneId</name>
+        <shortname>PhoneId</shortname>
+        <owner>process</owner>
+        <permission>android.permission.READ_PHONE_STATE</permission>
+        <method>
+            <name>GetSubscriberId</name>
+            <comment>Returns the unique subscriber id.
+Returns an empty string if it is not available.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>GetSimSerialNumber</name>
+            <comment>Returns the serial number of the SIM card.
+Returns an empty string if it is not available.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>GetDeviceId</name>
+            <comment>Returns a unique device Id. Returns an empty string if the device Id is not available (usually on wifi only devices).</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>GetLine1Number</name>
+            <comment>Returns the phone number string for line 1 as configured in the SIM card.
+Returns an empty string if it is not available.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneVibrate</name>
+        <shortname>PhoneVibrate</shortname>
+        <owner>process</owner>
+        <permission>android.permission.VIBRATE</permission>
+        <method>
+            <name>Vibrate</name>
+            <comment>Vibrates the phone for the specified duration.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>TimeMs</name>
+                <type>long</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneWakeState</name>
+        <shortname>PhoneWakeState</shortname>
+        <comment>The PhoneWakeState object allows you to prevent the device from turning off the screen.
+Once you call KeepAlive the phone screen will stay on till you call ReleaseKeepAlive.
+It is important to eventually release it.
+A recommended usage is to call KeepAlive in Activity_Resume and call ReleaseKeepAlive in Activity_Pause.
+Note that the user can still turn off the screen by pressing on the power button.
+Calling PartialLock will prevent the CPU from going to sleep even if the user presses on the power button.
+It will not however affect the screen.</comment>
+        <owner>process</owner>
+        <permission>android.permission.WAKE_LOCK</permission>
+        <method>
+            <name>KeepAlive</name>
+            <comment>Prevents the device from going to sleep.
+Call ReleaseKeepAlive to release the power lock.
+BrightScreen - Whether to keep the screen bright or dimmed.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>BrightScreen</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReleaseKeepAlive</name>
+            <comment>Releases the power lock and allows the device to go to sleep.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>PartialLock</name>
+            <comment>Acquires a partial lock. This will prevent the CPU from going to sleep, even if the user presses on the power button.
+Make sure to call ReleasePartialLock eventually to release this lock.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ReleasePartialLock</name>
+            <comment>Releases a partial lock that was previously acquired by calling PartialLock.</comment>
+            <returntype>void</returntype>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneIntents</name>
+        <shortname>PhoneIntents</shortname>
+        <comment>This object contains methods that create intents objects. An intent does nothing until you call StartActivity with the intent.
+Calling StartActivity sends the intent to the OS.</comment>
+        <owner>process</owner>
+        <method>
+            <name>PlayVideo</name>
+            <comment>Creates an intent that will start playing the given video file with the default player.
+This method cannot work with internal files.</comment>
+            <returntype>android.content.Intent</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>File</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>OpenBrowser</name>
+            <comment>Creates an intent that will open the specified URI.
+Example:&lt;code&gt;
+StartActivity (PhoneIntents.OpenBrowser("http://www.google.com"))&lt;/code&gt;</comment>
+            <returntype>android.content.Intent</returntype>
+            <parameter>
+                <name>Uri</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>PlayAudio</name>
+            <comment>Creates an intent that will start playing the given audio file with the default player.
+This method cannot work with internal files.</comment>
+            <returntype>android.content.Intent</returntype>
+            <parameter>
+                <name>Dir</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>File</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneCalls</name>
+        <shortname>PhoneCalls</shortname>
+        <comment>This object creates an intent that launches the phone application.
+The reason that it is not part of the PhoneIntents library is that it requires an additional permission.</comment>
+        <owner>process</owner>
+        <permission>android.permission.CALL_PHONE</permission>
+        <method>
+            <name>Call</name>
+            <comment>Creates an intent that will call a phone number.
+Example:&lt;code&gt;
+Dim p As PhoneCalls
+StartActivity(p.Call("1234567890"))&lt;/code&gt;</comment>
+            <returntype>android.content.Intent</returntype>
+            <parameter>
+                <name>PhoneNumber</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneSms</name>
+        <shortname>PhoneSms</shortname>
+        <owner>process</owner>
+        <permission>android.permission.SEND_SMS</permission>
+        <method>
+            <name>Send</name>
+            <comment>Sends an Sms message. Note that this method actually sends the message (unlike most other methods that
+create an intent object).
+You can use PhoneEvents to handle the SmsSentStatus and SmsDelivered events.
+This method is equivalent to calling Send2(PhoneNumber, Text, True, True).</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>PhoneNumber</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Text</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Send2</name>
+            <comment>Sends an Sms message. Note that this method actually sends the message (unlike most other methods that
+create an intent object).
+You can use PhoneEvents to handle the SmsSentStatus and SmsDelivered events.
+ReceiveSentNotification - If true then the SmsSentStatus event (PhoneEvents) will be raised when the message is sent.
+ReceiveDeliveredNotification - If true then the SmsDelivered event (PhoneEvents) will be raised when the message is delivered.
+Note that the two above notifications might incur an additional payment.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>PhoneNumber</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Text</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>ReceiveSentNotification</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>ReceiveDeliveredNotification</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.Email</name>
+        <shortname>Email</shortname>
+        <comment>Using an Email object you can create an intent that holds a complete email message.
+You can then launch the email application by calling StartActivity. Note that the email will not be sent automatically. The user will need to press on the send button.
+Example:&lt;code&gt;
+Dim Message As Email
+Message.To.Add("SomeEmail@example.com")
+Message.Attachments.Add(File.Combine(File.DirRootExternal, "SomeFile.txt"))
+StartActivity(Message.GetIntent)&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <method>
+            <name>GetHtmlIntent</name>
+            <comment>Returns the Intent that should be sent with StartActivity.
+The email message will be a Html message.</comment>
+            <returntype>android.content.Intent</returntype>
+        </method>
+        <method>
+            <name>GetIntent</name>
+            <comment>Returns the Intent that should be sent with StartActivity.</comment>
+            <returntype>android.content.Intent</returntype>
+        </method>
+        <field>
+            <name>BCC</name>
+            <comment></comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </field>
+        <field>
+            <name>Body</name>
+            <comment></comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>Subject</name>
+            <comment></comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>CC</name>
+            <comment></comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </field>
+        <field>
+            <name>To</name>
+            <comment></comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </field>
+        <field>
+            <name>Attachments</name>
+            <comment></comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.LogCat</name>
+        <shortname>LogCat</shortname>
+        <comment>LogCat allows you to read the internal phone logs.
+Refer to the &lt;link&gt;LogCat documentation|http://developer.android.com/intl/fr/guide/developing/tools/adb.html#logcat&lt;/link&gt; for more information about the optional arguments.
+The LogCatData event is raised when there is new data available.
+You should use BytesToString to convert the raw bytes to string.
+&lt;b&gt;Note that the LogCatData event is raised in a different thread.&lt;/b&gt; This means that you can only log the messages.
+You can also use the Threading library to delegate the data to the main thread.</comment>
+        <owner>process</owner>
+        <event>LogCatData (Buffer() As Byte, Length As Int)</event>
+        <permission>android.permission.READ_LOGS</permission>
+        <method>
+            <name>LogCatStop</name>
+            <comment>Stops tracking the logs.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>LogCatStart</name>
+            <comment>Starts tracking the logs.
+Args - Optional arguments passed to the internal LogCat command.
+EventName - The Sub that will handle the LogCatData event.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Args</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.ContentChooser</name>
+        <shortname>ContentChooser</shortname>
+        <comment>The ContentChooser object allows the user to select a specific type of content using other installed applications.
+For example the user can use the internal Gallery application to select an image.
+If the user has installed a file manager then the ContentChooser can be used to select general files.
+This object should usually be declared as a process global object.
+After initializing the object you can let the user select content by calling Show with the required MIME types.
+The Result event will be raised with a Success flag and with the content Dir and FileName.
+Note that these values may point to resources other than regular files. Still you can pass them to methods that expect Dir and FileName.
+Only content types that can be opened with an InputStream are supported.</comment>
+        <owner CheckForReinitialize="true">process</owner>
+        <event>Result (Success As Boolean, Dir As String, FileName As String)</event>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and sets the Sub that will handle the Result event.
+Example:&lt;code&gt;
+Dim CC As ContentChooser
+CC.Initialize("CC")&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Show</name>
+            <comment>Sends the request to the system. If there are more than one applications that support the given Mime then a list with the applications will be displayed to the user.
+The Result event will be raised after the user chose an item or canceled the dialog.
+Mime - The content MIME type.
+Title - The title of the chooser dialog (when there is more than one application).
+Examples:&lt;code&gt;
+CC.Show("image/*", "Choose image")
+CC.Show("audio/*", "Choose audio file")&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Mime</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Title</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.VoiceRecognition</name>
+        <shortname>VoiceRecognition</shortname>
+        <comment>Most Android devices support voice recognition (speech to text). Usually the service works by sending the audio stream to some external server
+which analyzes the stream and returns the possible results.
+Working with this object is quite simple.
+You should declare a VoiceRecognition object as a process global object and initialize it in Activity_Create when FirstTime is True.
+Later when you call Listen a dialog will be displayed, asking the user to speak. The Result event will be raised with a Success flag and a list with the possible results (usually one result).</comment>
+        <owner>process</owner>
+        <event>Result (Success As Boolean, Texts As List)</event>
+        <method>
+            <name>Listen</name>
+            <comment>Starts listening. The Result event will be raised when the result arrives.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and sets the Sub that will catch the Result event.
+Example:&lt;code&gt;
+Dim VR As VoiceRecognition
+VR.Initialize("VR")&lt;/code&gt;</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsSupported</name>
+            <comment>Tests whether voice recognition is supported on this device.</comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Listen2</name>
+            <comment>Similar to Listen. Allows you to build the intent yourself.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>RecognizeIntent</name>
+                <type>android.content.Intent</type>
+            </parameter>
+        </method>
+        <property>
+            <name>Prompt</name>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the prompt that is displayed in the "Speak now" dialog in addition to the "Speak now" message.</comment>
+        </property>
+        <property>
+            <name>Language</name>
+            <parameter>
+                <name>value</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Sets the language used. By default the device default language is used.
+Example:&lt;code&gt;
+VR.Language = "en"&lt;/code&gt;</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneOrientation</name>
+        <shortname>PhoneOrientation</shortname>
+        <comment>This object gives access to the internal orientation sensors.
+See the &lt;link&gt;Orientation and accelerometers example|http://www.basic4ppc.com/forum/basic4android-getting-started-tutorials/6647-orientation-accelerometer.html&lt;/link&gt;.
+This object should be declared as a process global object.</comment>
+        <owner>process</owner>
+        <event>OrientationChanged (Azimuth As Float, Pitch As Float, Roll As Float)</event>
+        <method>
+            <name>StartListening</name>
+            <comment>Starts listening for OrientationChanged events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StopListening</name>
+            <comment>Stops listening for events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneAccelerometer</name>
+        <shortname>PhoneAccelerometer</shortname>
+        <comment>This object gives access to the internal accelerometers sensors.
+See the &lt;link&gt;Orientation and accelerometers example|http://www.basic4ppc.com/forum/basic4android-getting-started-tutorials/6647-orientation-accelerometer.html&lt;/link&gt;.
+This object should be declared as a process global object.</comment>
+        <owner>process</owner>
+        <event>AccelerometerChanged (X As Float, Y As Float, Z As Float)</event>
+        <method>
+            <name>StartListening</name>
+            <comment>Starts listening for AccelerometerChanged events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StopListening</name>
+            <comment>Stops listening for events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Phone.PhoneSensors</name>
+        <shortname>PhoneSensors</shortname>
+        <comment>The PhoneSensors object allows you to listen for changes in one of the device sensors.
+See the &lt;link&gt;Sensors example|http://www.basic4ppc.com/forum/basic4android-getting-started-tutorials/6647-orientation-accelerometer.html&lt;/link&gt;.
+Most devices do not support all sensors. The StartListening method returns False if the sensor is not supported.
+After initializing the object and calling StartListening, the SensorChanged event will be raised each time the sensor value changes.
+The value is passed as an array of Floats. Some sensors pass a single value and some pass three values.</comment>
+        <owner>process</owner>
+        <event>SensorChanged (Values() As Float)</event>
+        <method>
+            <name>Initialize</name>
+            <comment>Initializes the object and sets the sensor type (one of the TYPE_ constants).</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>SensorType</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StartListening</name>
+            <comment>Starts listening for sensor events.
+Returns True if the sensor is supported.
+Usually you will want to start listening in Sub Activity_Resume and stop listening in Sub Activity_Pause.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StopListening</name>
+            <comment>Stops listening for events.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize2</name>
+            <comment>Initializes the object and sets the sensor type and sensor events rate.
+SensorType - One of the TYPE_ constants.
+SensorDelay - A value between 0 (fastest rate) to 3 (slowest rate). This is only a hint to the system.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>SensorType</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>SensorDelay</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <property>
+            <name>MaxValue</name>
+            <returntype>float</returntype>
+            <comment>Returns the maximum value for this sensor.
+Returns -1 if this sensor is not supported.</comment>
+        </property>
+        <field>
+            <name>TYPE_ACCELEROMETER</name>
+            <comment>Three values - Acceleration measured in Meters / Second ^ 2 for each axis (X, Y and Z).</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_GYROSCOPE</name>
+            <comment>Three values - Angular velocity measured in Radians / Second around each of the three axis.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_PROXIMITY</name>
+            <comment>Single value - Proximity measured in centimeters. Most devices will return only two possible values representing "near" and "far".
+"far" should match MaxRange and "near" should be a value smaller than MaxRange.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_TEMPERATURE</name>
+            <comment>Single value - Ambient temperature.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_MAGNETIC_FIELD</name>
+            <comment>Three values - Ambient magnetic field measured in micro-Tesla for the X, Y and Z axis.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_LIGHT</name>
+            <comment>Single value - Ambient light level measured in SI lux units.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_ORIENTATION</name>
+            <comment>Three values - Orientation measured in degrees for azimuth, pitch and roll.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_PRESSURE</name>
+            <comment>Single value - Atmospheric pressure.</comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.PackageManagerWrapper</name>
+        <shortname>PackageManager</shortname>
+        <comment>The PackageManager allows you to find information about installed applications.
+Applications are referenced using their package name.
+You can get a list of all the packages by calling GetInstalledPackages.</comment>
+        <owner>process</owner>
+        <method>
+            <name>GetApplicationIcon</name>
+            <comment>Returns the application icon.
+Example:&lt;code&gt;
+Dim pm As PackageManager
+Activity.Background = pm.GetApplicationIcon("com.google.android.youtube")&lt;/code&gt;</comment>
+            <returntype>android.graphics.drawable.Drawable</returntype>
+            <parameter>
+                <name>Package</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetVersionName</name>
+            <comment>Returns the application version name.</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>Package</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetInstalledPackages</name>
+            <comment>Returns a list of the installed packages.
+Example:&lt;code&gt;
+Dim pm As PackageManager
+Dim packages As List
+packages = pm.GetInstalledPackages
+For i = 0 To packages.Size - 1
+	Log(packages.Get(i))
+Next&lt;/code&gt;</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </method>
+        <method>
+            <name>GetVersionCode</name>
+            <comment>Returns the application version code.</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>Package</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>QueryIntentActivities</name>
+            <comment>Returns a list with the installed activities that can handle the given intent.
+Each item in the list is the "component name" of an activity. You can use Intent.SetComponent to explicitly choose the activity.
+The first item is considered the best match.
+For example, the following code lists all the activities that can "view" a text file:&lt;code&gt;
+Dim pm As PackageManager
+Dim Intent1 As Intent
+Intent1.Initialize(Intent1.ACTION_VIEW, "file://")
+Intent1.SetType("text/*")
+For Each cn As String In pm.QueryIntentActivities(Intent1)
+	Log(cn)
+Next&lt;/code&gt;</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Intent</name>
+                <type>android.content.Intent</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetApplicationLabel</name>
+            <comment>Returns the application label.</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>Package</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetApplicationIntent</name>
+            <comment>Returns an Intent object that can be used to start the given application.
+Example:&lt;code&gt;
+Dim in As Intent
+Dim pm As PackageManager
+in = pm.GetApplicationIntent("com.google.android.youtube")
+If in.IsInitialized Then StartActivity(in)
+StartActivity(in)&lt;/code&gt;</comment>
+            <returntype>anywheresoftware.b4a.objects.IntentWrapper</returntype>
+            <parameter>
+                <name>Package</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.ContactsWrapper</name>
+        <shortname>Contacts</shortname>
+        <comment>Contacts object allows you to access the device stored contacts.
+The following code finds all contacts named John (actually it will find all contacts which their name contains the string "john"),
+and print their fields to the LogCat. It will also fetch the contact photo if it exists.
+Example:&lt;code&gt;
+Dim Contacts1 As Contacts
+Dim listOfContacts As List
+listOfContacts = Contacts1.FindByName("John", False)
+For i = 0 To listOfContacts.Size - 1
+	Dim Contact As Contact
+	Contact = listOfContacts.Get(i)
+	Log(Contact) 'will print the fields to the LogCat
+	Dim photo As Bitmap
+	photo = Contact.GetPhoto
+	If photo &lt;&gt; Null Then Activity.SetBackgroundImage(photo)
+	Dim emails As Map
+	emails = Contact.GetEmails
+	If emails.Size &gt; 0 Then Log("Email addresses: " &amp; emails)
+	Dim phones As Map
+	phones = Contact.GetPhones
+	If phones.Size &gt; 0 Then Log("Phone numbers: " &amp; phones)
+Next&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <permission>android.permission.READ_CONTACTS</permission>
+        <method>
+            <name>GetAll</name>
+            <comment>Returns a List of Contact objects with all the contacts. This list can be very large.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+        </method>
+        <method>
+            <name>FindByName</name>
+            <comment>Returns a List of Contact objects with all contacts matching the given name.
+Name - The name to search for.
+Exact - If True then only contacts with the exact name value (case sensitive) will return
+, otherwise all contacts names that include the Name string will return (case insensitive).</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Name</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Exact</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetById</name>
+            <comment>Returns the Contact with the specified Id.
+ Returns Null if no matching contact found.</comment>
+            <returntype>anywheresoftware.b4a.phone.ContactsWrapper.Contact</returntype>
+            <parameter>
+                <name>Id</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>FindByMail</name>
+            <comment>Returns a List of Contact objects with all contacts matching the given email.
+Email - The email to search for.
+Exact - If True then only contacts with the exact email address (case sensitive) will return
+, otherwise all contacts email addresses that include the Email string will return (case insensitive).</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Email</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Exact</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.ContactsWrapper.Contact</name>
+        <shortname>Contact</shortname>
+        <comment>Represents a single contact.
+The Contacts object should be used to get lists of Contact objects.
+EMAIL_x constants are the possible email types.
+PHONE_x constants are the possible phone types.</comment>
+        <owner>process</owner>
+        <method>
+            <name>GetEmails</name>
+            <comment>Returns a Map with the contacts email addresses as keys and the email types as values.
+This call executes an additional query.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.Map</returntype>
+        </method>
+        <method>
+            <name>GetPhoto</name>
+            <comment>Returns the contact photo or Null if there is no attached photo.
+This call executes an additional query.</comment>
+            <returntype>anywheresoftware.b4a.objects.drawable.CanvasWrapper.BitmapWrapper</returntype>
+        </method>
+        <method>
+            <name>GetPhones</name>
+            <comment>Returns a Map with all the contacts phone numbers as keys and the phone types as values.
+This call executes an additional query.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.Map</returntype>
+        </method>
+        <field>
+            <name>PHONE_CUSTOM</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>LastTimeContacted</name>
+            <comment>Last time that this contact was contacted. Value is a ticks value.</comment>
+            <returntype>long</returntype>
+        </field>
+        <field>
+            <name>Starred</name>
+            <comment>Whether this contact is a "favorite" contact.</comment>
+            <returntype>boolean</returntype>
+        </field>
+        <field>
+            <name>PhoneNumber</name>
+            <comment>Primary phone number.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>PHONE_OTHER</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>DisplayName</name>
+            <comment>The displayed name. Equals to the Name if the Name is not empty, otherwise equals to the contacts first email address.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>EMAIL_WORK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PHONE_PAGER</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>EMAIL_HOME</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>Name</name>
+            <comment>Contact name.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>Notes</name>
+            <comment></comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>EMAIL_MOBILE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PHONE_WORK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>EMAIL_OTHER</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>Id</name>
+            <comment>Internal Id.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TimesContacted</name>
+            <comment>Number of times that this contact was contacted.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PHONE_MOBILE</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PHONE_FAX_HOME</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>EMAIL_CUSTOM</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PHONE_HOME</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>PHONE_FAX_WORK</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.Contacts2Wrapper</name>
+        <shortname>Contacts2</shortname>
+        <comment>Contacts2 object allows you to access the device stored contacts. This type is based on a new API supported by Android 2.0 and above.
+This type supersedes Contacts type. 
+The following code finds all contacts named John (actually it will find all contacts which their name contains the string "john"),
+and print their fields to the LogCat. It will also fetch the contact photo if it exists.
+Example:&lt;code&gt;
+Dim Contacts2 As Contacts2
+Dim listOfContacts As List
+listOfContacts = Contacts2.FindByName("John", False, True, True)
+For i = 0 To listOfContacts.Size - 1
+    Dim Contact As Contact
+    Contact = listOfContacts.Get(i)
+    Log(Contact) 'will print the fields to the LogCat
+    Dim photo As Bitmap
+    photo = Contact.GetPhoto
+    If photo &lt;&gt; Null Then Activity.SetBackgroundImage(photo)
+    Dim emails As Map
+    emails = Contact.GetEmails
+    If emails.Size &gt; 0 Then Log("Email addresses: " &amp; emails)
+    Dim phones As Map
+    phones = Contact.GetPhones
+    If phones.Size &gt; 0 Then Log("Phone numbers: " &amp; phones)
+Next &lt;/code&gt;</comment>
+        <owner>process</owner>
+        <event>Complete (ListOfContacts As List)</event>
+        <permission>android.permission.READ_CONTACTS</permission>
+        <method>
+            <name>GetAll</name>
+            <comment>Returns a List of Contact objects with all the contacts. This list can be very large.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>IncludePhoneNumber</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludeNotes</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>FindByName</name>
+            <comment>Returns a List of Contact objects with all contacts matching the given name.
+Name - The name to search for.
+Exact - If True then only contacts with the exact name value (case sensitive) will return
+, otherwise all contacts names that include the Name string will return (case insensitive).
+
+IncludePhoneNumber - Whether to fetch the default phone number.
+IncludeNotes - Whether to fetch the notes field.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Name</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Exact</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludePhoneNumber</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludeNotes</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetContactsAsync</name>
+            <comment>This method is an asynchronous version of GetContactsByQuery. Once the list is ready the Complete event will be raised.
+The EventName parameter sets the sub that will handle this event.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>EventName</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Query</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Arguments</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+            <parameter>
+                <name>IncludePhoneNumber</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludeNotes</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetById</name>
+            <comment>Returns the Contact with the specified Id.
+Returns Null if no matching contact found.
+IncludePhoneNumber - Whether to fetch the default phone number.
+IncludeNotes - Whether to fetch the notes field.</comment>
+            <returntype>anywheresoftware.b4a.phone.ContactsWrapper.Contact</returntype>
+            <parameter>
+                <name>Id</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>IncludePhoneNumber</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludeNotes</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>FindByMail</name>
+            <comment>Returns a List of Contact objects with all contacts matching the given email.
+Email - The email to search for.
+Exact - If True then only contacts with the exact email address (case sensitive) will return
+, otherwise all contacts email addresses that include the Email string will return (case insensitive).
+
+IncludePhoneNumber - Whether to fetch the default phone number.
+IncludeNotes - Whether to fetch the notes field.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Email</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Exact</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludePhoneNumber</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludeNotes</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetContactsByQuery</name>
+            <comment>Returns a list of contacts based on the specified query and arguments.
+Query - The SQL query. Pass an empty string to return all contacts.
+Arguments - An array of strings used for parameterized queries. Pass Null if not needed.
+IncludePhoneNumber - Whether to fetch the phone number for each contact.
+IncludeNotes - Whether to fetch the notes field for each contact.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Query</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>Arguments</name>
+                <type>java.lang.String[]</type>
+            </parameter>
+            <parameter>
+                <name>IncludePhoneNumber</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>IncludeNotes</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.CallLogWrapper</name>
+        <shortname>CallLog</shortname>
+        <comment>CallLog allows you to browse the call logs.
+Retrieved calls are always ordered by descending date.
+Usage example:&lt;code&gt;
+Dim Calls As List
+Dim CallLog As CallLog
+calls = CallLog.GetAll(10) 'Get the last 10 calls
+For i = 0 To calls.Size - 1
+	Dim c As CallItem
+	c = calls.Get(i)
+	Dim callType, name As String
+	Select c.CallType
+		Case c.TYPE_INCOMING
+			callType="Incoming"
+		Case c.TYPE_MISSED
+			callType = "Missed"
+		Case c.TYPE_OUTGOING
+			callType = "Outgoing"
+	End Select
+	name = c.CachedName
+	If name = "" Then name = "N/A"
+	Log("Number=" &amp; c.Number &amp; ", Name=" &amp; name _
+		&amp; ", Type=" &amp; callType &amp; ", Date=" &amp; DateTime.Date(c.Date))
+Next&lt;/code&gt;</comment>
+        <owner>process</owner>
+        <permission>android.permission.READ_CONTACTS</permission>
+        <method>
+            <name>GetSince</name>
+            <comment>Returns all CallItems with a date value larger than the specified value.
+Limit - Maximum number of items to return. Pass 0 to return all items.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Date</name>
+                <type>long</type>
+            </parameter>
+            <parameter>
+                <name>Limit</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetAll</name>
+            <comment>Returns all calls ordered by date (descending) as a List of CallItems.
+Limit - Maximum number of CallItems to return. Pass 0 to return all items.</comment>
+            <returntype>anywheresoftware.b4a.objects.collections.List</returntype>
+            <parameter>
+                <name>Limit</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GetById</name>
+            <comment>Returns the CallItem with the specified Id.
+Returns Null if no matching CallItem found.</comment>
+            <returntype>anywheresoftware.b4a.phone.CallLogWrapper.CallItem</returntype>
+            <parameter>
+                <name>Id</name>
+                <type>int</type>
+            </parameter>
+        </method>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.phone.CallLogWrapper.CallItem</name>
+        <shortname>CallItem</shortname>
+        <comment>Represents a single call in the call logs. See CallLog for more information.</comment>
+        <owner>process</owner>
+        <field>
+            <name>TYPE_INCOMING</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_OUTGOING</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>TYPE_MISSED</name>
+            <comment></comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>Date</name>
+            <comment>The call date measured as ticks.</comment>
+            <returntype>long</returntype>
+        </field>
+        <field>
+            <name>CallType</name>
+            <comment>The call type. This value matches one of the TYPE constants.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>Number</name>
+            <comment>The call phone number.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+        <field>
+            <name>Duration</name>
+            <comment>The call duration in seconds.</comment>
+            <returntype>long</returntype>
+        </field>
+        <field>
+            <name>Id</name>
+            <comment>The call internal id.</comment>
+            <returntype>int</returntype>
+        </field>
+        <field>
+            <name>CachedName</name>
+            <comment>Returns the cached name assigned to this call number at the time of call.
+Returns an empty string if no name was assigned.</comment>
+            <returntype>java.lang.String</returntype>
+        </field>
+    </class>
+    <version>2.26</version>
+    <comment>&lt;b&gt;The Phone library changed and several methods belonging to the Phone object have moved to PhoneId and PhoneVibrate.&lt;/b&gt;
+ The reason for this change is to avoid adding unnecessary permissions.
+ The Phone library contains all kinds of features related to the Android phone.
+&lt;b&gt;Phone&lt;/b&gt; object includes information about the device and also other general features.
+&lt;b&gt;PhoneAccelerometer&lt;/b&gt; and PhoneOrientation objects are now replaced with PhoneSensors which support other sensors as well.
+&lt;b&gt;PhoneEvents&lt;/b&gt; allows you to handle all kinds of system events.
+&lt;b&gt;PhoneId&lt;/b&gt; gives access to the the specific phone values.
+&lt;b&gt;PhoneSms&lt;/b&gt; supports sending Sms messages.
+&lt;b&gt;PhoneVibrate&lt;/b&gt; vibrates the phone.
+&lt;b&gt;SmsMessages&lt;/b&gt; together with Sms support fetching messages from the phone database.
+&lt;b&gt;SmsInterceptor&lt;/b&gt; intercepts incoming Sms messages.
+&lt;b&gt;PhoneIntents&lt;/b&gt; and PhoneCalls include several useful intents.
+&lt;b&gt;Email&lt;/b&gt; helps with building an Intent that sends an email.
+&lt;b&gt;PhoneWakeState&lt;/b&gt; allows you to force the screen and power to keep on.
+&lt;b&gt;Contact&lt;/b&gt; and Contacts give access to the stored contacts.
+&lt;b&gt;CallLog&lt;/b&gt; and CallItem give access to the phone calls log.
+&lt;b&gt;ContentChooser&lt;/b&gt; allows the user to choose content from other applications. For example the user can choose an image from the Gallery application.
+&lt;b&gt;VoiceRecognition&lt;/b&gt; converts speech to text.
+&lt;b&gt;LogCat&lt;/b&gt; tracks the internal phone logs.
+&lt;b&gt;PackageManager&lt;/b&gt; allows you to retrieve information about the installed applications.</comment>
+</root>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.02</doclet-version-NOT-library-version>
+    <class>
+        <name>com.omnicorp.media.MediaController</name>
+        <shortname>MediaController</shortname>
+        <owner>process</owner>
+        <method>
+            <name>MediaButton</name>
+            <comment>Will control the system media player
+Button,: such as KeyCodes.KEYCODE_MEDIA_FAST_FORWARD or KeyCodes.KEYCODE_MEDIA_PLAY_PAUSE
+Return type: @return:nothing</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>ba</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>Button</name>
+                <type>int</type>
+            </parameter>
+        </method>
+    </class>
+    <version>1.0</version>
+    <author>NeoTechni</author>
+</root>

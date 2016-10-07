@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.00</doclet-version-NOT-library-version>
+    <class>
+        <name>anywheresoftware.b4a.agraham.threading.Threading</name>
+        <shortname>Thread</shortname>
+        <comment>This is the Thread object that actually runs a Basic4Android Sub on a separate thread.
+Normally Threads should be created as Process objects so they will persist as long as 
+the application exists. This will make their behaviour easier to predict and control
+rather them being Activity objects which will need recreating when an activity resumes
+which might leave orphan threads running that could cause unexpected problems.</comment>
+        <objectwrapper>java.lang.Thread</objectwrapper>
+        <owner>process</owner>
+        <event>Ended(endedOK As Boolean, error As String) 'The thread has terminated. If endedOK is False error holds the reason for failure</event>
+        <method>
+            <name>Yield</name>
+            <comment>Note that this method affects the caller and not this Thread object.
+This causes the calling thread to sleep for zero milliseconds which has the
+effect of suspending the thread and immediately rescheduling it for execution.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>RunOnGuiThread</name>
+            <comment>Causes the specified Sub to be scheduled for execution on the main GUI thread.
+This mechanism is the only way a thread can access GUI items. This call returns
+immediately. If it is necessary for the thread to wait for the result of the
+GUI operation then it should wait on a Lock that will be reset by the called Sub
+after it haas completed the GUI operation. Sometimes it seems that if the user
+presses the back button, and maybe in other scenarions, then Android loses the
+message and the GUI thread doesn't get it and the Sub isn't run and the Lock
+isn't freed so it may be advisable in this case to use WaitFor with a reasonably
+long timeout and retry until it returns True.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>params</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialise</name>
+            <comment>Initialises the thread object with the given event name.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>processBA</name>
+                <type>anywheresoftware.b4a.BA</type>
+            </parameter>
+            <parameter>
+                <name>eventname</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Start</name>
+            <comment>Starts the new thread of execution. The specified Sub will be called by the newly
+started thread and passed the provided parameters. Returns True if the thread was
+started, False if the thread is already running and a new one could not be started.
+Threads are always started as daemon threads which are threads that will be killed
+when the main application thread terminates. Because Exceptions in a separate thread
+are not passed back to the main thread and can cause the application to hang any
+uncaught Exceptions thrown in the thread Sub are trapped and saved in the threads
+Error property. The Thread ends when the thread Sub returns or throws an uncaught Exception.
+When the thread terminates, for whatever reason, the Ended event is raised. If the thread
+terminated normally then the Ended event endedOK parameter is True otherwise endedOK is
+False and the error parameter contains the reason which is the same string returned by
+reading the Error property. If a Sub includes a Try - Catch it can always rethrow the
+exception using an ExceptionEx object.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>sub</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <parameter>
+                <name>args</name>
+                <type>java.lang.Object[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Sleep</name>
+            <comment>Note that this method affects the caller and not this Thread object.
+Causes the thread to sleep for the specified number of milliseconds suspending
+the thread before rescheduling it for execution. The precision of the length of
+sleep is not guaranteed, the Thread may sleep for more or less time than requested</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>mSecs</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Join</name>
+            <comment>Blocks the calling thread until the called thread finishes its execution
+and dies or the specified timeout expires, whichever happens first.
+Passing a value of zero or less blocks the calling thread until the called
+thread finishes its execution and dies.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>mSecs</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Interrupt</name>
+            <comment>Posts an interrupt request to this thread. The thread is only interrupted
+if the thread is doing I/O or is in a wait-state (having called wait() on
+a LockFlag. If the thread is blocked in a join() or sleep() it will be
+woken up, its interrupt status will be cleared, and it will receive an
+InterruptedException. If the thread is blocked in an I/O operation of an
+InterruptibleChannel it will have its interrupt status set and receive a
+ClosedByInterruptException and the channel will be closed.
+If the thread Sub code is running freely without waiting or blocking and
+it knows that it might be expected to stop on an Interrupt then it should
+periodically check the IsInterrupted property and exit gracefully if it is True.
+Otherwise the recommended way of stopping a thread is for it to inspect
+a global variable whose value will tell it to stop or perform some other action.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>NormalPriority</name>
+            <returntype>int</returntype>
+            <comment>The normal (default) priority value assigned to threads.</comment>
+        </property>
+        <property>
+            <name>Exception</name>
+            <returntype>java.lang.Exception</returntype>
+            <parameter>
+                <name>e</name>
+                <type>java.lang.Exception</type>
+            </parameter>
+            <comment>Because Exceptions in a separate thread are not passed back to the main thread
+and can cause the application to hang any Exceptions are trapped in the Thread
+object Start method and the Exception object saved in the Exception property
+and the thread Ended event raised on the main GUI thread. Reading this property
+returns  the saved Exception object.</comment>
+        </property>
+        <property>
+            <name>IsInterrupted</name>
+            <returntype>boolean</returntype>
+            <comment>Returns a boolean indicating whether the thread has a pending interrupt request
+(True) or not (False). It also has the side-effect of clearing the flag.</comment>
+        </property>
+        <property>
+            <name>Running</name>
+            <returntype>boolean</returntype>
+            <comment>Returns True if the thread has already been started and still runs code
+(hasn't died yet). Returns False either if the thread hasn't been started yet
+or if it has already started and run to completion and died.</comment>
+        </property>
+        <property>
+            <name>MaxPriority</name>
+            <returntype>int</returntype>
+            <comment>The maximum priority value allowed for this thread.</comment>
+        </property>
+        <property>
+            <name>MinPriority</name>
+            <returntype>int</returntype>
+            <comment>The minimum priority value allowed for a thread.</comment>
+        </property>
+        <property>
+            <name>Version</name>
+            <returntype>double</returntype>
+            <comment>Returns the version number of the library.</comment>
+        </property>
+        <property>
+            <name>Error</name>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>error</name>
+                <type>java.lang.String</type>
+            </parameter>
+            <comment>Because Exceptions in a separate thread are not passed back to the main thread
+and can cause the application to hang any Exceptions are trapped in the Thread
+object Start method and the Exception message saved in the Error property and
+the thread Ended event raised on the main GUI thread. Reading this property
+gets the description of any exception caused by the thread code and is the same
+string that is passed to the Ended event.</comment>
+        </property>
+        <property>
+            <name>Priority</name>
+            <returntype>int</returntype>
+            <parameter>
+                <name>priority</name>
+                <type>int</type>
+            </parameter>
+            <comment>Sets or returns the priority of the Thread.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.agraham.threading.Threading.ExceptionWrapper</name>
+        <shortname>ExceptionEx</shortname>
+        <comment>This is the Exception object that provides facilites for handling exceptions.
+As Basic4Android has a more basic Exception object this one is called ExceptionEx
+to avoid a name conflict.</comment>
+        <objectwrapper>java.lang.Exception</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>Initialize</name>
+            <comment>Constructs a new ExceptionEx with the current stack trace and
+the specified message.</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>message</name>
+                <type>java.lang.String</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StackTraceElementMethod</name>
+            <comment>Returns the name of the method belonging to this StackTraceElement.</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>index</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>ToString</name>
+            <comment>Returns a string containing both the name of this Exception and the
+message, if any, provided when it was created.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>StackTraceElementLine</name>
+            <comment>Returns the line number in the Java source for the method belonging
+to this StackTraceElement. Only useful for the gurus amongst us!</comment>
+            <returntype>int</returntype>
+            <parameter>
+                <name>index</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>StackTraceElementFile</name>
+            <comment>Returns the name of the Java source file containing the method belonging
+to this StackTraceElement.</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>index</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <method>
+            <name>Throw</name>
+            <comment>Throws this Exception.</comment>
+            <returntype>java.lang.String</returntype>
+        </method>
+        <method>
+            <name>StackTraceElement</name>
+            <comment>Returns a string describing the stack trace element at position
+index in the stack trace for this Exception. Index 0 is the one
+at the top of the stack and identifies the method and line number
+in the Java source code at which this Exception was thrown.</comment>
+            <returntype>java.lang.String</returntype>
+            <parameter>
+                <name>index</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <property>
+            <name>Name</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Returns the name of the class of this Exception which identifies
+the type of the Exception.</comment>
+        </property>
+        <property>
+            <name>Message</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Returns the information message which was provided when this
+Exception was created. Returns null if no message was provided at
+creation time.</comment>
+        </property>
+        <property>
+            <name>Version</name>
+            <returntype>double</returntype>
+            <comment>Returns the version number of the library.</comment>
+        </property>
+        <property>
+            <name>StackTraceLength</name>
+            <returntype>int</returntype>
+            <comment>Returns the number of stack trace entries in the stack trace for
+this Exception.</comment>
+        </property>
+        <property>
+            <name>Cause</name>
+            <returntype>java.lang.Exception</returntype>
+            <comment>Returns the cause of this Exception, or Null if there is no cause.</comment>
+        </property>
+        <property>
+            <name>StackTrace</name>
+            <returntype>java.lang.String</returntype>
+            <comment>Returns a string containing the entire stack trace for this Exception.</comment>
+        </property>
+    </class>
+    <class>
+        <name>anywheresoftware.b4a.agraham.threading.Threading.SemaphoreWrapper</name>
+        <shortname>Lock</shortname>
+        <comment>This is the Lock  object that is a thin wrapper over an Android Semaphore object.</comment>
+        <objectwrapper>java.util.concurrent.Semaphore</objectwrapper>
+        <owner>process</owner>
+        <method>
+            <name>WaitFor</name>
+            <comment>Causes the calling thread to wait on this lock until it becomes free or until
+the timeout expires. If the specified waiting time elapses without the lock
+becoming free then the value False is returned. If the time is less than or equal
+to zero, the method will not wait at all. If this is locked then the calling thread
+will halt until another thread frees it or the timeout expires. If during the wait
+the lock is freed then the waiting thread  will proceed and and this method returns
+True and the lock is immediately set again. If it is already unlocked then the
+thread does not wait but proceeds immediately returning True and setting the lock
+as it does so.</comment>
+            <returntype>boolean</returntype>
+            <parameter>
+                <name>timeout</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Initialize</name>
+            <comment>Makes a new locked Semaphore, with zero permits, or an unlocked Semaphore
+with one permit. A Semaphore initialised unlocked can be used to control
+access to a resource. To acquire a resource the sequence for a thread is
+Wait() - use resource - UnLock(). A Semaphore initialised locked can be
+used to flag events across threads. The sequence is for the waiting thread
+to call Wait() and the invoking thread to call Unlock().</comment>
+            <returntype>void</returntype>
+            <parameter>
+                <name>locked</name>
+                <type>boolean</type>
+            </parameter>
+        </method>
+        <method>
+            <name>Wait</name>
+            <comment>Causes the calling thread to wait on this lock until it becomes free.
+If this is locked then the calling thread will halt until another thread
+frees it, the waiting thread will then proceed and the lock is imediately
+set again. If it is already unlocked then the thread does not wait but
+proceeds immediately setting the lock as it does so.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Unlock</name>
+            <comment>Frees the lock allowing one other thread waiting on it to proceed.
+If no threads are waiting then the next thread that tries to wait
+will proceed immediately setting the lock as it does.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>Lock</name>
+            <comment>Sets the lock on this Semaphore. Any thread now trying to wait on it
+will halt waiting for some other thread to unlock it.</comment>
+            <returntype>void</returntype>
+        </method>
+        <method>
+            <name>IsInitialized</name>
+            <comment></comment>
+            <returntype>boolean</returntype>
+        </method>
+        <property>
+            <name>LockState</name>
+            <returntype>boolean</returntype>
+            <comment>Returns the state of this Lock, True if locked, False otherwise.
+Note that in some situations this might become invalid as soon
+as it is read if another thread uses this Lock.</comment>
+        </property>
+        <property>
+            <name>Version</name>
+            <returntype>double</returntype>
+            <comment>Returns the version number of the library.</comment>
+        </property>
+    </class>
+    <version>1.0</version>
+    <comment>Basic4Android applications have only one thread, the main or GUI (Graphical User Interface)
+thread that, not surprisingly, handles the user interface (and everything else).
+Using this library you can create additional threads that operate (apparently)
+in parallel alongside each other and the GUI thread. Threads can be useful to keep
+the user interface alive while performing a long sequence of computations or while
+waiting for something to happen.
+
+Such threads are not allowed to manipulate GUI elements directly but this can be
+achieved by the Thread.RunOnGuiThread method that runs a Sub on the main GUI thread.
+
+This library contains a Thread object that runs the Basic4Android Sub on a separate
+thread, a Lock object to facilite orderly use of resources by different threads and
+can also be used to synchronise threads and an Exception object to give more
+flexibility in handling exceptions than is native to Basic4Android.</comment>
+</root>
