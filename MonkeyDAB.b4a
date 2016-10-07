@@ -1,7 +1,6 @@
 ﻿Version=5.02
-NumberOfModules=2
+NumberOfModules=1
 Module1=RadioService
-Module2=Slideshow
 Build1=Default,com.freshollie.radioapp
 ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.basic4ppc.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="12" android:targetSdkVersion="22"/>~\n~<supports-screens android:largeScreens="true" ~\n~	android:normalScreens="true" ~\n~	android:smallScreens="false" ~\n~	android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'SetActivityAttribute(main,android:screenOrientation, "sensorLandscape")~\n~'End of default text.~\n~AddApplicationText(~\n~<activity android:name="anywheresoftware.b4a.objects.preferenceactivity"/>)
 IconFile=

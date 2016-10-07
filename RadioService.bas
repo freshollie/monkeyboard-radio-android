@@ -41,7 +41,7 @@ Sub Process_Globals
 	Dim MuteResponse As String
 	Dim StationCopyResponse As Int
 	
-	Dim CloseAfterStop as Boolean
+	Dim CloseAfterStop As Boolean
 	
 	Private session As JavaObject
 	
@@ -54,11 +54,11 @@ End Sub
 #Region'--------------------Functions------------------
 
 Sub Wait(Sekunden As Int)
-   Dim Ti As Long
-   Ti = DateTime.Now + (Sekunden * 1000)
-   Do While DateTime.Now < Ti
-   DoEvents
-   Loop
+	Dim Ti As Long
+	Ti = DateTime.Now + (Sekunden * 1000)
+	Do While DateTime.Now < Ti
+	DoEvents
+	Loop
 End Sub
 #End Region
 
@@ -1270,24 +1270,25 @@ import android.content.Intent;
 import anywheresoftware.b4a.objects.IntentWrapper;
 
 public static class MyCallback extends Callback {
-   public MyCallback() {
-   }
-   
-   public void onCommand(String command, Bundle args, ResultReceiver cb) {
-   BA.Log(command);
-     processBA.raiseEventFromUI(null, "media_oncommand", command);
-   }
-   
-   public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-   	KeyEvent event = (KeyEvent)mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-    IntentWrapper baIntent = new IntentWrapper();
-    baIntent.setObject(mediaButtonIntent);
-	if (event.getAction() == KeyEvent.ACTION_UP){
-   		Boolean b = (Boolean) processBA.raiseEvent(null, "media_onbutton", event.getKeyCode());
-    	return b == null ? false : b;
-	} else {
-	return false;
+	public MyCallback() {
 	}
-   }
+   
+	public void onCommand(String command, Bundle args, ResultReceiver cb) {
+		BA.Log(command);
+		processBA.raiseEventFromUI(null, "media_oncommand", command);
+	}
+   
+	public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
+		KeyEvent event = (KeyEvent)mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+		IntentWrapper baIntent = new IntentWrapper();
+		baIntent.setObject(mediaButtonIntent);
+		if (event.getAction() == KeyEvent.ACTION_UP){
+			Boolean b = (Boolean) processBA.raiseEvent(null, "media_onbutton", event.getKeyCode());
+			return b == null ? false : b;
+		} else {
+			return false;
+		}
+	}
 }
+
 #end if
