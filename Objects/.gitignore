@@ -1,0 +1,6 @@
+/src
+/res
+/gen
+/bin
+*.xml
+*.dex
