@@ -26,6 +26,6 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.github.felHR85:UsbSerial:4.5'
+    compile project(':usbSerialForAndroid')
     testCompile 'junit:junit:4.12'
 }

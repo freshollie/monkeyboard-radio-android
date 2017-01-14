@@ -8,12 +8,14 @@ public class RadioStation {
 
     private String name;
     private int channelNumber;
-    private String genre;
+    private int genre;
+    private String ensemble;
 
-    public RadioStation(String stationName, int channelNum, String stationGenre) {
+    public RadioStation(String stationName, int channelNum, int stationGenre, String stationEnsemble) {
         name = stationName;
         channelNumber = channelNum;
         genre = stationGenre;
+        ensemble = stationEnsemble;
     }
 
     public String getName() {
@@ -24,7 +26,11 @@ public class RadioStation {
         return channelNumber;
     }
 
-    public String getGenre() {
+    public int getGenre() {
         return genre;
+    }
+
+    public String getEnsemble() {
+        return ensemble;
     }
 }

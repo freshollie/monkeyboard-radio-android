@@ -3,4 +3,46 @@
 
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string-array name="STATION_GENRES">
+        <item/>
+        <item>News</item>
+        <item>Current Affairs</item>
+        <item>Information</item>
+        <item>Sport</item>
+        <item>Education</item>
+        <item>Drama</item>
+        <item>Arts</item>
+        <item>Science</item>
+        <item>Talk</item>
+        <item>Pop Music</item>
+        <item>Rock Music</item>
+        <item>Easy Listening</item>
+        <item>Light Classical</item>
+        <item>Classical Music</item>
+        <item>Other Music</item>
+        <item>Weather</item>
+        <item>Finance</item>
+        <item>Children</item>
+        <item>Factual</item>
+        <item>Religion</item>
+        <item>Phone In</item>
+        <item>Travel</item>
+        <item>Leisure</item>
+        <item>Jazz and Blues</item>
+        <item>Country Music</item>
+        <item>National Music</item>
+        <item>Oldies Music</item>
+        <item>Folk Music</item>
+        <item>Documentary</item>
+        <item>Undefined</item>
+        <item>Undefined</item>
+    </string-array>
+
+    <string-array name="STEREO_AUDIO_NAMES">
+        <item>Stereo</item>
+        <item>Joint Stereo</item>
+        <item>Dual Channel</item>
+        <item>Mono</item>
+    </string-array>
 </resources>
