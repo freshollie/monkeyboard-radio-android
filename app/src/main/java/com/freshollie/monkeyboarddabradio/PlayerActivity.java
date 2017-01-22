@@ -49,7 +49,6 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     public void onStop() {
                         Log.v(TAG, "Radio Connection Closed");
-
                     }
                 });
         radio.connect();
