@@ -5,7 +5,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
     <string-array name="STATION_GENRES">
-        <item/>
+        <item />
         <item>News</item>
         <item>Current Affairs</item>
         <item>Information</item>

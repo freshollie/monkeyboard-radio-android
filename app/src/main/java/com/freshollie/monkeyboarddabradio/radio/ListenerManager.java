@@ -1,5 +1,7 @@
 package com.freshollie.monkeyboarddabradio.radio;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 
 /**
@@ -8,34 +10,41 @@ import java.util.ArrayList;
 
 public class ListenerManager {
 
-    private ArrayList<DeviceConnection.ConnectionStateListener> connectionStateListeners;
+    /**
+     * Listener used to notify when the Radio Device connection has started
+     */
+
+    public interface ConnectionStateChangeListener {
+        void onStart();
+        void onStop();
+    }
+
+    private ArrayList<ConnectionStateChangeListener> connectionStateChangeListeners;
 
     public ListenerManager() {
         unregisterAll();
     }
 
     public void onConnectionStop() {
-        for (DeviceConnection.ConnectionStateListener listener : connectionStateListeners) {
+        for (ConnectionStateChangeListener listener : connectionStateChangeListeners) {
             listener.onStop();
         }
     }
 
     public void onConnectionStart() {
-        for (DeviceConnection.ConnectionStateListener listener : connectionStateListeners) {
+        for (ConnectionStateChangeListener listener : connectionStateChangeListeners) {
             listener.onStart();
         }
     }
 
-    public void registerConnectionStateListener
-            (DeviceConnection.ConnectionStateListener listener) {
-        connectionStateListeners.add(listener);
+    public void registerConnectionStateChangedListener(ConnectionStateChangeListener listener) {
+        connectionStateChangeListeners.add(listener);
     }
 
-    public void unregisterConnectionStateListener
-            (DeviceConnection.ConnectionStateListener listener) {
-        connectionStateListeners.remove(listener);
+    public void unregisterConnectionStateChangedListener(ConnectionStateChangeListener listener) {
+        connectionStateChangeListeners.remove(listener);
     }
     private void unregisterAll() {
-        connectionStateListeners = new ArrayList<>();
+        connectionStateChangeListeners = new ArrayList<>();
     }
 }

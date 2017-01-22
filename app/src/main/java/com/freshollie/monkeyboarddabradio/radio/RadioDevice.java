@@ -1,24 +1,24 @@
 package com.freshollie.monkeyboarddabradio.radio;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by Freshollie on 12/01/2017.
  */
 
 public class RadioDevice {
-    public static final int PRODUCT_ID = 1002;
+    public static final int PRODUCT_ID = 10;
     public static final int VENDOR_ID = 1240;
     public static final int BAUD_RATE = 57600;
+
+    private int COMMAND_ATTEMPTS_TIMEOUT = 500;
 
     public static class ByteValues {
         static byte RESPONSE_TYPE_ACK = 0x00;
@@ -52,6 +52,13 @@ public class RadioDevice {
 
 
         static byte STREAM_MODE_DAB = 0x00;
+    }
+
+    public static class Values {
+        public static int PLAY_STATUS_PLAYING = 0;
+        public static int PLAY_STATUS_SEARCHING = 1;
+        public static int PLAY_STATUS_TUNING = 2;
+        public static int PLAY_STATUS_STREAM_STOP = 3;
     }
 
     /*
@@ -108,7 +115,7 @@ public class RadioDevice {
     }
 
     public void connect() {
-        connection.setConnectionStateListener(new DeviceConnection.ConnectionStateListener() {
+        connection.setConnectionStateListener(new ListenerManager.ConnectionStateChangeListener() {
             @Override
             public void onStart() {
                 listenerManager.onConnectionStart();
@@ -120,13 +127,13 @@ public class RadioDevice {
             }
         });
 
-        if (!connection.isConnected()) {
-            connection.connect();
+        if (!connection.isRunning()) {
+            connection.start();
         }
     }
 
     public void disconnect() {
-        connection.disconnect();
+        connection.stop();
     }
 
     public void startPollLoop() {
@@ -156,13 +163,14 @@ public class RadioDevice {
         START_BYTE,
         FUNCTION_CATEGORY,
         FUNCTION,
-        SERIAL_NUMBER,
+        UNIQUE_COMMAND_NUMBER,
         0,
         NUM_PARAMETERS,
         PARAMETER,
         ...
         ...
         END_BYTE
+     }
      */
 
     /**
@@ -178,7 +186,7 @@ public class RadioDevice {
         buffer[0] = ByteValues.START_BYTE;
         buffer[1] = functionType;
         buffer[2] = function;
-        buffer[3] = ByteValues.EMPTY_SERIAL_NUMBER; // Written when command is sent
+        buffer[3] = ByteValues.EMPTY_SERIAL_NUMBER; // Overwritten when command is sent
         buffer[4] = 0x00;
         buffer[5] = (byte) parameters.length;
 
@@ -193,14 +201,22 @@ public class RadioDevice {
 
         buffer[lastByteNum] = ByteValues.END_BYTE;
 
-        byte[] response = connection.sendForResponse(Arrays.copyOfRange(buffer, 0, lastByteNum + 1));
+        long startTime = SystemClock.elapsedRealtimeNanos();
 
-        if (response.length > 5) {
-            if (isResponse(response) &&
-                    (isCommandAck(response) || isCorrectResponse(response, functionType, function))) {
-                return response;
+        while (startTime - SystemClock.elapsedRealtimeNanos() > COMMAND_ATTEMPTS_TIMEOUT) {
+            byte[] response = connection.sendForResponse(Arrays.copyOfRange(buffer, 0, lastByteNum + 1));
+
+            if (response.length > 5) {
+                if (isResponse(response)) {
+                    if (isCommandAck(response)) {
+                        return response;
+                    } else if (isCommandNak(response)) {
+                        break;
+                    }
+                }
             }
         }
+
         return null;
     }
 
@@ -508,9 +524,6 @@ public class RadioDevice {
         }
     }
 
-    private boolean isCorrectResponse(byte[] response, byte type, byte command) {
-        return response[1] == type && response[2] == command;
-    }
     private boolean isResponse(byte[] response) {
         return response[0] == ByteValues.START_BYTE;
     }
@@ -528,6 +541,13 @@ public class RadioDevice {
                 response[5] == 0;
     }
 
+    private boolean isCommandNak(byte[] response) {
+        return isResponse(response) &&
+                response[1] == ByteValues.RESPONSE_TYPE_ACK &&
+                response[2] == ByteValues.CMD_NAK &&
+                response[5] == 0;
+    }
+
     /**
      * Runs all of the commands needed to poll a dab radio.
      *
@@ -542,5 +562,13 @@ public class RadioDevice {
         }
 
         return true;
+    }
+
+    public boolean isAttached() {
+        return connection.isDeviceAttached();
+    }
+
+    public boolean isConnected() {
+        return connection.isRunning();
     }
 }

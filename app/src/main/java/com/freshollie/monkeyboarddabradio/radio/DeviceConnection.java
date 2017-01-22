@@ -32,8 +32,8 @@ public class DeviceConnection{
     public boolean DEBUG_OUTPUT = true;
 
     public static final int MAX_PACKET_LENGTH = 255;
-    public final int COMMUNICATION_TIMEOUT_LENGTH = 100;
-    public final int RESPONSE_TIMEOUT_LENGTH = 1000;
+    public final int COMMUNICATION_TIMEOUT_LENGTH = 20;
+    public final int RESPONSE_TIMEOUT_LENGTH = 200;
 
     public final String ACTION_USB_PERMISSION =
             "com.freshollie.monkeyboarddabradio.radio.deviceconnection.action.USB_PERMISSION";
@@ -44,28 +44,19 @@ public class DeviceConnection{
     private UsbDeviceConnection usbDeviceConnection;
     private UsbSerialPort devicePort;
 
-    private ConnectionStateListener connectionStateListener;
+    private ListenerManager.ConnectionStateChangeListener connectionStateListener;
 
     private Context context;
 
-    private boolean connected = false;
+    private boolean running = false;
 
     private class NotConnectedException extends Exception{
-    }
-
-    /**
-     * Listener used to notify when the Radio Device connection has started
-     */
-    public interface ConnectionStateListener {
-        void onStart();
-        void onStop();
     }
 
     /**
      * This receiver is called when a usb device is detached and when a usb
      * permission is granted or denied.
      */
-
     private BroadcastReceiver usbBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -89,7 +80,7 @@ public class DeviceConnection{
                     UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                     if (device != null) {
                         if (device.getVendorId() == RadioDevice.VENDOR_ID &&
-                                device.getDeviceId() == RadioDevice.PRODUCT_ID) {
+                                device.getProductId() == RadioDevice.PRODUCT_ID) {
                             closeConnection();
                         }
                     }
@@ -113,48 +104,42 @@ public class DeviceConnection{
         context.registerReceiver(usbBroadcastReceiver, filter);
     }
 
-    private void requestConnection() {
-        Log.v(TAG, "Requesting connection to device");
-
+    private UsbDevice getDevice() {
         for (UsbDevice device : usbManager.getDeviceList().values()) {
-            Log.v(TAG, "Checking connected devices");
-            Log.v(TAG, "ProductId: " + String.valueOf(device.getDeviceId()));
-            Log.v(TAG, "VendorId: " + String.valueOf(device.getVendorId()));
-
-            if (device.getDeviceId() == RadioDevice.PRODUCT_ID &&
+            if (device.getProductId() == RadioDevice.PRODUCT_ID &&
                     device.getVendorId() == RadioDevice.VENDOR_ID) {
-                Log.v(TAG, "Found device");
-                if (usbManager.hasPermission(device)) {
-                    usbDevice = device;
-                    openConnection();
-                } else {
-                    Log.v(TAG, "Requesting permission for device");
-                    usbManager.requestPermission(device, usbPermissionIntent);
-
-                }
-                return;
+                return device;
             }
         }
-
-        Log.v(TAG, "No devices found");
+        return null;
     }
 
-    public void connect() {
+    private void requestConnection() {
+        Log.v(TAG, "Requesting connection to device");
+        UsbDevice device = getDevice();
+        if (device != null) {
+            if (usbManager.hasPermission(device)) {
+                usbDevice = device;
+                openConnection();
+            } else {
+                Log.v(TAG, "Requesting permission for device");
+                usbManager.requestPermission(device, usbPermissionIntent);
+            }
+        } else {
+            Log.v(TAG, "No devices found");
+        }
+    }
+
+    public void start() {
         requestConnection();
     }
 
-    public void disconnect() {
+    public void stop() {
         closeConnection();
     }
 
     private void openConnection() {
         Log.v(TAG, "Opening connection to device");
-        /*
-        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
-        if (availableDrivers.isEmpty()) {
-            return;
-        }
-        */
 
         usbDeviceConnection = usbManager.openDevice(usbDevice);
 
@@ -168,7 +153,7 @@ public class DeviceConnection{
             devicePort.setDTR(false);
             devicePort.setRTS(true);
 
-            connected = true;
+            running = true;
             connectionStateListener.onStart();
         } catch (IOException e){
             e.printStackTrace();
@@ -179,7 +164,7 @@ public class DeviceConnection{
 
     private void closeConnection() {
         Log.v(TAG, "Closing connection to device");
-        connected = false;
+        running = false;
         if (devicePort != null) {
             try {
                 devicePort.close();
@@ -279,32 +264,41 @@ public class DeviceConnection{
      * @return response byte
      */
     public synchronized byte[] sendForResponse(byte[] commandBuffer) {
-        byte serialNumber = generateCommandSerialNumber();
-        commandBuffer[3] = serialNumber;
-        if (DEBUG_OUTPUT) {
-            Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
-        }
         byte[] responseBytes = new byte[MAX_PACKET_LENGTH];
 
-        try {
-            devicePort.write(commandBuffer, COMMUNICATION_TIMEOUT_LENGTH);
-
-            responseBytes = getResponse(serialNumber);
-            if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
-                Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
+        if (running) {
+            byte serialNumber = generateCommandSerialNumber();
+            commandBuffer[3] = serialNumber;
+            if (DEBUG_OUTPUT) {
+                Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
             }
+            if (isRunning()) {
+                try {
+                    devicePort.write(commandBuffer, COMMUNICATION_TIMEOUT_LENGTH);
 
-        } catch (IOException e){
-            e.printStackTrace();
+                    responseBytes = getResponse(serialNumber);
+                    if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
+                        Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
         return responseBytes;
     }
 
-    public void setConnectionStateListener(ConnectionStateListener listener) {
+    public void setConnectionStateListener(ListenerManager.ConnectionStateChangeListener listener) {
         connectionStateListener = listener;
     }
 
-    public boolean isConnected() {
-        return connected;
+    public boolean isRunning() {
+        return running;
+    }
+
+    public boolean isDeviceAttached() {
+        return getDevice() != null;
     }
 }
