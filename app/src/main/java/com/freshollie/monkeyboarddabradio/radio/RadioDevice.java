@@ -1,16 +1,20 @@
 package com.freshollie.monkeyboarddabradio.radio;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.freshollie.monkeyboarddabradio.R;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
  * Created by Freshollie on 12/01/2017.
+ * Used as an API to interact with the monkeyboard
  */
 
 public class RadioDevice {
@@ -18,9 +22,20 @@ public class RadioDevice {
     public static final int VENDOR_ID = 1240;
     public static final int BAUD_RATE = 57600;
 
+    private boolean DEBUG_OUT_COMMANDS = false;
+
+    private int lastVolume;
+    private int lastProgramDataRate;
+    private int lastPlayStatus;
+    private String lastProgramText;
+    private int lastSignalQuality;
+    private int lastStereoState;
+
+    private int pollNumber = 0;
+
     private int COMMAND_ATTEMPTS_TIMEOUT = 500;
 
-    public static class ByteValues {
+    static class ByteValues {
         static byte RESPONSE_TYPE_ACK = 0x00;
         static byte CMD_ACK = 0x01;
         static byte CMD_NAK = 0x02;
@@ -37,6 +52,7 @@ public class RadioDevice {
         static byte STREAM_StopSearch = 0x04;
         static byte STREAM_GetPlayStatus = 0x05;
         static byte STREAM_GetPlayIndex = 0x07;
+        static byte STREAM_GetSignalStrength = 0x08;
         static byte STREAM_SetStereoMode = 0x09;
         static byte STREAM_GetStereo = 0x0B;
         static byte STREAM_SetVolume = 0x0C;
@@ -61,53 +77,75 @@ public class RadioDevice {
         public static int PLAY_STATUS_STREAM_STOP = 3;
     }
 
-    /*
+
     public static class StringValues {
         static String[] genres = new String[]{};
         static String[] stereoModes = new String[]{};
-        static String[] playStatus = new String[]{};
+        static String[] playStatusValues = new String[]{};
 
-        public static String getGenreName(int genreId) {
-            if (genreId > genres.length) {
-                return "";
+        public static String getGenreFromId(int genreId) {
+            if (genreId > genres.length - 1 || genreId < 0) {
+                return "Unknown";
             } else {
                 return genres[genreId];
             }
         }
 
-        public static String getStereoName(int stereoId) {
-            if (stereoId > stereoModes.length) {
-                return "";
+        public static String getStereoModeFromId(int stereoModeId) {
+            if (stereoModeId > stereoModes.length - 1  || stereoModeId < 0) {
+                return "Unknown";
             } else {
-                return genres[stereoId];
+                return stereoModes[stereoModeId];
             }
         }
-    };
-    */
+
+        public static String getPlayStatusFromId(int playStatusId) {
+            if (playStatusId > playStatusValues.length - 1  || playStatusId < 0) {
+                return "N/A";
+            } else {
+                return playStatusValues[playStatusId];
+            }
+        }
+    }
+
+
+    public interface CopyProgramsListener {
+        void onProgressUpdate(int progress, int max);
+        void onComplete(RadioStation[] stationList);
+    }
 
     private final String TAG = this.getClass().getSimpleName();
 
     private DeviceConnection connection;
     private Context context;
 
-    private ListenerManager listenerManager = new ListenerManager();
+    private ListenerManager listenerManager;
 
-    private ArrayList<RadioStation> stationList = new ArrayList<>();
-
-    private Thread pollLoop = new Thread(new Runnable() {
+    private Runnable pollLoop = new Runnable() {
         @Override
         public void run() {
             while (true) {
-                if (!poll()) {
+                if (!poll() || !connection.isRunning()) {
                     break;
                 }
             }
         }
-    });
+    };
 
-    public RadioDevice(Context appContext) {
-        context = appContext;
-        connection = new DeviceConnection(appContext);
+    private Thread pollThread = new Thread();
+
+    public RadioDevice(Context serviceContext) {
+        context = serviceContext;
+        connection = new DeviceConnection(serviceContext);
+        listenerManager = new ListenerManager(new Handler(serviceContext.getMainLooper()));
+
+        StringValues.genres =
+                context.getResources().getStringArray(R.array.STATION_GENRES);
+        StringValues.stereoModes =
+                context.getResources().getStringArray(R.array.STEREO_AUDIO_NAMES);
+        StringValues.playStatusValues =
+                context.getResources().getStringArray(R.array.PLAYSTATUS_VALUES);
+
     }
 
     public ListenerManager getListenerManager() {
@@ -115,15 +153,18 @@ public class RadioDevice {
     }
 
     public void connect() {
+        Log.v(TAG, "Connecting");
         connection.setConnectionStateListener(new ListenerManager.ConnectionStateChangeListener() {
             @Override
             public void onStart() {
-                listenerManager.onConnectionStart();
+                Log.v(TAG, "Connection opened");
+                listenerManager.informConnectionStart();
             }
 
             @Override
             public void onStop() {
-                listenerManager.onConnectionStop();
+                listenerManager.informConnectionStop();
+                disconnect();
             }
         });
 
@@ -133,21 +174,31 @@ public class RadioDevice {
     }
 
     public void disconnect() {
+        stopPollLoop();
         connection.stop();
+        Log.v(TAG, "Disconnected");
     }
 
     public void startPollLoop() {
-        pollLoop.start();
+        if (!pollThread.isAlive()) {
+            pollThread = new Thread(pollLoop);
+            pollThread.start();
+        }
+    }
+
+    public void stopPollLoop() {
+        pollThread.interrupt();
     }
 
     private int getIntFromBytes(byte[] bytes){
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        for (byte value: bytes) {
-            byteBuffer.put(value);
+        ByteBuffer wrapped = ByteBuffer.wrap(bytes);
+        int value;
+        if (bytes.length < 4) {
+            value = wrapped.getShort();
+        } else {
+            value = wrapped.getInt();
         }
-
-        byteBuffer.flip();
-        return byteBuffer.getInt();
+        return value;
     }
 
     private String getStringFromBytes(byte[] bytes) {
@@ -201,17 +252,30 @@ public class RadioDevice {
 
         buffer[lastByteNum] = ByteValues.END_BYTE;
 
-        long startTime = SystemClock.elapsedRealtimeNanos();
+        long startTime = SystemClock.currentThreadTimeMillis();
+        while ((SystemClock.currentThreadTimeMillis() - startTime) < COMMAND_ATTEMPTS_TIMEOUT &&
+                connection.isRunning()) {
 
-        while (startTime - SystemClock.elapsedRealtimeNanos() > COMMAND_ATTEMPTS_TIMEOUT) {
-            byte[] response = connection.sendForResponse(Arrays.copyOfRange(buffer, 0, lastByteNum + 1));
+            byte[] response;
+
+            try {
+                response = connection.sendForResponse(Arrays.copyOfRange(buffer, 0, lastByteNum + 1));
+            } catch (DeviceConnection.NotConnectedException e) {
+                break;
+            }
 
             if (response.length > 5) {
                 if (isResponse(response)) {
-                    if (isCommandAck(response)) {
-                        return response;
-                    } else if (isCommandNak(response)) {
+                    if (isCommandNak(response)) {
+                        if (DEBUG_OUT_COMMANDS) {
+                            Log.v(TAG, "Command not acknowledged");
+                        }
                         break;
+                    } else {
+                        if (DEBUG_OUT_COMMANDS) {
+                            Log.v(TAG, "Response: " + Arrays.toString(response));
+                        }
+                        return response;
                     }
                 }
             }
@@ -232,6 +296,9 @@ public class RadioDevice {
     }
 
     public int getVolume() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getVolume()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -251,6 +318,9 @@ public class RadioDevice {
     }
 
     public boolean play(int channelNum) {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "play(" + String.valueOf(channelNum) + ")");
+        }
         return call(
                 ByteValues.CLASS_STREAM,
                 ByteValues.STREAM_Play,
@@ -286,7 +356,9 @@ public class RadioDevice {
     }
 
     public int getPlayStatus() {
-        Log.v(TAG, "getPlayStatus()");
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getPlayStatus()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -342,12 +414,15 @@ public class RadioDevice {
     }
 
     public int getProgramType(int channelId) {
-        Log.v(TAG, "getProgramType(" + String.valueOf(channelId) + ")");
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getProgramType(" + String.valueOf(channelId) + ")");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
                         ByteValues.STREAM_GetProgramType,
                         new byte[]{
+                                0,0,0,
                                 (byte) channelId
                         }
                 );
@@ -360,8 +435,10 @@ public class RadioDevice {
     }
 
     public String getProgramName(int channelId, boolean abbreviated) {
-        Log.v(TAG, "getProgramName(" + String.valueOf(channelId) + ", " +
-                ""+ String.valueOf(abbreviated) +")");
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getProgramName(" + String.valueOf(channelId) + ", " +
+                    ""+ String.valueOf(abbreviated) +")");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -376,14 +453,13 @@ public class RadioDevice {
         if (response != null) {
             byte[] programNameBytes = Arrays.copyOfRange(response, 6, response.length-3);
 
-            Log.v(TAG, Arrays.toString("talkSPORT".getBytes(Charset.forName("UTF-16"))));
-            Log.v(TAG, Arrays.toString(programNameBytes));
-
             try {
                 return getStringFromBytes(programNameBytes);
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.v(TAG, "Error in encoding program name");
+                if (DEBUG_OUT_COMMANDS) {
+                    Log.v(TAG, "Error in encoding program name");
+                }
                 return null;
             }
         } else {
@@ -392,6 +468,10 @@ public class RadioDevice {
     }
 
     public String getProgramText() {
+
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getProgramText()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -400,12 +480,13 @@ public class RadioDevice {
                 );
 
         if (response != null) {
-            byte[] programTextBytes = Arrays.copyOfRange(response, 6, response.length-3);
+            byte[] programTextBytes = Arrays.copyOfRange(response, 6, response.length - 3);
 
             try {
                 return getStringFromBytes(programTextBytes);
             } catch (Exception e) {
                 Log.v(TAG, "Error in encoding program name");
+                Log.v(TAG, Arrays.toString(response));
                 return null;
             }
         } else {
@@ -413,7 +494,10 @@ public class RadioDevice {
         }
     }
 
-    public int getDataRate() {
+    public int getProgramDataRate() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getProgramDataRate()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -429,7 +513,9 @@ public class RadioDevice {
     }
 
     public int getSignalQuality() {
-        Log.v(TAG, "getSignalQuality()");
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getSignalQuality()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -437,6 +523,21 @@ public class RadioDevice {
                         new byte[]{}
                 );
 
+        if (response != null) {
+            return response[6];
+        } else {
+            return -1;
+        }
+    }
+
+    public int getSignalStrength() {
+        byte[] response =
+                call(
+                        ByteValues.CLASS_STREAM,
+                        ByteValues.STREAM_GetSignalStrength,
+                        new byte[]{}
+                );
+        Log.v(TAG, Arrays.toString(response));
         if (response != null) {
             return response[6];
         } else {
@@ -462,8 +563,10 @@ public class RadioDevice {
     }
 
     public String getEnsembleName(int channelId, boolean abbreviated) {
-        Log.v(TAG, "getEnsembleName(" + String.valueOf(channelId) + ", " +
-                ""+ String.valueOf(abbreviated) +")");
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getEnsembleName(" + String.valueOf(channelId) + ", " +
+                    ""+ String.valueOf(abbreviated) +")");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -491,7 +594,9 @@ public class RadioDevice {
     }
 
     public int getTotalPrograms() {
-        Log.v(TAG, "getTotalPrograms()");
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getTotalPrograms()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -506,22 +611,65 @@ public class RadioDevice {
         }
     }
 
-    public ArrayList<RadioStation> getStationList() {
+    private RadioStation getRadioStation(int channelId) {
+        String name = getProgramName(channelId, false);
+        int genre = getProgramType(channelId);
+        String ensemble = getEnsembleName(channelId, false);
+
+        Log.v(TAG, String.valueOf(genre));
+
+        return new RadioStation(name, channelId, genre, ensemble);
+    }
+
+    public RadioStation[] getStationList() {
+        int totalPrograms = getTotalPrograms();
+        RadioStation[] stationList = new RadioStation[totalPrograms];
+
+        for (int channelId = 0; channelId < totalPrograms; channelId++) {
+            RadioStation radioStation = getRadioStation(channelId);
+
+            Log.v(TAG, "Adding " + radioStation.getName() + " to station list");
+
+            stationList[channelId] = radioStation;
+        }
         return stationList;
     }
 
-    public void refreshStationList() {
-        stationList.clear();
-        int totalPrograms = getTotalPrograms();
-        for (int channelId = 0; channelId < totalPrograms; channelId++) {
-            String name = getProgramName(channelId, false);
-            int genre = getProgramType(channelId);
-            String ensemble = getEnsembleName(channelId, false);
+    private class CopyStationsTask extends AsyncTask<CopyProgramsListener, Integer, RadioStation[]> {
+        private CopyProgramsListener copyProgramsListener;
 
-            Log.v(TAG, "Adding " + name + " to station list");
+        @Override
+        protected RadioStation[] doInBackground(CopyProgramsListener... copyListener) {
 
-            stationList.add(new RadioStation(name, channelId, genre, ensemble));
+            copyProgramsListener = copyListener[0];
+
+            int totalPrograms = getTotalPrograms();
+            RadioStation[] stationList = new RadioStation[totalPrograms];
+
+            for (int channelId = 0; channelId < totalPrograms; channelId++) {
+                RadioStation radioStation = getRadioStation(channelId);
+
+                Log.v(TAG, "Adding " + radioStation.getName() + " to station list");
+
+                publishProgress(channelId, totalPrograms - 1);
+                stationList[channelId] = radioStation;
+            }
+
+            return stationList;
         }
+
+        protected void onProgressUpdate(Integer... progress) {
+            copyProgramsListener.onProgressUpdate(progress[0], progress[1]);
+        }
+
+        protected void onPostExecute(RadioStation[] stationList) {
+            copyProgramsListener.onComplete(stationList);
+        }
+    }
+
+    public void copyStationList(final CopyProgramsListener copyListener) {
+        new CopyStationsTask().execute(copyListener);
+
     }
 
     private boolean isResponse(byte[] response) {
@@ -544,22 +692,70 @@ public class RadioDevice {
     private boolean isCommandNak(byte[] response) {
         return isResponse(response) &&
                 response[1] == ByteValues.RESPONSE_TYPE_ACK &&
-                response[2] == ByteValues.CMD_NAK &&
-                response[5] == 0;
+                response[2] == ByteValues.CMD_NAK;
     }
 
     /**
-     * Runs all of the commands needed to poll a dab radio.
+     * Runs all of the commands needed to poll information from a dab radio.
      *
      * @return
      */
-    public boolean poll() {
+    private boolean poll() {
         try {
+            int newVolume = getVolume();
+            if (newVolume != lastVolume && newVolume != -1) {
+                Log.v(TAG, "new Volume: " + newVolume);
+                listenerManager.informVolumeChanged(newVolume);
+                lastVolume = newVolume;
+            }
 
+            if (pollNumber % 20 == 0) { // Only poll this every 20 polls
+                int newProgramDataRate = getProgramDataRate();
+                if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
+                    Log.v(TAG, "new DataRate: " + newProgramDataRate);
+                    listenerManager.informProgramDataRateChanged(newProgramDataRate);
+                    lastProgramDataRate = newProgramDataRate;
+                }
+
+                int newStereoState = getStereo();
+                if (newStereoState != lastStereoState && newStereoState != -1) {
+                    Log.v(TAG, "new NewStereoState: " + newStereoState);
+                    listenerManager.informStereoStateChanged(newStereoState);
+                    lastStereoState = newStereoState;
+                }
+            }
+
+            int newSignalQuality = getSignalQuality();
+            if (newSignalQuality != lastSignalQuality && newSignalQuality != -1) {
+                Log.v(TAG, "new Signal Quality: " + newSignalQuality);
+                listenerManager.informSignalQualityChanged(newSignalQuality);
+                lastSignalQuality = newSignalQuality;
+            }
+
+            String newProgramText = getProgramText();
+            if (newProgramText != null) {
+                if (!newProgramText.equals(lastProgramText) && !newProgramText.isEmpty()) {
+                    Log.v(TAG, "new ProgramText: " + newProgramText);
+                    listenerManager.informProgramTextChanged(newProgramText);
+                    lastProgramText = newProgramText;
+                }
+            }
+
+            int newPlayStatus = getPlayStatus();
+
+            if (newPlayStatus != lastPlayStatus && newPlayStatus != -1) {
+                Log.v(TAG, "new PlayStatus: " + newPlayStatus);
+                listenerManager.informPlayStatusChanged(newPlayStatus);
+                lastPlayStatus = newPlayStatus;
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (connection.isDeviceAttached()) {
+                e.printStackTrace();
+            }
             return false;
         }
+        pollNumber += 1;
+        pollNumber %= 255;
 
         return true;
     }
