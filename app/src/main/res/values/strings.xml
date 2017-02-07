@@ -4,6 +4,16 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
+    <string name="settings_icon_description">Settings</string>
+
+    <string name="program_datarate_placeholder">%1$d Kbps</string>
+
+    <string name="SHARED_PREFERENCES_KEY">asdhafasyfanef</string>
+    <string name="CURRENT_CHANNEL_KEY">current_channel</string>
+    <string name="STATION_LIST_KEY">station_list</string>
+    <string name="VOLUME_KEY">volume</string>
+    <string name="DUCK_VOLUME_KEY">duck_volume</string>
+
     <string-array name="STATION_GENRES">
         <item />
         <item>News</item>
@@ -44,5 +54,14 @@
         <item>Joint Stereo</item>
         <item>Dual Channel</item>
         <item>Mono</item>
+    </string-array>
+
+    <string-array name="PLAYSTATUS_VALUES">
+        <item>Playing</item>
+        <item>Searching</item>
+        <item>Tuning</item>
+        <item>Stop</item>
+        <item>Sorting</item>
+        <item>Reconfiguration</item>
     </string-array>
 </resources>
