@@ -778,10 +778,14 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 handlePauseRequest();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                handleFocusDuck();
+                if (radio.isAttached()) {
+                    handleFocusDuck();
+                }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                handleMuteRequest();
+                if (radio.isAttached()) {
+                    handleMuteRequest();
+                }
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
                 handleFocusGain();
