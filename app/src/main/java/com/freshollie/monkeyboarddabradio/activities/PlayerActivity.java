@@ -22,6 +22,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.freshollie.monkeyboarddabradio.R;
@@ -29,6 +30,8 @@ import com.freshollie.monkeyboarddabradio.playback.RadioPlayerService;
 import com.freshollie.monkeyboarddabradio.radio.ListenerManager;
 import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
 import com.freshollie.monkeyboarddabradio.radio.RadioStation;
+
+import org.w3c.dom.Text;
 
 import java.util.Arrays;
 
@@ -49,6 +52,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private ImageButton volumeButton;
     private ImageButton settingsButton;
 
+    private SeekBar volumeSeekBar;
+
     private TextView currentChannelView;
     private TextView programTextTextView;
     private TextView signalStrengthView;
@@ -58,6 +63,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private TextView dataRateTextView;
     private TextView stereoStateTextView;
     private ImageView signalStrengthIcon;
+    private TextView volumeText;
 
     private RecyclerView stationListRecyclerView;
     private StationListAdapter stationListAdapter = new StationListAdapter(this);
@@ -278,9 +284,91 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         updatePlayIcon(playerService.getPlaybackState());
     }
 
+    public void openSeekBar() {
+        volumeSeekBar.setVisibility(View.VISIBLE);
+        volumeText.setVisibility(View.VISIBLE);
+    }
+
+    public void closeSeekBar() {
+        volumeSeekBar.setVisibility(View.INVISIBLE);
+        volumeText.setVisibility(View.INVISIBLE);
+    }
+
+    private Runnable seekBarIdle = new Runnable() {
+        @Override
+        public void run() {
+            closeSeekBar();
+        }
+    };
+
     public void setupVolumeControls() {
         volumeButton = (ImageButton) findViewById(R.id.volume_button);
-        onVolumeChanged(radio.getVolume());
+        volumeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (volumeSeekBar.getVisibility() == View.VISIBLE) {
+                    closeSeekBar();
+                } else {
+                    openSeekBar();
+                    volumeSeekBar.postDelayed(seekBarIdle, 2000);
+                }
+            }
+        });
+
+        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (playerBound) {
+                    volumeText.setText(String.valueOf(progress));
+                    playerService.handleSetVolumeRequest(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                seekBar.removeCallbacks(seekBarIdle);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                seekBar.postDelayed(seekBarIdle, 2000);
+            }
+        });
+        if (playerBound) {
+            updateVolumeSeekBar(playerService.getPlayerVolume());
+            onVolumeChanged(radio.getVolume());
+        }
+    }
+
+    public void updateVolumeSeekBar(int volume){
+        volumeSeekBar.setProgress(volume);
+        volumeText.setText(String.valueOf(volume));
+    }
+
+    public boolean handleVolumeUp() {
+        if (playerBound) {
+            openSeekBar();
+            int newVolume = playerService.getPlayerVolume() + 1;
+            if (newVolume <= 16) {
+                updateVolumeSeekBar(newVolume);
+                playerService.handleSetVolumeRequest(newVolume);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean handleVolumeDown() {
+        if (playerBound) {
+            openSeekBar();
+            int newVolume = playerService.getPlayerVolume() - 1;
+            if (newVolume > -1) {
+                updateVolumeSeekBar(newVolume);
+                playerService.handleSetVolumeRequest(newVolume);
+            }
+            return true;
+        }
+        return false;
     }
 
     public void setupSettingsButton() {
@@ -305,6 +393,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         signalStrengthIcon = (ImageView) findViewById(R.id.signal_strength_icon);
         programTextTextView = (TextView) findViewById(R.id.program_text);
         stereoStateTextView = (TextView) findViewById(R.id.program_stereo_mode);
+        volumeSeekBar = (SeekBar) findViewById(R.id.volume_seek_bar);
+        volumeText = (TextView) findViewById(R.id.volume_text);
     }
 
     public void clearPlayerAttributes() {
@@ -542,10 +632,17 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             }
         } else {
             // At full volume
-            icon = R.drawable.ic_volume_up_white_24dp;
+            if (volume > 8) {
+                icon = R.drawable.ic_volume_up_white_24dp;
+            } else if (volume > 0) {
+                icon = R.drawable.ic_volume_down_white_24dp;
+            } else {
+                icon = R.drawable.ic_volume_mute_white_24dp;
+            }
         }
 
         if (icon != 0) {
+            // Sets the icon to the new icon
             volumeButton.setForeground(ContextCompat.getDrawable(this, icon));
         }
     }
@@ -687,6 +784,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         finish();
     }
 
@@ -694,8 +792,16 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
         if (!controllerInput || keyCode == KeyEvent.KEYCODE_BACK) {
             handleKeyDown(keyCode);
+            return true;
+        } else {
+            switch(keyCode) {
+                case KeyEvent.KEYCODE_VOLUME_DOWN:
+                    return handleVolumeDown();
+                case KeyEvent.KEYCODE_VOLUME_UP:
+                    return handleVolumeUp();
+             }
         }
-        return true;
+        return false;
     }
 
 }
