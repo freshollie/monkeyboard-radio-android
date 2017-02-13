@@ -25,7 +25,7 @@ import java.util.Arrays;
  *
  */
 
-public class DeviceConnection{
+public class DeviceConnection {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -92,17 +92,12 @@ public class DeviceConnection{
 
     private PendingIntent usbPermissionIntent;
 
-    DeviceConnection(Context appContext) {
+    public DeviceConnection(Context appContext) {
         context = appContext;
 
         usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         usbPermissionIntent =
                 PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-
-        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-        filter.addAction(ACTION_USB_PERMISSION);
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        context.registerReceiver(usbBroadcastReceiver, filter);
     }
 
     private UsbDevice getDevice() {
@@ -119,6 +114,11 @@ public class DeviceConnection{
         Log.v(TAG, "Requesting connection to device");
         UsbDevice device = getDevice();
         if (device != null) {
+            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+            filter.addAction(ACTION_USB_PERMISSION);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+            context.registerReceiver(usbBroadcastReceiver, filter);
+
             if (usbManager.hasPermission(device)) {
                 usbDevice = device;
                 openConnection();
@@ -167,7 +167,11 @@ public class DeviceConnection{
 
     private void closeConnection() {
         Log.v(TAG, "Closing connection to device");
-        running = false;
+        if (isRunning()) {
+            running = false;
+            context.unregisterReceiver(usbBroadcastReceiver);
+            connectionStateListener.onStop();
+        }
 
         if (deviceSerialInterface != null) {
             try {
@@ -180,7 +184,6 @@ public class DeviceConnection{
         deviceSerialInterface = null;
         usbDeviceConnection = null;
         usbDevice = null;
-        connectionStateListener.onStop();
     }
 
     private byte generateCommandSerialNumber() {
@@ -204,7 +207,7 @@ public class DeviceConnection{
         int commandByteNumber = 0;
 
         // Keep trying to read for a response byte until we time out
-        while ((SystemClock.elapsedRealtime() - startTime) < RESPONSE_TIMEOUT_LENGTH) {
+        while ((SystemClock.elapsedRealtime() - startTime) < RESPONSE_TIMEOUT_LENGTH && isRunning()) {
             byte[] readBytes = new byte[MAX_PACKET_LENGTH];
             int numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
 

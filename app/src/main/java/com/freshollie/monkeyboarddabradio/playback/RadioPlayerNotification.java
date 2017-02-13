@@ -3,6 +3,7 @@ package com.freshollie.monkeyboarddabradio.playback;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -41,31 +42,31 @@ public class RadioPlayerNotification {
         update();
     }
 
-    public Notification buildNotification() {
+    private Notification buildNotification() {
         int playIcon;
         String playAction;
         String playDescription;
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(playerService);
 
         // Used for setting a pause of play icon and action depending on the current play state
         if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
             playIcon = R.drawable.ic_pause_white_24dp;
             playAction = RadioPlayerService.ACTION_PAUSE;
             playDescription = "pause";
+            builder.setOngoing(true);
         } else {
             playIcon = R.drawable.ic_play_arrow_white_24dp;
             playAction = RadioPlayerService.ACTION_PLAY;
             playDescription = "play";
         }
 
-        return new NotificationCompat.Builder(playerService)
-                .setShowWhen(false)
+        return builder.setShowWhen(false)
                 .setSmallIcon(R.drawable.ic_radio_black_24dp)
                 .setLargeIcon(
                         ((BitmapDrawable) playerService.getResources().
                                 getDrawableForDensity(R.mipmap.ic_launcher, 480, null)).getBitmap()
                 )
                 .setColor(ContextCompat.getColor(playerService, R.color.colorPrimaryDark))
-                .setOngoing(true)
                 .setContentIntent(
                         PendingIntent.getActivity(
                                 playerService,
@@ -91,7 +92,7 @@ public class RadioPlayerNotification {
                 .setContentTitle(playerService.getMetadata()
                         .getString(MediaMetadataCompat.METADATA_KEY_TITLE)
                 )
-                .setContentInfo(
+                .setContentText(
                         playerService.getMetadata().getString(
                                 MediaMetadataCompat.METADATA_KEY_GENRE
                         )
@@ -111,24 +112,39 @@ public class RadioPlayerNotification {
                         "next",
                         getPendingIntentForAction(RadioPlayerService.ACTION_NEXT)
                 )
+                .setDeleteIntent(
+                        getPendingIntentForAction(
+                                RadioPlayerService.ACTION_STOP
+                        )
+                )
                 .build();
     }
 
     private PendingIntent getPendingIntentForAction(String action) {
-        return PendingIntent.getBroadcast(
+        return PendingIntent.getService(
                 playerService,
                 0,
                 new Intent(action)
-                        .setPackage(playerService.getPackageName()),
+                        .setComponent(
+                                new ComponentName(playerService, RadioPlayerService.class)
+                        ),
                 PendingIntent.FLAG_CANCEL_CURRENT
         );
     }
 
     public void update() {
-        playerService.startForeground(
-                NOTIFICATION_ID,
-                buildNotification()
-        );
+        if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
+            playerService.startForeground(
+                    NOTIFICATION_ID,
+                    buildNotification()
+            );
+        } else {
+            playerService.stopForeground(false);
+            notificationManager.notify(
+                    NOTIFICATION_ID,
+                    buildNotification()
+            );
+        }
     }
 
     public void cancel() {

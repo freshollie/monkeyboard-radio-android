@@ -2,12 +2,15 @@
 <resources>
     <color name="colorPrimary">#2962ff</color>
     <color name="colorPrimaryDark">#1565c0</color>
-    <color name="colorAccent">#ff9100</color>
+    <color name="colorAccent">#E040FB</color>
+    <color name="colorHighlight">#bf360c</color>
 
     <color name="darkColor">#616161</color>
     <color name="backgroundDark">#263238</color>
     <color name="backgroundDarkAccent">#424242</color>
     <color name="backgroundDarker">#212121</color>
+    <color name="colorTest">#bbdefb</color>
 
+    <color name="stationListBackgroundColor">@color/backgroundDarkAccent</color>
 
 </resources>

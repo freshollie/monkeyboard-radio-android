@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/settings_title_radio">
+        <Preference
+            android:key="@string/setting_perform_dab_search_button_key"
+            android:title="@string/setting_perform_dab_search_text"
+            android:summary="@string/setting_perform_dab_search_summary" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/settings_title_control">
+
+        <CheckBoxPreference
+            android:key="@string/setting_headunitcontroller_input"
+            android:title="@string/setting_headunitcontroller_input"
+            android:summary="@string/setting_headunitcontroller_input_summary"
+            />
+
+        <CheckBoxPreference
+            android:key="@string/setting_scroll_wrap"
+            android:title="@string/setting_scroll_wrap"
+            android:summary="@string/setting_scroll_warp_summary"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/settings_title_volume">
+        <ListPreference
+            android:key="@string/setting_duck_volume"
+            android:title="@string/setting_duck_volume"
+            android:summary="@string/setting_duck_volume_summary" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/about_category_title">
+        <Preference
+            android:key="pref_static_field_key"
+            android:selectable="false"
+            android:persistent="false"
+            android:summary="@string/about_text"/>
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -13,7 +13,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@color/backgroundDarkAccent"
         android:orientation="horizontal"
         android:elevation="20dp">
         <android.support.v7.widget.RecyclerView
@@ -21,7 +20,11 @@
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/backgroundDarkAccent" />
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:fadeScrollbars="false"
+            android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+            android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+            android:background="@color/stationListBackgroundColor"/>
         <!--
         <LinearLayout
             android:layout_width="wrap_content"
@@ -114,7 +117,7 @@
                 android:foreground="@drawable/ic_settings_white_24dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
-                android:layout_margin="@dimen/activity_vertical_margin" />
+                android:layout_marginTop="@dimen/activity_vertical_margin" />
 
             <TextView
                 android:layout_width="50dp"
@@ -123,21 +126,19 @@
                 android:layout_toStartOf="@id/settings_button"
                 android:id="@+id/play_status"
                 android:text="Tuning"
-                android:textSize="15sp"
-                android:textAppearance="?android:attr/textAppearanceInverse"/>
+                android:textSize="15sp" />
 
             <TextView
-                android:layout_width="49dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toStartOf="@id/play_status"
-                android:layout_margin="@dimen/activity_vertical_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:paddingEnd="20dp"
                 android:textAlignment="textEnd"
                 android:id="@+id/signal_strength"
-                android:text="40%"
-                android:textSize="15sp"
-                android:textAppearance="?android:attr/textAppearanceInverse"/>
+                android:text="100%"
+                android:textSize="15sp" />
 
             <ImageView
                 android:layout_margin="@dimen/activity_vertical_margin"
@@ -154,7 +155,6 @@
                 android:textSize="15sp"
                 android:text="128 Kbps"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:textAppearance="?android:textAppearanceInverse"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true" />
 
@@ -164,7 +164,6 @@
                 android:id="@+id/program_stereo_mode"
                 android:textSize="15sp"
                 android:text="Stereo"
-                android:textAppearance="?android:textAppearanceInverse"
                 android:layout_below="@id/data_rate"
                 android:layout_centerHorizontal="true" />
 
@@ -177,7 +176,7 @@
                 android:id="@+id/station_ensemble_name"
                 android:textSize="20sp"
                 android:text="BBC National DAB"
-                android:textAppearance="?android:textAppearanceSmallInverse" />
+                android:textAppearance="?android:textAppearanceSmall" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -187,7 +186,7 @@
                 android:id="@+id/station_genre"
                 android:textSize="20sp"
                 android:text="Pop"
-                android:textAppearance="?android:textAppearanceSmallInverse" />
+                android:textAppearance="?android:textAppearanceSmall" />
 
             <ImageButton
                 android:layout_width="30dp"
@@ -205,7 +204,7 @@
                 android:layout_centerHorizontal="true"
                 android:text="BBC Radio 1"
                 android:textSize="60sp"
-                android:textAppearance="?android:attr/textAppearanceLargeInverse"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/channel_name"/>
 
             <View
@@ -226,7 +225,7 @@
                 android:textSize="30sp"
                 android:text="Test program text, this will display text about the program"
                 android:id="@+id/program_text"
-                android:textAppearance="?android:attr/textAppearanceInverse" />
+                android:textAppearance="?android:attr/textAppearance" />
         </RelativeLayout>
 
         <RelativeLayout
