@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:orientation="horizontal"
-    tools:context="com.freshollie.monkeyboarddabradio.PlayerActivity">
+    tools:context="com.freshollie.monkeyboarddabradio.activities.PlayerActivity">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -25,75 +25,6 @@
             android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
             android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
             android:background="@color/stationListBackgroundColor"/>
-        <!--
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:minWidth="50sp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_weight="1"
-            android:layout_margin="4dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textSize="40sp"
-                android:text="1"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:id="@+id/button_1"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="2"
-                android:textSize="40sp"
-                android:clickable="true"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:id="@+id/button_2"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textSize="40sp"
-                android:text="3"
-                android:clickable="true"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:id="@+id/button_3"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textSize="40sp"
-                android:text="4"
-                android:clickable="true"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:id="@+id/button_4"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textSize="40sp"
-                android:text="5"
-                android:clickable="true"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:id="@+id/button_5"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textSize="40sp"
-                android:text="6"
-                android:clickable="true"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:id="@+id/button_6"/>
-        </LinearLayout>
-!-->
-
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -265,6 +196,5 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"/>
         </RelativeLayout>
-
     </LinearLayout>
 </LinearLayout>

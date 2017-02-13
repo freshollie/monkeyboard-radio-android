@@ -92,6 +92,10 @@ public class DeviceConnection {
 
     private PendingIntent usbPermissionIntent;
 
+    /**
+     * Initialises connection. Requires context.
+     * @param appContext
+     */
     public DeviceConnection(Context appContext) {
         context = appContext;
 
@@ -100,6 +104,9 @@ public class DeviceConnection {
                 PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
     }
 
+    /**
+     * @return the radio device
+     */
     private UsbDevice getDevice() {
         for (UsbDevice device : usbManager.getDeviceList().values()) {
             if (device.getProductId() == RadioDevice.PRODUCT_ID &&
@@ -110,6 +117,10 @@ public class DeviceConnection {
         return null;
     }
 
+    /**
+     * Checks the devices connected to android and finds the radio. It then attempts to get
+     * permission to connect to the radio.
+     */
     private void requestConnection() {
         Log.v(TAG, "Requesting connection to device");
         UsbDevice device = getDevice();
@@ -127,20 +138,29 @@ public class DeviceConnection {
                 usbManager.requestPermission(device, usbPermissionIntent);
             }
         } else {
-            Log.v(TAG, "No devices found");
+            Log.v(TAG, "No device found");
         }
     }
 
+    /**
+     * Used as API to start the connection
+     */
     public void start() {
         requestConnection();
     }
 
+    /**
+     * API used to stop the connection
+     */
     public void stop() {
         if (isRunning()) {
             closeConnection();
         }
     }
 
+    /**
+     * Called once we have permission, this will open a connection to the radio
+     */
     private void openConnection() {
         Log.v(TAG, "Opening connection to device");
 
@@ -165,6 +185,10 @@ public class DeviceConnection {
 
     }
 
+
+    /**
+     * Ends the connection to the radio
+     */
     private void closeConnection() {
         Log.v(TAG, "Closing connection to device");
         if (isRunning()) {
@@ -186,6 +210,10 @@ public class DeviceConnection {
         usbDevice = null;
     }
 
+    /**
+     * Generates a unique serial byte (0-255) for the command
+     * @return
+     */
     private byte generateCommandSerialNumber() {
         commandSerialNumber += 1;
         if (commandSerialNumber > 255) {
@@ -196,10 +224,17 @@ public class DeviceConnection {
 
     /**
      * Gets the returned data from the given command serial number
+     *
      * @param serialNumber
      * @return
      */
     private byte[] getResponse(byte serialNumber) throws IOException{
+        /*
+        * It does this by reading the in bytes until it gets a start command
+        * byte, then once a full command is received it checks the serial number of the command to
+        * verify it is the correct command
+         */
+
         long startTime = SystemClock.elapsedRealtime();
 
         // This holds a command while it is being received
@@ -257,7 +292,9 @@ public class DeviceConnection {
             }
         }
 
-        Log.v(TAG, "getResponse timed out");
+        if (DEBUG_OUTPUT) {
+            Log.v(TAG, "getResponse timed out");
+        }
         return new byte[MAX_PACKET_LENGTH];
     }
 
