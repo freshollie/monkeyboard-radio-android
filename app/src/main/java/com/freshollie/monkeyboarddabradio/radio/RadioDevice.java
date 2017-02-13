@@ -33,7 +33,7 @@ public class RadioDevice {
 
     private int pollNumber = 0;
 
-    private int COMMAND_ATTEMPTS_TIMEOUT = 500;
+    private int COMMAND_ATTEMPTS_TIMEOUT = 300;
 
     static class ByteValues {
         static byte RESPONSE_TYPE_ACK = 0x00;
@@ -44,6 +44,10 @@ public class RadioDevice {
         static byte END_BYTE = (byte) 0xFD;
 
         static byte EMPTY_SERIAL_NUMBER = 0x00;
+
+        static byte CLASS_SYSTEM = 0x00;
+        static byte SYSTEM_GetSysRdy = 0x00;
+        static byte SYSTEM_Reset = 0x01;
 
         static byte CLASS_STREAM = 0x01;
         static byte STREAM_Play = 0x00;
@@ -65,7 +69,7 @@ public class RadioDevice {
         static byte STREAM_GetFrequency = 0x14; // Get current search frequency
         static byte STREAM_GetEnsembleName = 0x15; // Name of the DAB collection
         static byte STREAM_GetTotalProgram = 0x16;
-
+        static byte STREAM_GetSearchProgram = 0x1B;
 
         static byte STREAM_MODE_DAB = 0x00;
     }
@@ -75,6 +79,12 @@ public class RadioDevice {
         public static int PLAY_STATUS_SEARCHING = 1;
         public static int PLAY_STATUS_TUNING = 2;
         public static int PLAY_STATUS_STREAM_STOP = 3;
+
+        public static int RESET_TYPE_REBOOT = 0;
+        public static int RESET_TYPE_CLEAR_REBOOT = 1;
+        public static int RESET_TYPE_CLEAR = 2;
+
+        public static int MAX_CHANNEL_BAND = 40;
     }
 
 
@@ -114,6 +124,12 @@ public class RadioDevice {
         void onComplete(RadioStation[] stationList);
     }
 
+    public interface DABSearchListener {
+        void onStarted();
+        void onProgressUpdate(int numPrograms, int progress);
+        void onComplete(int numPrograms);
+    }
+
     private final String TAG = this.getClass().getSimpleName();
 
     private DeviceConnection connection;
@@ -124,8 +140,10 @@ public class RadioDevice {
     private Runnable pollLoop = new Runnable() {
         @Override
         public void run() {
+            Log.v(TAG, " 100% Poll Loop started");
             while (true) {
-                if (!poll() || !connection.isRunning()) {
+                if (!poll() || !connection.isRunning() || Thread.currentThread().isInterrupted()) {
+                    Log.v(TAG, "100% Poll Loop stopped");
                     break;
                 }
             }
@@ -158,6 +176,7 @@ public class RadioDevice {
             @Override
             public void onStart() {
                 Log.v(TAG, "Connection opened");
+                startPollLoop();
                 listenerManager.informConnectionStart();
             }
 
@@ -174,19 +193,24 @@ public class RadioDevice {
     }
 
     public void disconnect() {
-        stopPollLoop();
-        connection.stop();
-        Log.v(TAG, "Disconnected");
+        if (isConnected()) {
+            stopPollLoop();
+            connection.stop();
+            Log.v(TAG, "Disconnected");
+        }
     }
 
     public void startPollLoop() {
+        Log.v(TAG, "startPollLoop()");
         if (!pollThread.isAlive()) {
+            Log.v(TAG, "Starting poll loop");
             pollThread = new Thread(pollLoop);
             pollThread.start();
         }
     }
 
     public void stopPollLoop() {
+        Log.v(TAG, "Stopping poll loop");
         pollThread.interrupt();
     }
 
@@ -232,7 +256,7 @@ public class RadioDevice {
      * @param parameters
      * @return
      */
-    private byte[] call(byte functionType, byte function, byte[] parameters) {
+    private byte[] call(byte functionType, byte function, byte[] parameters, boolean retry) {
         byte [] buffer = new byte[DeviceConnection.MAX_PACKET_LENGTH];
         buffer[0] = ByteValues.START_BYTE;
         buffer[1] = functionType;
@@ -279,14 +303,22 @@ public class RadioDevice {
                     }
                 }
             }
+
+            if (!retry) {
+                break;
+            }
         }
 
         return null;
     }
 
-    public boolean setVolume(int volume) {
-        return call(
+    private byte[] call(byte functionType, byte function, byte[] parameters) {
+        return call(functionType, function, parameters, true);
+    }
 
+    public boolean setVolume(int volume) {
+
+        return call(
                 ByteValues.CLASS_STREAM,
                 ByteValues.STREAM_SetVolume,
                 new byte[]{
@@ -339,15 +371,22 @@ public class RadioDevice {
         ) != null;
     }
 
-    public boolean startChannelScan() {
+    public boolean autoSearch(int startBand, int stopBand) {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "autoSearch(" + String.valueOf(startBand) + ", " + String.valueOf(stopBand) + ")");
+        }
         return call(
                 ByteValues.CLASS_STREAM,
                 ByteValues.STREAM_AutoSearch,
-                new byte[]{}
+                new byte[]{
+                        (byte) startBand,
+                        (byte) stopBand
+                }
         ) != null;
     }
 
-    public boolean stopChannelScan() {
+    public boolean stopSearch() {
+        Log.v(TAG, "stopSearch()");
         return call(
                 ByteValues.CLASS_STREAM,
                 ByteValues.STREAM_StopSearch,
@@ -545,7 +584,16 @@ public class RadioDevice {
         }
     }
 
+    /**
+     * Used to get the frequency of the current program, or used to get the current
+     * search frequency when performing a DAB auto search.
+     * @param channelId
+     * @return
+     */
     public int getFrequency(int channelId) {
+        if (DEBUG_OUT_COMMANDS){
+            Log.v(TAG, "getFrequency(" + String.valueOf(channelId) + ")");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -553,6 +601,28 @@ public class RadioDevice {
                         new byte[]{
                                 (byte) channelId
                         }
+                );
+
+        if (response != null) {
+            return response[6];
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * @return number of programs found so far during a search
+     */
+    public int getSearchProgram() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getSearchProgram()");
+        }
+
+        byte[] response =
+                call(
+                        ByteValues.CLASS_STREAM,
+                        ByteValues.STREAM_GetSearchProgram,
+                        new byte[]{}
                 );
 
         if (response != null) {
@@ -611,12 +681,36 @@ public class RadioDevice {
         }
     }
 
+    public boolean getSysReady() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getSysReady()");
+        }
+
+        return call(
+                ByteValues.CLASS_SYSTEM,
+                ByteValues.SYSTEM_GetSysRdy,
+                new byte[]{},
+                false
+        ) != null;
+    }
+
+    public boolean reset(int type) {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "reset(" + String.valueOf(type) + ")");
+        }
+        return call(
+                ByteValues.CLASS_SYSTEM,
+                ByteValues.SYSTEM_Reset,
+                new byte[]{
+                        (byte) type
+                }
+        ) != null;
+    }
+
     private RadioStation getRadioStation(int channelId) {
         String name = getProgramName(channelId, false);
         int genre = getProgramType(channelId);
         String ensemble = getEnsembleName(channelId, false);
-
-        Log.v(TAG, String.valueOf(genre));
 
         return new RadioStation(name, channelId, genre, ensemble);
     }
@@ -640,21 +734,29 @@ public class RadioDevice {
 
         @Override
         protected RadioStation[] doInBackground(CopyProgramsListener... copyListener) {
+            boolean pollLoopWasRunning = pollThread.isAlive();
+            if (pollLoopWasRunning) {
+                stopPollLoop();
+            }
 
             copyProgramsListener = copyListener[0];
 
             int totalPrograms = getTotalPrograms();
+            if (totalPrograms < 0) {
+                totalPrograms = 0;
+            }
+
             RadioStation[] stationList = new RadioStation[totalPrograms];
 
             for (int channelId = 0; channelId < totalPrograms; channelId++) {
                 RadioStation radioStation = getRadioStation(channelId);
-
-                Log.v(TAG, "Adding " + radioStation.getName() + " to station list");
-
                 publishProgress(channelId, totalPrograms - 1);
                 stationList[channelId] = radioStation;
             }
 
+            if (pollLoopWasRunning) {
+                startPollLoop();
+            }
             return stationList;
         }
 
@@ -667,9 +769,78 @@ public class RadioDevice {
         }
     }
 
-    public void copyStationList(final CopyProgramsListener copyListener) {
-        new CopyStationsTask().execute(copyListener);
+    /**
+     * Task resets the boards Database and performs a channel search giving updates of the
+     * search process.
+     */
+    private class DABSearchTask extends AsyncTask<DABSearchListener, Integer, Integer> {
+        private DABSearchListener dabSearchListener;
 
+        @Override
+        protected Integer doInBackground(DABSearchListener... searchListeners) {
+            boolean pollLoopWasRunning = pollThread.isAlive();
+            if (pollLoopWasRunning) {
+                stopPollLoop();
+            }
+            dabSearchListener = searchListeners[0];
+            dabSearchListener.onStarted();
+
+            if (getTotalPrograms() > 0 || true) { // TODO needs to be fixed after debuging
+                reset(Values.RESET_TYPE_CLEAR);
+            }
+
+            // After a reset we need to wait for the board to respond to this command;
+            long startTime = SystemClock.currentThreadTimeMillis();
+            while ((SystemClock.currentThreadTimeMillis() - startTime) < 5000 &&
+                    connection.isRunning()) {
+                if (getSysReady()) {
+                    break;
+                }
+            }
+
+
+            int lastProgess = -1;
+            int lastNumChannels = -1;
+            int progress;
+            int numChannels = 0;
+            if (autoSearch(0, Values.MAX_CHANNEL_BAND)) {
+                while (getFrequency(0) != -1 && getPlayStatus() == Values.PLAY_STATUS_SEARCHING) {
+                    progress = getFrequency(0); // Gets the current frequency of the search
+                    numChannels = getSearchProgram();
+                    if (lastNumChannels != numChannels || lastProgess != progress) {
+                        publishProgress(numChannels, progress);
+                    }
+                }
+            }
+
+            if (pollLoopWasRunning) {
+                startPollLoop();
+            }
+            return numChannels;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+            dabSearchListener.onProgressUpdate(progress[0], progress[1]);
+        }
+
+        protected void onPostExecute(Integer numChannels) {
+            dabSearchListener.onComplete(numChannels);
+        }
+
+    }
+
+    public void copyStationList(final CopyProgramsListener copyListener) {
+        Log.v(TAG, "copyStationList");
+        new CopyStationsTask().execute(copyListener);
+    }
+
+    public boolean startDABSearch(DABSearchListener searchListener) {
+        Log.v(TAG, "startDABSearch");
+        if (getPlayStatus() != Values.PLAY_STATUS_SEARCHING) {
+            new DABSearchTask().execute(searchListener);
+            return true;
+        }
+        return false;
     }
 
     private boolean isResponse(byte[] response) {
@@ -749,7 +920,7 @@ public class RadioDevice {
                 lastPlayStatus = newPlayStatus;
             }
         } catch (Exception e) {
-            if (connection.isDeviceAttached()) {
+            if (connection.isDeviceAttached() && connection.isRunning()) {
                 e.printStackTrace();
             }
             return false;

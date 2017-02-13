@@ -15,10 +15,6 @@ public class ListenerManager {
      * Manager used to notify given listeners when attributes about the connected radio change
      */
 
-    public interface ChannelScanListener {
-        void onScanFinished();
-    }
-
     public interface DataListener {
         void onProgramTextChanged(String programText);
         void onPlayStatusChanged(int playStatus);
@@ -36,7 +32,6 @@ public class ListenerManager {
     private Handler mainHandler;
     private ArrayList<ConnectionStateChangeListener> connectionStateChangeListeners;
     private ArrayList<DataListener> dataListeners;
-    private ArrayList<ChannelScanListener> channelScanListeners;
 
     public ListenerManager(Handler handler) {
         mainHandler = handler;
@@ -75,7 +70,6 @@ public class ListenerManager {
 
     private void unregisterAll() {
         connectionStateChangeListeners = new ArrayList<>();
-        channelScanListeners = new ArrayList<>();
         dataListeners = new ArrayList<>();
     }
 
@@ -148,25 +142,6 @@ public class ListenerManager {
             public void run() {
                 for (DataListener dataListener: dataListeners) {
                     dataListener.onStereoStateChanged(stereoState);
-                }
-            }
-        });
-    }
-
-    public void registerChannelScanListener(ChannelScanListener channelScanListener) {
-        channelScanListeners.add(channelScanListener);
-    }
-
-    public void unregisterChannelScanListener(ChannelScanListener channelScanListener) {
-        channelScanListeners.remove(channelScanListener);
-    }
-
-    void informChannelScanFinished() {
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (ChannelScanListener channelScanListener : channelScanListeners) {
-                    channelScanListener.onScanFinished();
                 }
             }
         });

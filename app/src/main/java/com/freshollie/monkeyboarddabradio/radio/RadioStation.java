@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 /**
  * Created by Freshollie on 12/01/2017.
+ * Used to store information about a radio station
  */
 
 public class RadioStation {

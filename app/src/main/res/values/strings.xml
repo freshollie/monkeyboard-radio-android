@@ -1,18 +1,64 @@
 <resources>
     <string name="app_name">Monkeyboard Dab Radio</string>
 
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="no_saved_stations">Radio has no stored stations, perform scan?</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="cancel">cancel</string>
+
+    <string name="device_connection_timed_out_try_again">Waited too long for device to connect. \nTry again?</string>
+    <string name="dialog_dab_search_try_again_message">No stations found. Make sure the arial is plugged in.\nTry again?</string>
+
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_title_radio">Radio</string>
+    <string name="settings_title_control">Control</string>
+    <string name="settings_title_volume">Volume</string>
+    <string name="settings_title_about">About</string>
+
+    <string name="setting_perform_dab_search_button_key">dab_search</string>
+    <string name="setting_perform_dab_search_text">Perform DAB Search</string>
+    <string name="setting_perform_dab_search_summary">Clear radio database and perform a DAB search</string>
+    <string name="setting_perform_dab_search_confirmation">Are you sure you want to clear the currently saved DAB stations and perform a search?</string>
+
+    <string name="dialog_dab_search_title">DAB Search</string>
+    <string name="dialog_dab_search_status_connecting">Connecting</string>
+    <string name="dialog_dab_search_status_searching">Searching</string>
+    <string name="dialog_dab_search_status_copying">Copying</string>
+    <string name="dialog_dab_search_status_failed">Failed</string>
+
+    <string name="dialog_dab_search_failed_no_channels_found">No channels found</string>
+    <string name="dialog_dab_search_failed_timed_out">Timed out waiting for board to connect</string>
+
+    <string name="dialog_dab_search_wait_onnect">Waiting for device to connect</string>
+    <string name="dialog_dab_search_found_channels_progress">Found %1$d channels</string>
+    <string name="dialog_dab_search_copying_channels_progress">Copied %1$d channels</string>
+
+    <string name="setting_duck_volume">Duck Volume</string>
+    <string name="setting_duck_volume_summary">Volume that will be set when \
+        another app needs temporary audio focus</string>
+    <string name="setting_duck_volume_updated">Duck volume updated</string>
+
+    <string name="setting_headunitcontroller_input">Headunit Controller input</string>
+    <string name="setting_headunitcontroller_input_summary">Use Headunit Controller as main device input</string>
+
+    <string name="setting_scroll_wrap">Scroll wrap</string>
+    <string name="setting_scroll_warp_summary">When scrolling with the cursor, warp around at each end</string>
 
     <string name="settings_icon_description">Settings</string>
 
+    <string name="about_category_title">About</string>
+    <string name="about_text">Written by Oliver Bell, 2016\nOpen Source</string>
+
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
-    <string name="SHARED_PREFERENCES_KEY">asdhafasyfanef</string>
+    <string name="SHARED_PREFERENCES_KEY">98asfa98as8ffd</string>
     <string name="CURRENT_CHANNEL_KEY">current_channel</string>
     <string name="STATION_LIST_KEY">station_list</string>
     <string name="VOLUME_KEY">volume</string>
     <string name="DUCK_VOLUME_KEY">duck_volume</string>
+    <string name="HEADUNIT_MAIN_INPUT_KEY">headunit_main_input</string>
+    <string name="SCROLL_WRAP_KEY">scroll_wrap</string>
 
     <string-array name="STATION_GENRES">
         <item />
