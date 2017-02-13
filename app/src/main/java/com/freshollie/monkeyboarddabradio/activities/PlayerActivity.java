@@ -808,6 +808,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                     return true;
                 case KeyEvent.KEYCODE_DPAD_UP:
                     return true;
+                case KeyEvent.KEYCODE_ENTER:
+                    return true;
              }
         }
         return false;
