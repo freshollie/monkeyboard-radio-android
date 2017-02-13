@@ -192,7 +192,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             if (connectThread.isAlive()) {
                 connectThread.interrupt();
             } else {
-                handlePauseRequest();
+                if (hasFocus()) {
+                    handlePauseRequest();
+                }
             }
         }
     };
@@ -700,7 +702,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     .build()
             );
 
-            if (playerNotification != null && radio.isConnected()) {
+            if (playerNotification != null) {
                 playerNotification.update();
             }
         }
@@ -733,7 +735,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                             .build()
             );
 
-            if (playerNotification != null && radio.isConnected()) {
+            if (playerNotification != null) {
                 playerNotification.update();
             }
         }
@@ -771,6 +773,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Another app has gained focus;
                 handleFocusLost();
+                handleFocusLost();
                 break;
             case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
                 handlePauseRequest();
@@ -793,6 +796,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (radio.isConnected()) {
             handlePauseRequest();
         }
+
         radio.disconnect();
         playerNotification.cancel();
     }
@@ -801,16 +805,16 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     public void onDestroy() {
         Log.v(TAG, "Stopping service");
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-        playerNotification.cancel();
         mediaSession.setCallback(null);
         mediaSession.release();
+
+        radio.getListenerManager().unregisterDataListener(dataListener);
+        radio.getListenerManager().unregisterConnectionStateChangedListener(connectionStateListener);
 
         if (radio.isConnected()) {
             radio.disconnect();
         }
-
-        radio.getListenerManager().unregisterDataListener(dataListener);
-        radio.getListenerManager().unregisterConnectionStateChangedListener(connectionStateListener);
+        playerNotification.cancel();
     }
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback {

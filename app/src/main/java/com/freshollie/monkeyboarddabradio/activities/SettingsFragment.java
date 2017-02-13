@@ -164,8 +164,8 @@ public class SettingsFragment extends PreferenceFragment {
 
         // Duck Volume preference list
 
-        CharSequence[] entrySequence = new CharSequence[15];
-        for (int i = 0; i < 15; i++) {
+        CharSequence[] entrySequence = new CharSequence[17];
+        for (int i = 0; i < 17; i++) {
             entrySequence[i] = String.valueOf(i);
         }
 
