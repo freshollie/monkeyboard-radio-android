@@ -773,7 +773,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Another app has gained focus;
                 handleFocusLost();
-                handleFocusLost();
                 break;
             case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
                 handlePauseRequest();

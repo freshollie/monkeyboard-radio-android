@@ -308,6 +308,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             public void onClick(View v) {
                 if (volumeSeekBar.getVisibility() == View.VISIBLE) {
                     closeSeekBar();
+                    volumeSeekBar.removeCallbacks(seekBarIdle);
                 } else {
                     openSeekBar();
                     volumeSeekBar.postDelayed(seekBarIdle, 2000);
@@ -348,6 +349,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public boolean handleVolumeUp() {
         if (playerBound) {
             openSeekBar();
+            volumeSeekBar.removeCallbacks(seekBarIdle);
+            volumeSeekBar.postDelayed(seekBarIdle, 2000);
             int newVolume = playerService.getPlayerVolume() + 1;
             if (newVolume <= 16) {
                 updateVolumeSeekBar(newVolume);
@@ -361,6 +364,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public boolean handleVolumeDown() {
         if (playerBound) {
             openSeekBar();
+            volumeSeekBar.removeCallbacks(seekBarIdle);
+            volumeSeekBar.postDelayed(seekBarIdle, 2000);
             int newVolume = playerService.getPlayerVolume() - 1;
             if (newVolume > -1) {
                 updateVolumeSeekBar(newVolume);
@@ -799,6 +804,10 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                     return handleVolumeDown();
                 case KeyEvent.KEYCODE_VOLUME_UP:
                     return handleVolumeUp();
+                case KeyEvent.KEYCODE_TAB:
+                    return true;
+                case KeyEvent.KEYCODE_DPAD_UP:
+                    return true;
              }
         }
         return false;
