@@ -1,6 +1,5 @@
-package com.freshollie.monkeyboarddabradio;
+package com.freshollie.monkeyboarddabradio.activities;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.freshollie.monkeyboarddabradio.R;
 import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
 import com.freshollie.monkeyboarddabradio.radio.RadioStation;
 

@@ -6,19 +6,14 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.session.PlaybackState;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaButtonReceiver;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.freshollie.monkeyboarddabradio.PlayerActivity;
+import com.freshollie.monkeyboarddabradio.activities.PlayerActivity;
 import com.freshollie.monkeyboarddabradio.R;
 
 /**

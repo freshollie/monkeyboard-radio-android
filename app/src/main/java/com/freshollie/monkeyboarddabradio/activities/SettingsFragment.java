@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio;
+package com.freshollie.monkeyboarddabradio.activities;
 
 
 import android.app.FragmentManager;
@@ -15,11 +15,11 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 
+import com.freshollie.monkeyboarddabradio.R;
 import com.freshollie.monkeyboarddabradio.playback.RadioPlayerService;
 
 public class SettingsFragment extends PreferenceFragment {

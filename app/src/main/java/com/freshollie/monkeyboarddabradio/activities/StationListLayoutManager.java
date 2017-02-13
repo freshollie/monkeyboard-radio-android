@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio;
+package com.freshollie.monkeyboarddabradio.activities;
 
 import android.content.Context;
 import android.graphics.PointF;

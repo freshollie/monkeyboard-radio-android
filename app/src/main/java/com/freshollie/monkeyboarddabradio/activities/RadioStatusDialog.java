@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio;
+package com.freshollie.monkeyboarddabradio.activities;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.freshollie.monkeyboarddabradio.R;
 import com.freshollie.monkeyboarddabradio.playback.RadioPlayerService;
 import com.freshollie.monkeyboarddabradio.radio.ListenerManager;
 import com.freshollie.monkeyboarddabradio.radio.RadioDevice;

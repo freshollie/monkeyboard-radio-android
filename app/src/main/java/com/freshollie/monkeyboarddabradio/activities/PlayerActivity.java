@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio;
+package com.freshollie.monkeyboarddabradio.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.freshollie.monkeyboarddabradio.R;
 import com.freshollie.monkeyboarddabradio.playback.RadioPlayerService;
 import com.freshollie.monkeyboarddabradio.radio.ListenerManager;
 import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
