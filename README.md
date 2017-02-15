@@ -17,7 +17,7 @@ I wrote this application to be compatible with another one of my custom written 
 I designed this app for use in my car, as so the interface has been designed to work in a car.
 
 ## Libraries
-
+~
 The application uses several third party libraries to acheive full functionallity.
 
 - [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android) - this has been slightly modified in this repo for newer android versions.
