@@ -33,6 +33,10 @@ The application uses several third party libraries to acheive full functionallit
     <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/searching_interface.png" alt="Searching interface" width="800"/>
 </p>
 
-<p>
+<p align="center">>
     <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/settings_interface.png" align="center" alt="Settings interface" width="800"/>
 </p>
+
+## Licence
+
+    GPL 2.0
