@@ -24,6 +24,13 @@ The application uses several third party libraries to acheive full functionallit
 - [SnappySmoothScroller](https://github.com/nshmura/SnappySmoothScroller)
 - [CircularProgressView](https://github.com/rahatarmanahmed/CircularProgressView)
 
+
+## Contributing
+
+If you wish to make a fix, fork this project commit and then make a pull request describing the fix in detail.
+
+If you wish to report a bug, create an issue and I will look into it.
+
 ## Screenshots
 <p align="center">
     <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/main_interface.png" alt="Main interface" width="800"/>
@@ -39,4 +46,5 @@ The application uses several third party libraries to acheive full functionallit
 
 ## Licence
 
-    GPL 2.0
+    GPL 3.0
+   
