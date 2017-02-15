@@ -4,7 +4,7 @@
 
 ## About
 
-This app will interface with a [Monkeyboard](link) and provides a control and feedback interface for the user for DAB only.
+This app will interface with a [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-fm-digital-radio-development-board) and provides a control and feedback interface for the user for DAB only.
 
 The Monkeyboard communicates via USB serial and so I used the specifcation from the manufacturer to write a simple API interface for the board (com.freshollie.monkeyboarddab.radio). 
 
@@ -25,9 +25,14 @@ The application uses several third party libraries to acheive full functionallit
 - [CircularProgressView](https://github.com/rahatarmanahmed/CircularProgressView)
 
 ## Screenshots
+<p align="center">
+    <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/main_interface.png" alt="Main interface" width="800"/>
+</p>
 
-<img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/main_interface.png" align="center" alt="Main interface" width="400"/>
+<p align="center">
+    <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/searching_interface.png" alt="Searching interface" width="800"/>
+</p>
 
-<img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/searching_interface.png" align="center" alt="Searching interface" width="400"/>
-
-<img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/settings_interface.png" align="center" alt="Settings interface" width="400"/>
+<p>
+    <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/settings_interface.png" align="center" alt="Settings interface" width="800"/>
+</p>
