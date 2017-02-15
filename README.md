@@ -1,6 +1,8 @@
 # Monkeyboard DAB radio for android
 
-[Latest Build](https://github.com/freshollie/MonkeyboardAndroidRadioApp/tree/readme-development/app/build/outputs/apk)
+[Latest Build](https://github.com/freshollie/MonkeyboardAndroidRadioApp/tree/readme-development/app/build/outputs/apk) (Minimum version 4.2)
+
+Build has only been tested on 6.0. If the app crashes on your system submit an issue with a full log file (Look this up if you dont know how to do this)
 
 ## About
 
