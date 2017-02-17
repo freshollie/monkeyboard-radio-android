@@ -264,26 +264,19 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             }
         });
 
-        pauseButton = (ImageButton) findViewById(R.id.pause_button);
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!playerBound) {
-                    bindPlayerService();
-                } else {
-                    playerService.handlePauseRequest();
-                }
-            }
-        });
 
-        playButton = (ImageButton) findViewById(R.id.play_button);
+        playButton = (ImageButton) findViewById(R.id.play_pause_button);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!playerBound) {
                     bindPlayerService();
                 } else {
-                    playerService.handlePlayRequest();
+                    if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
+                        playerService.handlePauseRequest();
+                    } else {
+                        playerService.handlePlayRequest();
+                    }
                 }
             }
         });
@@ -442,13 +435,13 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
 
     public void updatePlayIcon(int playState) {
+        int icon;
         if (playState == PlaybackStateCompat.STATE_PLAYING) {
-            playButton.setVisibility(View.INVISIBLE);
-            pauseButton.setVisibility(View.VISIBLE);
+            icon = R.drawable.ic_pause_white_24dp;
         } else {
-            playButton.setVisibility(View.VISIBLE);
-            pauseButton.setVisibility(View.INVISIBLE);
+            icon = R.drawable.ic_play_arrow_white_24dp;
         }
+        playButton.setImageResource(icon);
     }
 
     public void updateCurrentChannelName(String channelName) {
@@ -592,7 +585,6 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     @Override
     public void onPlayStatusChanged(int playStatus) {
-        Log.v(TAG, "Updating Play Status: " + RadioDevice.StringValues.getPlayStatusFromId(playStatus));
         playStatusView.setText(RadioDevice.StringValues.getPlayStatusFromId(playStatus));
     }
 
