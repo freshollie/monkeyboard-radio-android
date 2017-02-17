@@ -651,7 +651,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
         if (icon != 0) {
             // Sets the icon to the new icon
-            volumeButton.setForeground(ContextCompat.getDrawable(this, icon));
+            volumeButton.setImageResource(icon);
         }
     }
 
