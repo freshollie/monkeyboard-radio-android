@@ -124,7 +124,8 @@
                 android:layout_height="30dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
-                android:foreground="@drawable/ic_volume_mute_white_24dp"
+                android:src="@drawable/ic_volume_mute_white_24dp"
+                android:scaleType="fitXY"
                 android:id="@+id/volume_button"
                 android:background="?selectableItemBackgroundBorderless"/>
 
