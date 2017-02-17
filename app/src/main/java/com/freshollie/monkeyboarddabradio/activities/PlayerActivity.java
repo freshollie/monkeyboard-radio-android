@@ -31,8 +31,6 @@ import com.freshollie.monkeyboarddabradio.radio.ListenerManager;
 import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
 import com.freshollie.monkeyboarddabradio.radio.RadioStation;
 
-import org.w3c.dom.Text;
-
 import java.util.Arrays;
 
 public class PlayerActivity extends AppCompatActivity implements ListenerManager.DataListener,
@@ -48,7 +46,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     private ImageButton nextButton;
     private ImageButton previousButton;
-    private ImageButton playPauseButton;
+    private ImageButton pauseButton;
+    private ImageButton playButton;
     private ImageButton volumeButton;
     private ImageButton settingsButton;
 
@@ -265,18 +264,26 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             }
         });
 
-        playPauseButton = (ImageButton) findViewById(R.id.play_pause_button);
-        playPauseButton.setOnClickListener(new View.OnClickListener() {
+        pauseButton = (ImageButton) findViewById(R.id.pause_button);
+        pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!playerBound) {
                     bindPlayerService();
                 } else {
-                    if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
-                        playerService.handlePauseRequest();
-                    } else {
-                        playerService.handlePlayRequest();
-                    }
+                    playerService.handlePauseRequest();
+                }
+            }
+        });
+
+        playButton = (ImageButton) findViewById(R.id.play_button);
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!playerBound) {
+                    bindPlayerService();
+                } else {
+                    playerService.handlePlayRequest();
                 }
             }
         });
@@ -284,12 +291,12 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         updatePlayIcon(playerService.getPlaybackState());
     }
 
-    public void openSeekBar() {
+    public void openVolumeSeekBar() {
         volumeSeekBar.setVisibility(View.VISIBLE);
         volumeText.setVisibility(View.VISIBLE);
     }
 
-    public void closeSeekBar() {
+    public void closeVolumeSeekBar() {
         volumeSeekBar.setVisibility(View.INVISIBLE);
         volumeText.setVisibility(View.INVISIBLE);
     }
@@ -297,7 +304,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private Runnable seekBarIdle = new Runnable() {
         @Override
         public void run() {
-            closeSeekBar();
+            closeVolumeSeekBar();
         }
     };
 
@@ -307,10 +314,10 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             @Override
             public void onClick(View v) {
                 if (volumeSeekBar.getVisibility() == View.VISIBLE) {
-                    closeSeekBar();
+                    closeVolumeSeekBar();
                     volumeSeekBar.removeCallbacks(seekBarIdle);
                 } else {
-                    openSeekBar();
+                    openVolumeSeekBar();
                     volumeSeekBar.postDelayed(seekBarIdle, 2000);
                 }
             }
@@ -348,7 +355,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     public boolean handleVolumeUp() {
         if (playerBound) {
-            openSeekBar();
+            openVolumeSeekBar();
             volumeSeekBar.removeCallbacks(seekBarIdle);
             volumeSeekBar.postDelayed(seekBarIdle, 2000);
             int newVolume = playerService.getPlayerVolume() + 1;
@@ -363,7 +370,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     public boolean handleVolumeDown() {
         if (playerBound) {
-            openSeekBar();
+            openVolumeSeekBar();
             volumeSeekBar.removeCallbacks(seekBarIdle);
             volumeSeekBar.postDelayed(seekBarIdle, 2000);
             int newVolume = playerService.getPlayerVolume() - 1;
@@ -433,15 +440,15 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         programTextTextView.setText("");
     }
 
-    public void updatePlayIcon(int playState) {
-        int icon;
-        if (playState == PlaybackStateCompat.STATE_PLAYING) {
-            icon = R.drawable.ic_pause_white_24dp;
-        } else {
-            icon = R.drawable.ic_play_arrow_white_24dp;
-        }
 
-        playPauseButton.setForeground(ContextCompat.getDrawable(this, icon));
+    public void updatePlayIcon(int playState) {
+        if (playState == PlaybackStateCompat.STATE_PLAYING) {
+            playButton.setVisibility(View.INVISIBLE);
+            pauseButton.setVisibility(View.VISIBLE);
+        } else {
+            playButton.setVisibility(View.VISIBLE);
+            pauseButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void updateCurrentChannelName(String channelName) {
@@ -542,10 +549,6 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         stationListRecyclerView.post(cursorScrollRunnable);
     }
 
-    public void clearProgramText() {
-        programTextTextView.setText("");
-    }
-
     public void handleSetChannel(int channel) {
         if (playerBound) {
             playerService.handleSetChannel(channel);
@@ -596,8 +599,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     @Override
     public void onSignalQualityChanged(int signalStrength) {
         signalStrengthView.setText(String.valueOf(signalStrength) + "%");
-        int drawableId = 0;
 
+        int drawableId;
         if (signalStrength > 70) {
             drawableId = R.drawable.ic_signal_cellular_4_bar_white_24dp;
         } else if (signalStrength > 60) {
