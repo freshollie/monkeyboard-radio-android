@@ -7,7 +7,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
@@ -45,22 +47,27 @@ public class RadioPlayerNotification {
 
         // Used for setting a pause of play icon and action depending on the current play state
         if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
-            playIcon = R.drawable.ic_pause_white_24dp;
+            playIcon = R.drawable.ic_notification_pause;
             playAction = RadioPlayerService.ACTION_PAUSE;
             playDescription = "pause";
             builder.setOngoing(true);
         } else {
-            playIcon = R.drawable.ic_play_arrow_white_24dp;
+            playIcon = R.drawable.ic_notification_play;
             playAction = RadioPlayerService.ACTION_PLAY;
             playDescription = "play";
         }
 
         return builder.setShowWhen(false)
-                .setSmallIcon(R.drawable.ic_radio_black_24dp)
                 .setLargeIcon(
-                        ((BitmapDrawable) playerService.getResources().
-                                getDrawableForDensity(R.mipmap.ic_launcher, 480, null)).getBitmap()
+                        ((BitmapDrawable) ResourcesCompat.getDrawableForDensity(
+                                playerService.getResources(),
+                                R.mipmap.ic_launcher,
+                                480,
+                                null
+                        )
+                        ).getBitmap()
                 )
+                .setSmallIcon(R.drawable.ic_notification_radio)
                 .setColor(ContextCompat.getColor(playerService, R.color.colorPrimaryDark))
                 .setContentIntent(
                         PendingIntent.getActivity(
@@ -93,7 +100,7 @@ public class RadioPlayerNotification {
                         )
                 )
                 .addAction(
-                        R.drawable.ic_skip_previous_white_24dp,
+                        R.drawable.ic_notification_skip_prev,
                         "prev",
                         getPendingIntentForAction(RadioPlayerService.ACTION_PREVIOUS)
                 )
@@ -103,7 +110,7 @@ public class RadioPlayerNotification {
                         getPendingIntentForAction(playAction)
                 )
                 .addAction(
-                        R.drawable.ic_skip_next_white_24dp,
+                        R.drawable.ic_notification_skip_next,
                         "next",
                         getPendingIntentForAction(RadioPlayerService.ACTION_NEXT)
                 )
@@ -119,11 +126,9 @@ public class RadioPlayerNotification {
         return PendingIntent.getService(
                 playerService,
                 0,
-                new Intent(action)
-                        .setComponent(
-                                new ComponentName(playerService, RadioPlayerService.class)
-                        ),
-                PendingIntent.FLAG_CANCEL_CURRENT
+                new Intent(playerService, RadioPlayerService.class)
+                        .setAction(action),
+                PendingIntent.FLAG_UPDATE_CURRENT
         );
     }
 

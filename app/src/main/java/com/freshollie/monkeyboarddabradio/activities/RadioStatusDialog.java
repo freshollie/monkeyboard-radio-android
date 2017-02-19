@@ -58,6 +58,7 @@ public class RadioStatusDialog extends DialogFragment{
         if (currentState == State.Connecting) {
             statusText.setText(getString(R.string.dialog_dab_search_status_connecting));
             progressIcon.setIndeterminate(true);
+            progressIcon.setVisibility(View.VISIBLE);
             progressText.setText("");
             if (radio.isConnected()) {
                 setState(State.Searching);

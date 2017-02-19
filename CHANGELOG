@@ -1,0 +1,16 @@
+# BETA 1.1
+
+## Fixes
+- Fixed major issues with backwards compatibility referenced in #2
+- Fixed issue with the connection never timing out
+- Fixed progress icon not being visible when retrying connection on DAB search
+- Removed unused icons from assets
+- Fixed pending intent backwards compatibility
+
+## Changes
+- Changed connection timeout to 10 seconds
+- Changed size of signal strength and radio status
+
+## New
+- Added support down to API 16
+- Added connecting status for when the app is trying to connect to the device

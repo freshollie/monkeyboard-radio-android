@@ -39,7 +39,7 @@ import java.util.Set;
  */
 public class RadioPlayerService extends Service implements AudioManager.OnAudioFocusChangeListener {
     private static String TAG = RadioPlayerService.class.getSimpleName();
-    static int ATTACH_TIMEOUT = 20000; // Radio will stop trying to connect after 20 seconds
+    static int ATTACH_TIMEOUT = 10000; // Radio will stop trying to connect after 10 seconds
 
     // Actions
     public final static String ACTION_NEXT =
@@ -207,7 +207,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     long startTime = SystemClock.currentThreadTimeMillis();
 
                     while (!radio.isAttached()
-                            && (startTime - SystemClock.currentThreadTimeMillis()) < ATTACH_TIMEOUT) {
+                            && (SystemClock.currentThreadTimeMillis() - startTime) < ATTACH_TIMEOUT) {
                         if (Thread.currentThread().isInterrupted()) {
                             return;
                         }
@@ -372,6 +372,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void openConnection() {
         Log.v(TAG, "Starting device connection");
+        if (playerNotification != null) {
+            playerNotification.update();
+        }
+
         if (!connectThread.isAlive()) {
             connectThread = new Thread(connectRunnable);
             connectThread.start();
@@ -380,6 +384,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.v(TAG, "Got start intent");
         if (intent != null && intent.getAction() != null) {
             Log.v(TAG, "Received intent:" + intent.getAction());
 
@@ -794,6 +799,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void closeConnection () {
+        if (connectThread.isAlive()) {
+            connectThread.interrupt();
+        }
         abandonAudioFocus();
 
         if (radio.isConnected()) {

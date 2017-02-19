@@ -4,11 +4,12 @@ android {
     compileSdkVersion 24
     buildToolsVersion "25.0.2"
     defaultConfig {
+        vectorDrawables.useSupportLibrary = true
         applicationId "com.freshollie.monkeyboarddabradio"
-        minSdkVersion 17
+        minSdkVersion 16
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "Beta 1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
