@@ -1,5 +1,6 @@
 package com.freshollie.monkeyboarddabradio.activities;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -83,38 +84,32 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
         stationCard.stationItemBackground.setAlpha(1f);
         if (position == currentStationIndex) {
-            stationCard.stationItemBackground.setBackgroundColor(
-                    stationCard.stationItemBackground.getResources()
-                            .getColor(R.color.colorPrimaryDark, null)
+            stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+                            .getColor(playerActivity, R.color.colorPrimaryDark)
             );
         }
 
         if (position == cursorIndex) {
-            stationCard.stationBottomDivide.setBackgroundColor(
-                    stationCard.stationItemBackground.getResources()
-                            .getColor(R.color.colorPrimaryDark, null)
+            stationCard.stationBottomDivide.setBackgroundColor(ContextCompat
+                    .getColor(playerActivity, R.color.colorPrimaryDark)
             );
 
-            stationCard.stationTopDivide.setBackgroundColor(
-                    stationCard.stationItemBackground.getResources()
-                            .getColor(R.color.colorPrimaryDark, null)
+            stationCard.stationTopDivide.setBackgroundColor(ContextCompat
+                    .getColor(playerActivity, R.color.colorPrimaryDark)
             );
 
             if (position != currentStationIndex) {
-                stationCard.stationItemBackground.setBackgroundColor(
-                        stationCard.stationItemBackground.getResources()
-                                .getColor(R.color.colorAccent, null)
+                stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+                        .getColor(playerActivity, R.color.colorAccent)
                 );
                 stationCard.stationItemBackground.setAlpha(0.3f);
             }
         } else {
-            stationCard.stationBottomDivide.setBackgroundColor(
-                    stationCard.stationItemBackground.getResources()
-                            .getColor(R.color.backgroundDarker, null)
+            stationCard.stationBottomDivide.setBackgroundColor(ContextCompat
+                    .getColor(playerActivity, R.color.backgroundDarker)
             );
-            stationCard.stationTopDivide.setBackgroundColor(
-                    stationCard.stationItemBackground.getResources()
-                            .getColor(R.color.backgroundDarker, null)
+            stationCard.stationTopDivide.setBackgroundColor(ContextCompat
+                    .getColor(playerActivity, R.color.backgroundDarker)
             );
         }
 
