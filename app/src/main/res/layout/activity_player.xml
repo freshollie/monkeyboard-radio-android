@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -25,40 +26,42 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:id="@+id/settings_button"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:foreground="@drawable/ic_settings_white_24dp"
-                android:layout_alignParentEnd="true"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_settings_white_24dp"
+                android:scaleType="fitXY"
+                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="@dimen/activity_vertical_margin" />
 
             <TextView
-                android:layout_width="50dp"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:layout_toStartOf="@id/settings_button"
+                android:layout_below="@+id/signal_strength_icon"
+                android:layout_alignLeft="@+id/signal_strength_icon"
                 android:id="@+id/play_status"
-                android:text="Tuning"
+                android:text="@string/radio_status_connecting"
                 android:textSize="15sp" />
 
             <TextView
-                android:layout_width="60dp"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toStartOf="@id/play_status"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:paddingEnd="20dp"
-                android:textAlignment="textEnd"
+                android:gravity="right"
+                android:textAlignment="gravity"
                 android:id="@+id/signal_strength"
                 android:text="100%"
-                android:textSize="15sp" />
+                android:textSize="20sp"
+                android:layout_toLeftOf="@id/settings_button"
+                android:paddingRight="20dp" />
 
             <ImageView
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_signal_cellular_0_bar_white_24dp"
-                android:layout_toStartOf="@id/signal_strength"
-                android:id="@+id/signal_strength_icon"/>
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp"
+                android:id="@+id/signal_strength_icon"
+                android:layout_toLeftOf="@id/signal_strength" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,13 +85,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_margin="@dimen/activity_vertical_margin"
                 android:id="@+id/station_ensemble_name"
                 android:textSize="20sp"
                 android:text="BBC National DAB"
-                android:textAppearance="?android:textAppearanceSmall" />
+                android:textAppearance="?android:textAppearanceSmall"
+                android:layout_alignParentLeft="true" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -103,30 +106,30 @@
             <ImageButton
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
-                android:src="@drawable/ic_volume_mute_white_24dp"
+                app:srcCompat="@drawable/ic_volume_mute_white_24dp"
                 android:scaleType="fitXY"
                 android:id="@+id/volume_button"
-                android:background="?selectableItemBackgroundBorderless"/>
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_alignParentLeft="true" />
 
             <SeekBar
                 android:layout_width="400dp"
                 android:layout_height="40dp"
                 android:layout_above="@+id/volume_button"
-                android:layout_alignParentStart="true"
                 android:id="@+id/volume_seek_bar"
                 android:visibility="invisible"
-                android:max="16" />
+                android:max="16"
+                android:layout_alignParentLeft="true" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:layout_above="@+id/volume_seek_bar"
-                android:paddingStart="@dimen/activity_vertical_margin"
                 android:id="@+id/volume_text"
-                android:visibility="invisible" />
+                android:visibility="invisible"
+                android:paddingLeft="@dimen/activity_vertical_margin" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -149,8 +152,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/status_panel_middle_point"
                 android:layout_marginTop="20dp"
-                android:layout_marginStart="1dp"
-                android:layout_marginEnd="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
                 android:layout_centerHorizontal="true"
                 android:gravity="center"
                 android:textSize="30sp"
@@ -173,14 +176,15 @@
                 android:layout_height="100dp"
                 android:id="@+id/skip_next_button"
                 android:background="?selectableItemBackgroundBorderless"
-                android:foreground="@drawable/ic_skip_next_white_24dp"
-                android:layout_alignParentEnd="true"
+                app:srcCompat="@drawable/ic_skip_next_white_24dp"
+                android:scaleType="fitXY"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"/>
 
             <ImageButton
                 android:clickable="true"
                 android:background="?selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_play_arrow_white_24dp"
+                app:srcCompat="@drawable/ic_play_arrow_white_24dp"
                 android:scaleType="fitXY"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
@@ -192,9 +196,10 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="?selectableItemBackgroundBorderless"
-                android:foreground="@drawable/ic_skip_previous_white_24dp"
+                app:srcCompat="@drawable/ic_skip_previous_white_24dp"
+                android:scaleType="fitXY"
                 android:id="@+id/skip_previous_button"
-                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"/>
         </RelativeLayout>
 

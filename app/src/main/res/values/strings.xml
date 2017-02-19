@@ -16,6 +16,8 @@
     <string name="settings_title_volume">Volume</string>
     <string name="settings_title_about">About</string>
 
+    <string name="radio_status_connecting">Connecting…</string>
+
     <string name="setting_perform_dab_search_button_key">dab_search</string>
     <string name="setting_perform_dab_search_text">Perform DAB Search</string>
     <string name="setting_perform_dab_search_summary">Clear radio database and perform a DAB search</string>

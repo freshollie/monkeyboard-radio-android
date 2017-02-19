@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.IBinder;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -56,7 +55,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private TextView currentChannelView;
     private TextView programTextTextView;
     private TextView signalStrengthView;
-    private TextView playStatusView;
+    private TextView playStatusTextView;
     private TextView genreTextView;
     private TextView ensembleTextView;
     private TextView dataRateTextView;
@@ -203,6 +202,10 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public void onPlaybackServiceConnected() {
         radioStatusDialog.setPlayerService(playerService);
 
+        if (!radio.isConnected()) {
+            playStatusTextView.setText(getString(R.string.radio_status_connecting));
+        }
+
         radio.getListenerManager().registerDataListener(this);
         playerService.getMediaController().registerCallback(mediaControllerCallback);
         playerService.registerCallback(this);
@@ -213,8 +216,12 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
         stationListAdapter.updateStationList(playerService.getRadioStations());
         stationListRecyclerView.scrollToPosition(playerService.getCurrentChannelIndex());
+
+        // Scrolls to the currently playing track instantly
         stationListLayoutManager.setSnapDuration(1);
-        updatePlayerMetadata();
+
+        // then sets the animations back to normal
+        updatePlayerFromMetadata();
         stationListLayoutManager.setSnapDuration(250);
         stationListRecyclerView.getItemAnimator().setChangeDuration(100);
         stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
@@ -393,7 +400,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         dataRateTextView = (TextView) findViewById(R.id.data_rate);
         ensembleTextView = (TextView) findViewById(R.id.station_ensemble_name);
         genreTextView = (TextView) findViewById(R.id.station_genre);
-        playStatusView = (TextView) findViewById(R.id.play_status);
+        playStatusTextView = (TextView) findViewById(R.id.play_status);
         signalStrengthView = (TextView) findViewById(R.id.signal_strength);
         signalStrengthIcon = (ImageView) findViewById(R.id.signal_strength_icon);
         programTextTextView = (TextView) findViewById(R.id.program_text);
@@ -406,15 +413,16 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         signalStrengthView.setText("");
         programTextTextView.setText("");
         stereoStateTextView.setText("");
+        onProgramDataRateChanged(0);
         onSignalQualityChanged(0);
         onPlayStatusChanged(RadioDevice.Values.PLAY_STATUS_STREAM_STOP);
         genreTextView.setText("");
         ensembleTextView.setText("");
         currentChannelView.setText("");
-        updatePlayerMetadata();
+        updatePlayerFromMetadata();
     }
 
-    public void updatePlayerMetadata() {
+    public void updatePlayerFromMetadata() {
         if (playerBound) {
             RadioStation currentStation = playerService.getCurrentStation();
             if (currentStation != null) {
@@ -585,27 +593,27 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     @Override
     public void onPlayStatusChanged(int playStatus) {
-        playStatusView.setText(RadioDevice.StringValues.getPlayStatusFromId(playStatus));
+        playStatusTextView.setText(RadioDevice.StringValues.getPlayStatusFromId(playStatus));
     }
 
     @Override
     public void onSignalQualityChanged(int signalStrength) {
         signalStrengthView.setText(String.valueOf(signalStrength) + "%");
 
-        int drawableId;
+        int iconResId;
         if (signalStrength > 70) {
-            drawableId = R.drawable.ic_signal_cellular_4_bar_white_24dp;
+            iconResId = R.drawable.ic_signal_cellular_4_bar_white_24dp;
         } else if (signalStrength > 60) {
-            drawableId = R.drawable.ic_signal_cellular_3_bar_white_24dp;
+            iconResId = R.drawable.ic_signal_cellular_3_bar_white_24dp;
         } else if (signalStrength > 50) {
-            drawableId = R.drawable.ic_signal_cellular_2_bar_white_24dp;
+            iconResId = R.drawable.ic_signal_cellular_2_bar_white_24dp;
         } else if (signalStrength > 40) {
-            drawableId = R.drawable.ic_signal_cellular_1_bar_white_24dp;
+            iconResId = R.drawable.ic_signal_cellular_1_bar_white_24dp;
         } else {
-            drawableId = R.drawable.ic_signal_cellular_0_bar_white_24dp;
+            iconResId = R.drawable.ic_signal_cellular_0_bar_white_24dp;
         }
 
-        signalStrengthIcon.setImageDrawable(getDrawable(drawableId));
+        signalStrengthIcon.setImageResource(iconResId);
     }
 
     @Override
@@ -743,7 +751,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
-            updatePlayerMetadata();
+            updatePlayerFromMetadata();
         }
 
         @Override
