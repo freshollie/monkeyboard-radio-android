@@ -543,13 +543,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void handleSetVolumeRequest(final int newVolume) {
+        volume = newVolume;
+        saveVolume();
         handleAction(
                 new Runnable() {
                     @Override
                     public void run() {
-                        volume = newVolume;
                         radio.setVolume(volume);
-                        saveVolume();
                     }
                 }
         );
