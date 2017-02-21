@@ -32,7 +32,7 @@
     <string name="dialog_dab_search_failed_no_channels_found">No channels found</string>
     <string name="dialog_dab_search_failed_timed_out">Timed out waiting for board to connect</string>
 
-    <string name="dialog_dab_search_wait_onnect">Waiting for device to connect</string>
+    <string name="dialog_dab_search_wait_connect">Waiting for device to connect</string>
     <string name="dialog_dab_search_found_channels_progress">Found %1$d channels</string>
     <string name="dialog_dab_search_copying_channels_progress">Copied %1$d channels</string>
 
@@ -42,7 +42,7 @@
     <string name="setting_duck_volume_updated">Duck volume updated</string>
 
     <string name="setting_headunitcontroller_input">Headunit Controller input</string>
-    <string name="setting_headunitcontroller_input_summary">Use Headunit Controller as main device input</string>
+    <string name="setting_headunitcontroller_input_summary">Use Custom Headunit Controller as main device input (My custom app)</string>
 
     <string name="setting_scroll_wrap">Scroll wrap</string>
     <string name="setting_scroll_warp_summary">When scrolling with the cursor, warp around at each end</string>

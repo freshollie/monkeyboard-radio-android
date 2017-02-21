@@ -480,61 +480,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return muted;
     }
 
-    public void onAttachTimeout() {
-        Log.v(TAG, "Timed out waiting for device to attach");
-        for (PlayerCallback playerCallback: playerCallbacks) {
-            playerCallback.onAttachTimeout();
-        }
-    }
-
-    public void onStationListCopyStart() {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onStationListCopyStart();
-        }
-    }
-
-    public void onChannelSearchStart() {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onSearchStart();
-        }
-    }
-
-    public void onNoStoredStations() {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onNoStoredStations();
-        }
-    }
-
-    public void onChannelSearchProgressUpdate(int channelsFound, int progress) {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onSearchProgressUpdate(channelsFound, progress);
-        }
-    }
-
-    public void onChannelSearchComplete(int numChannels) {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onSearchComplete(numChannels);
-        }
-    }
-
-    public void onStationListCopyProgressUpdate(int progress, int max) {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onStationListCopyProgressUpdate(progress, max);
-        }
-    }
-
-    public void onStationListCopyComplete() {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onStationListCopyComplete();
-        }
-    }
-
-    public void onDismissed() {
-        for (PlayerCallback playerCallback: playerCallbacks) {
-            playerCallback.onDismissed();
-        }
-    }
-
     public void handleAction(Runnable action) {
         if (radio.isConnected()) {
             action.run();
@@ -636,6 +581,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void handlePauseRequest() {
         muted = true;
+
+        // Used to make sure that the volume is lowered, command
+        // is executed until the volume is confirmed lowered
         while (!radio.setVolume(0) && radio.isConnected()) {}
         updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
     }
@@ -700,11 +648,11 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (mediaSession != null) {
             mediaSession.setPlaybackState(
                     playbackStateBuilder
-                    .setState(
-                            state,
-                            0,
-                            1)
-                    .build()
+                        .setState(
+                                state,
+                                0,
+                                1)
+                        .build()
             );
 
             if (playerNotification != null) {
@@ -935,5 +883,60 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void unregisterCallback(PlayerCallback callback) {
         playerCallbacks.remove(callback);
+    }
+
+    public void onAttachTimeout() {
+        Log.v(TAG, "Timed out waiting for device to attach");
+        for (PlayerCallback playerCallback: playerCallbacks) {
+            playerCallback.onAttachTimeout();
+        }
+    }
+
+    public void onStationListCopyStart() {
+        for (PlayerCallback callback: playerCallbacks) {
+            callback.onStationListCopyStart();
+        }
+    }
+
+    public void onChannelSearchStart() {
+        for (PlayerCallback callback: playerCallbacks) {
+            callback.onSearchStart();
+        }
+    }
+
+    public void onNoStoredStations() {
+        for (PlayerCallback callback: playerCallbacks) {
+            callback.onNoStoredStations();
+        }
+    }
+
+    public void onChannelSearchProgressUpdate(int channelsFound, int progress) {
+        for (PlayerCallback callback: playerCallbacks) {
+            callback.onSearchProgressUpdate(channelsFound, progress);
+        }
+    }
+
+    public void onChannelSearchComplete(int numChannels) {
+        for (PlayerCallback callback: playerCallbacks) {
+            callback.onSearchComplete(numChannels);
+        }
+    }
+
+    public void onStationListCopyProgressUpdate(int progress, int max) {
+        for (PlayerCallback callback: playerCallbacks) {
+            callback.onStationListCopyProgressUpdate(progress, max);
+        }
+    }
+
+    public void onStationListCopyComplete() {
+        for (PlayerCallback callback: playerCallbacks) {
+            callback.onStationListCopyComplete();
+        }
+    }
+
+    public void onDismissed() {
+        for (PlayerCallback playerCallback: playerCallbacks) {
+            playerCallback.onDismissed();
+        }
     }
 }

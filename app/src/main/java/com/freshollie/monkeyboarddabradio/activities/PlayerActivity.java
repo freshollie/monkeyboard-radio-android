@@ -762,6 +762,14 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     public void handleKeyDown(int keyCode)  {
         switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                handleVolumeDown();
+                break;
+
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                handleVolumeUp();
+                break;
+
             case KeyEvent.KEYCODE_ENTER:
                 if (stationListAdapter != null) {
                     if (playerBound) {
@@ -778,15 +786,18 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                     }
                 }
                 break;
+
             case KeyEvent.KEYCODE_TAB:
                 handleNextCursorPosition();
                 break;
+
             case KeyEvent.KEYCODE_DPAD_UP:
                 handlePreviousCursorPosition();
                 break;
 
             case KeyEvent.KEYCODE_BACK:
                 finish();
+                break;
         }
     }
 
@@ -798,15 +809,17 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
+
+
         if (!controllerInput || keyCode == KeyEvent.KEYCODE_BACK) {
             handleKeyDown(keyCode);
             return true;
         } else {
             switch(keyCode) {
                 case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    return handleVolumeDown();
+                    return true;
                 case KeyEvent.KEYCODE_VOLUME_UP:
-                    return handleVolumeUp();
+                    return true;
                 case KeyEvent.KEYCODE_TAB:
                     return true;
                 case KeyEvent.KEYCODE_DPAD_UP:
