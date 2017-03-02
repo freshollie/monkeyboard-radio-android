@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.activities;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.freshollie.monkeyboarddabradio.R;
+import com.freshollie.monkeyboard.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

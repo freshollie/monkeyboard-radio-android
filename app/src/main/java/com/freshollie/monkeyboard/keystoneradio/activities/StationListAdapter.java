@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.activities;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.freshollie.monkeyboarddabradio.R;
-import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
-import com.freshollie.monkeyboarddabradio.radio.RadioStation;
+import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 /**
  * Created by Freshollie on 08/02/2017.

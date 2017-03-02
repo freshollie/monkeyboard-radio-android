@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -24,11 +24,11 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.freshollie.monkeyboarddabradio.R;
-import com.freshollie.monkeyboarddabradio.playback.RadioPlayerService;
-import com.freshollie.monkeyboarddabradio.radio.ListenerManager;
-import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
-import com.freshollie.monkeyboarddabradio.radio.RadioStation;
+import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
+import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 import java.util.Arrays;
 

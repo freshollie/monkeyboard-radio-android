@@ -1,13 +1,11 @@
-package com.freshollie.monkeyboarddabradio.playback;
+package com.freshollie.monkeyboard.keystoneradio.playback;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -15,8 +13,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.freshollie.monkeyboarddabradio.activities.PlayerActivity;
-import com.freshollie.monkeyboarddabradio.R;
+import com.freshollie.monkeyboard.keystoneradio.activities.PlayerActivity;
+import com.freshollie.monkeyboard.R;
 
 /**
  * Created by Freshollie on 15/01/2017.
