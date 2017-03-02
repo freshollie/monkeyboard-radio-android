@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.activities;
 
 
 import android.app.FragmentManager;
@@ -19,8 +19,8 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 
-import com.freshollie.monkeyboarddabradio.R;
-import com.freshollie.monkeyboarddabradio.playback.RadioPlayerService;
+import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
 
 public class SettingsFragment extends PreferenceFragment {
     private String TAG = this.getClass().getSimpleName();

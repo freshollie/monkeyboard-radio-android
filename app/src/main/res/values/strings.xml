@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Monkeyboard Dab Radio</string>
+    <string name="app_name">Monkeyboard Keystone Radio</string>
 
     <string name="no_saved_stations">Radio has no stored stations, perform scan?</string>
     <string name="yes">yes</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.freshollie.monkeyboarddabradio">
+    package="com.freshollie.monkeyboard">
 
     <uses-feature android:name="android.hardware.usb.host" />
 
@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.PlayerActivity"
+            android:name=".keystoneradio.activities.PlayerActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,15 +23,15 @@
         </activity>
 
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name=".keystoneradio.activities.SettingsActivity"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.freshollie.monkeyboarddabradio.activities.PlayerActivity" />
+                android:value=".keystoneradio.activities.PlayerActivity" />
         </activity>
 
         <service
-            android:name=".playback.RadioPlayerService"
+            android:name=".keystoneradio.playback.RadioPlayerService"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
