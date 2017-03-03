@@ -802,16 +802,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
-
-
-        if (!controllerInput || keyCode == KeyEvent.KEYCODE_BACK) {
+        if (!controllerInput && keyCode != KeyEvent.KEYCODE_BACK) {
             handleKeyDown(keyCode);
             return true;
         } else {
@@ -828,7 +820,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                     return true;
              }
         }
-        return false;
+        return super.onKeyDown(keyCode, keyEvent);
     }
 
 }

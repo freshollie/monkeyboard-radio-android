@@ -31,8 +31,14 @@
         </activity>
 
         <service
+<<<<<<< HEAD
             android:name=".keystoneradio.playback.RadioPlayerService"
             android:enabled="true">
+=======
+            android:name=".playback.RadioPlayerService"
+            android:enabled="true"
+            android:exported="true">
+>>>>>>> master
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
