@@ -41,6 +41,9 @@
         another app needs temporary audio focus</string>
     <string name="setting_duck_volume_updated">Duck volume updated</string>
 
+    <string name="setting_play_on_open">Play on open</string>
+    <string name="setting_play_on_open_summary">When the app comes to the foreground, automatically press play</string>
+
     <string name="setting_headunitcontroller_input">Headunit Controller input</string>
     <string name="setting_headunitcontroller_input_summary">Use Custom Headunit Controller as main device input (My custom app)</string>
 
@@ -50,7 +53,7 @@
     <string name="settings_icon_description">Settings</string>
 
     <string name="about_category_title">About</string>
-    <string name="about_text">Written by Oliver Bell, 2016\nOpen Source</string>
+    <string name="about_text">Written by Oliver Bell, 2017\nGPL 3.0 Open Source \nhttp://github.com/freshollie/MonkeyboardAndroidRadioApp/</string>
 
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
@@ -59,8 +62,10 @@
     <string name="STATION_LIST_KEY">station_list</string>
     <string name="VOLUME_KEY">volume</string>
     <string name="DUCK_VOLUME_KEY">duck_volume</string>
+    <string name="PLAY_ON_OPEN_KEY">play_on_open</string>
     <string name="HEADUNIT_MAIN_INPUT_KEY">headunit_main_input</string>
     <string name="SCROLL_WRAP_KEY">scroll_wrap</string>
+
 
     <string-array name="STATION_GENRES">
         <item />
