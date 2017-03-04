@@ -519,27 +519,31 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void handlePlayRequest() {
         Log.v(TAG, "Handling a play request");
-        handleAction(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!hasFocus()) {
-                            requestAudioFocus();
-                        }
+        if (currentChannelIndex == -1 || getRadioStations().length < 1) {
+            Log.v(TAG, "No station to play, ignoring request");
+        } else {
+            handleAction(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!hasFocus()) {
+                                requestAudioFocus();
+                            }
 
-                        if (hasFocus()) {
-                            if (handleSetChannel(currentChannelIndex)) {
-                                Log.v(TAG, "Updating playstate");
-                                handleUnmuteRequest();
-                                updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
-                            } else {
-                                Log.v(TAG, "Board denied play request");
+                            if (hasFocus()) {
+                                if (handleSetChannel(currentChannelIndex)) {
+                                    Log.v(TAG, "Updating playstate");
+                                    handleUnmuteRequest();
+                                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                                } else {
+                                    Log.v(TAG, "Board denied play request");
+                                }
                             }
                         }
-                    }
 
-                }
-        );
+                    }
+            );
+        }
     }
 
     public void handleSetVolumeRequest(final int newVolume) {

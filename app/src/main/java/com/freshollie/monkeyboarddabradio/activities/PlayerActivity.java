@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -75,37 +76,48 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private Runnable cursorScrollRunnable;
     private Runnable selectChannelScrollRunnable;
 
-    private boolean controllerInput = false;
-    private boolean cursorScrollWrap = true;
+    private boolean preferenceControllerInput = false;
+    private boolean preferenceCursorScrollWrap = true;
+    private boolean preferencePlayOnOpen = false;
 
     private BroadcastReceiver controlInputReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ACTION_SEND_KEYEVENT)) {
-                if (intent.hasExtra("keyCode") && controllerInput) {
+                if (intent.hasExtra("keyCode") && preferenceControllerInput) {
                     handleKeyDown(intent.getIntExtra("keyCode", -1));
                 }
             }
         }
     };
 
+    /**
+     * Updates our internal player preferences when changed
+     */
     private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
             if (s.equals(getString(R.string.SCROLL_WRAP_KEY))) {
-                cursorScrollWrap =
+                preferenceCursorScrollWrap =
                         sharedPreferences.getBoolean(
                                 getString(R.string.SCROLL_WRAP_KEY),
                                 false
                         );
-                Log.v(TAG, "Cursor Scroll wrap set to: " + String.valueOf(cursorScrollWrap));
-            } else if (s.equals(getString(R.string.HEADUNIT_MAIN_INPUT_KEY))){
-                controllerInput =
+                Log.v(TAG, "Cursor Scroll wrap set to: " + String.valueOf(preferenceCursorScrollWrap));
+            } else if (s.equals(getString(R.string.HEADUNIT_MAIN_INPUT_KEY))) {
+                preferenceControllerInput =
                         sharedPreferences.getBoolean(
                                 getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
                                 false
                         );
-                Log.v(TAG, "Headunit input set to: " + String.valueOf(controllerInput));
+                Log.v(TAG, "Headunit input set to: " + String.valueOf(preferenceControllerInput));
+            } else if (s.equals(getString(R.string.PLAY_ON_OPEN_KEY))) {
+                preferencePlayOnOpen =
+                        sharedPreferences.getBoolean(
+                                getString(R.string.PLAY_ON_OPEN_KEY),
+                                false
+                        );
+                Log.v(TAG, "Play on open set to: " + String.valueOf(preferencePlayOnOpen));
             }
         }
     };
@@ -142,15 +154,21 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
         sharedPreferences = getSharedPreferences(getString(R.string.SHARED_PREFERENCES_KEY), Context.MODE_PRIVATE);
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-        controllerInput = sharedPreferences.getBoolean(
+        preferenceControllerInput = sharedPreferences.getBoolean(
                 getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
                 false
         );
 
-        cursorScrollWrap = sharedPreferences.getBoolean(
+        preferenceCursorScrollWrap = sharedPreferences.getBoolean(
                 getString(R.string.SCROLL_WRAP_KEY),
                 false
         );
+
+        preferencePlayOnOpen = sharedPreferences.getBoolean(
+                getString(R.string.PLAY_ON_OPEN_KEY),
+                false
+        );
+
 
         bindPlayerService();
 
@@ -159,6 +177,9 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         clearPlayerAttributes();
     }
 
+    /**
+     * Starts the bind to the player service
+     */
     public void bindPlayerService() {
         startService(new Intent(this, RadioPlayerService.class));
 
@@ -182,7 +203,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                 stationListAdapter.refreshCurrentStation();
             }
             playerService.registerCallback(this);
-            if (playerService.getRadioStations().length > 0) {
+
+            if (preferencePlayOnOpen) {
                 playerService.handlePlayRequest();
             }
         } else {
@@ -227,7 +249,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
         stationListRecyclerView.getItemAnimator().setAddDuration(100);
 
-        if (playerService.getRadioStations().length > 0) {
+        if (preferencePlayOnOpen) {
             playerService.handlePlayRequest();
         }
     }
@@ -242,6 +264,9 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         stationListRecyclerView = (RecyclerView) findViewById(R.id.station_list);
         stationListRecyclerView.setLayoutManager(stationListLayoutManager);
         stationListRecyclerView.setAdapter(stationListAdapter);
+
+        ViewCompat.setElevation(findViewById(R.id.station_item_layout), 100);
+        ViewCompat.setElevation(findViewById(R.id.playing_panel), 50);
     }
 
     public void setupPlaybackControls() {
@@ -560,7 +585,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public void handleNextCursorPosition() {
         int newPosition = stationListAdapter.getCursorIndex() + 1;
         if (newPosition >= stationListAdapter.getItemCount()) {
-            if (cursorScrollWrap) {
+            if (preferenceCursorScrollWrap) {
                 newPosition = 0;
             } else {
                 newPosition = -1;
@@ -575,7 +600,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public void handlePreviousCursorPosition() {
         int newPosition = stationListAdapter.getCursorIndex() - 1;
         if (newPosition < 0) {
-            if (cursorScrollWrap) {
+            if (preferenceCursorScrollWrap) {
                 newPosition = stationListAdapter.getItemCount() - 1;
             } else {
                 newPosition = -1;
@@ -811,7 +836,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
 
 
-        if (!controllerInput || keyCode == KeyEvent.KEYCODE_BACK) {
+        if (!preferenceControllerInput || keyCode == KeyEvent.KEYCODE_BACK) {
             handleKeyDown(keyCode);
             return true;
         } else {
