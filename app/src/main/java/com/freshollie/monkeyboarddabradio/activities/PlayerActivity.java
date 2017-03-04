@@ -265,8 +265,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         stationListRecyclerView.setLayoutManager(stationListLayoutManager);
         stationListRecyclerView.setAdapter(stationListAdapter);
 
-        ViewCompat.setElevation(findViewById(R.id.station_item_layout), 100);
-        ViewCompat.setElevation(findViewById(R.id.playing_panel), 50);
+        ViewCompat.setElevation(findViewById(R.id.station_list_container), 100);
+        ViewCompat.setElevation(findViewById(R.id.player_control_panel), 50);
     }
 
     public void setupPlaybackControls() {
