@@ -84,7 +84,7 @@ public class RadioDevice {
         public static int RESET_TYPE_CLEAR_REBOOT = 1;
         public static int RESET_TYPE_CLEAR = 2;
 
-        public static int MAX_CHANNEL_BAND = 40;
+        public static int MAX_CHANNEL_BAND = 70; // Includes china
     }
 
 

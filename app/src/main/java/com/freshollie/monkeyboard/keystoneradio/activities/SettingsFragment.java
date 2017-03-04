@@ -122,6 +122,26 @@ public class SettingsFragment extends PreferenceFragment {
                     }
                 });
 
+        // Play on open checkbox
+        CheckBoxPreference playInputPreference =
+                (CheckBoxPreference) findPreference(getString(R.string.setting_play_on_open));
+
+        playInputPreference.setChecked(
+                sharedPreferences.getBoolean(getString(R.string.PLAY_ON_OPEN_KEY), false)
+        );
+
+        playInputPreference.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object o) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean(getString(R.string.PLAY_ON_OPEN_KEY), (boolean) o);
+                        editor.apply();
+                        return true;
+                    }
+                }
+        );
+
         // Input mode checkbox
         CheckBoxPreference headunitInputPreference =
                 (CheckBoxPreference) findPreference(getString(R.string.setting_headunitcontroller_input));

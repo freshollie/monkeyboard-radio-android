@@ -11,6 +11,12 @@
         android:title="@string/settings_title_control">
 
         <CheckBoxPreference
+            android:key="@string/setting_play_on_open"
+            android:title="@string/setting_play_on_open"
+            android:summary="@string/setting_play_on_open_summary"
+            />
+
+        <CheckBoxPreference
             android:key="@string/setting_headunitcontroller_input"
             android:title="@string/setting_headunitcontroller_input"
             android:summary="@string/setting_headunitcontroller_input_summary"

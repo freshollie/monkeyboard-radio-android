@@ -5,16 +5,17 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
     android:orientation="horizontal"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     tools:context=".keystoneradio.activities.PlayerActivity">
-
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        android:elevation="20dp">
+        android:clipToPadding="false"
+        android:background="@color/backgroundDarkAccent"
+        android:id="@+id/station_list_container">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/station_list"
             android:scrollbars="vertical"
@@ -23,8 +24,8 @@
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:fadeScrollbars="false"
             android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
-            android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
-            android:background="@color/stationListBackgroundColor"/>
+            android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"/>
+            <!--android:background="@color/stationListBackgroundColor" -->
     </LinearLayout>
 
     <LinearLayout
@@ -32,6 +33,7 @@
         android:layout_height="match_parent"
         android:layout_weight="2"
         android:orientation="vertical"
+        android:clipToPadding="false"
         android:id="@+id/playing_panel">
 
         <RelativeLayout
@@ -41,8 +43,8 @@
 
             <ImageButton
                 android:contentDescription="@string/settings_icon_description"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:id="@+id/settings_button"
                 android:background="?selectableItemBackgroundBorderless"
                 app:srcCompat="@drawable/ic_settings_white_24dp"
@@ -184,9 +186,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:elevation="3dp"
             android:background="@color/colorPrimary"
-            android:id="@+id/control_panel">
+            android:id="@+id/player_control_panel">
 
             <ImageButton
                 android:clickable="true"
