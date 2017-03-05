@@ -172,7 +172,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
         bindPlayerService();
 
-        setupPlayerAttributes();
+        setupPlayerAttributes(savedInstanceState);
         setupStationList();
         clearPlayerAttributes();
     }
@@ -420,7 +420,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         });
     }
 
-    public void setupPlayerAttributes() {
+    public void setupPlayerAttributes(Bundle savedInstanceState) {
         currentChannelView = (TextView) findViewById(R.id.channel_name);
         dataRateTextView = (TextView) findViewById(R.id.data_rate);
         ensembleTextView = (TextView) findViewById(R.id.station_ensemble_name);
@@ -432,6 +432,40 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         stereoStateTextView = (TextView) findViewById(R.id.program_stereo_mode);
         volumeSeekBar = (SeekBar) findViewById(R.id.volume_seek_bar);
         volumeText = (TextView) findViewById(R.id.volume_text);
+
+        if (savedInstanceState != null) {
+            Log.v(TAG, "Loading previous states");
+            currentChannelView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.channel_name))
+            );
+            dataRateTextView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.data_rate))
+            );
+            ensembleTextView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.station_ensemble_name))
+            );
+            genreTextView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.station_genre))
+            );
+            playStatusTextView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.play_status))
+            );
+
+            programTextTextView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.program_text))
+            );
+            stereoStateTextView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.program_stereo_mode))
+            );
+            volumeSeekBar.setProgress(
+                    savedInstanceState.getInt(String.valueOf(R.id.volume_seek_bar))
+            );
+            volumeText.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.volume_text))
+            );
+
+            onSignalQualityChanged(savedInstanceState.getInt(String.valueOf(R.id.signal_strength)));
+        }
     }
 
     public void clearPlayerAttributes() {
@@ -771,6 +805,43 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                 stopService(new Intent(this, RadioPlayerService.class));
             }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.v(TAG, "Saving state");
+        outState.putString(String.valueOf(R.id.channel_name),
+                currentChannelView.getText().toString());
+
+        outState.putString(String.valueOf(R.id.data_rate),
+                dataRateTextView.getText().toString());
+
+        outState.putString(String.valueOf(R.id.station_ensemble_name),
+                ensembleTextView.getText().toString());
+
+        outState.putString(String.valueOf(R.id.station_genre),
+                genreTextView.getText().toString());
+
+        outState.putString(String.valueOf(R.id.play_status),
+                playStatusTextView.getText().toString());
+
+        outState.putString(String.valueOf(R.id.program_text),
+                programTextTextView.getText().toString());
+
+        outState.putString(String.valueOf(R.id.program_stereo_mode),
+                stereoStateTextView.getText().toString());
+
+        outState.putInt(String.valueOf(R.id.volume_seek_bar),
+                volumeSeekBar.getProgress());
+
+        outState.putString(String.valueOf(R.id.volume_text),
+                volumeText.getText().toString());
+
+        String signalStrengthText = signalStrengthView.getText().toString();
+        outState.putInt(String.valueOf(R.id.signal_strength),
+                Integer.valueOf(signalStrengthText.substring(0, signalStrengthText.length() - 1)));
+
+        super.onSaveInstanceState(outState);
     }
 
     private MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
