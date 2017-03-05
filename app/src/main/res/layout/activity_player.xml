@@ -168,14 +168,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-<<<<<<< HEAD
-=======
-            android:elevation="3dp"
-            android:outlineProvider="bounds"
->>>>>>> 39b847629b497da433166b98492a67b45d0ca930
             android:background="@color/colorPrimary"
             android:id="@+id/player_control_panel">
-
             <ImageButton
                 android:clickable="true"
                 android:layout_width="100dp"
@@ -214,15 +208,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-<<<<<<< HEAD
         android:clipToPadding="false"
         android:background="@color/backgroundDarkAccent"
         android:id="@+id/station_list_container">
-=======
-        android:orientation="horizontal"
-        android:elevation="20dp"
-        android:outlineProvider="bounds">
->>>>>>> 39b847629b497da433166b98492a67b45d0ca930
         <android.support.v7.widget.RecyclerView
             android:id="@+id/station_list"
             android:scrollbars="vertical"
