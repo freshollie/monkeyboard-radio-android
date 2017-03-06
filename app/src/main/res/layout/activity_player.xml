@@ -170,7 +170,6 @@
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:id="@+id/player_control_panel">
-
             <ImageButton
                 android:clickable="true"
                 android:layout_width="100dp"
