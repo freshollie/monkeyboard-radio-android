@@ -80,6 +80,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private boolean preferenceCursorScrollWrap = true;
     private boolean preferencePlayOnOpen = false;
 
+    private boolean isRestartedInstance = false;
+
     private BroadcastReceiver controlInputReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -174,7 +176,11 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
         setupPlayerAttributes(savedInstanceState);
         setupStationList();
-        clearPlayerAttributes();
+        if (savedInstanceState == null) {
+            clearPlayerAttributes();
+        } else {
+            isRestartedInstance = true;
+        }
     }
 
     /**
@@ -243,11 +249,12 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         stationListLayoutManager.setSnapDuration(1);
 
         // then sets the animations back to normal
-        updatePlayerFromMetadata();
         stationListLayoutManager.setSnapDuration(250);
         stationListRecyclerView.getItemAnimator().setChangeDuration(100);
         stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
         stationListRecyclerView.getItemAnimator().setAddDuration(100);
+
+        updatePlayerFromMetadata(!isRestartedInstance);
 
         if (preferencePlayOnOpen) {
             playerService.handlePlayRequest();
@@ -481,7 +488,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         updatePlayerFromMetadata();
     }
 
-    public void updatePlayerFromMetadata() {
+    public void updatePlayerFromMetadata(boolean clearProgramText) {
         if (playerBound) {
             RadioStation currentStation = playerService.getCurrentStation();
             if (currentStation != null) {
@@ -497,6 +504,13 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             updateStationListSelection(0);
         }
 
+        if (clearProgramText) {
+            programTextTextView.setText("");
+        }
+    }
+
+    public void updatePlayerFromMetadata() {
+        updatePlayerFromMetadata(false);
         programTextTextView.setText("");
     }
 
