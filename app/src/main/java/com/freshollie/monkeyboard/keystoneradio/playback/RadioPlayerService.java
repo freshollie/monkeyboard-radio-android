@@ -204,6 +204,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             new Runnable() {
                 @Override
                 public void run() {
+                    Log.v(TAG, "Starting a wait for attachment thread");
                     long startTime = SystemClock.currentThreadTimeMillis();
 
                     while (!radio.isAttached()
@@ -767,6 +768,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     @Override
     public void onDestroy() {
         Log.v(TAG, "Stopping service");
+        connectThread.interrupt();
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
         mediaSession.setCallback(null);
         mediaSession.release();
