@@ -182,6 +182,11 @@ public class RadioDevice {
             }
 
             @Override
+            public void onFail() {
+                listenerManager.informConnectionFail();
+            }
+
+            @Override
             public void onStop() {
                 listenerManager.informConnectionStop();
                 disconnect();

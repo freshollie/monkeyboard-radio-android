@@ -284,6 +284,11 @@ public class RadioStatusDialog extends DialogFragment{
         }
 
         @Override
+        public void onFail() {
+            dismiss();
+        }
+
+                @Override
         public void onStop() {
             dismiss();
         }

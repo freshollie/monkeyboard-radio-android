@@ -26,6 +26,7 @@ public class ListenerManager {
 
     public interface ConnectionStateChangeListener {
         void onStart();
+        void onFail();
         void onStop();
     }
 
@@ -44,6 +45,17 @@ public class ListenerManager {
             public void run() {
                 for (ConnectionStateChangeListener listener : connectionStateChangeListeners) {
                     listener.onStop();
+                }
+            }
+        });
+    }
+
+    void informConnectionFail() {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (ConnectionStateChangeListener listener: connectionStateChangeListeners) {
+                    listener.onFail();
                 }
             }
         });
