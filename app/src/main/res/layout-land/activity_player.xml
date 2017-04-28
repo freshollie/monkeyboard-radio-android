@@ -8,7 +8,7 @@
     android:orientation="horizontal"
     android:clipToPadding="false"
     android:clipChildren="false"
-    tools:context="com.freshollie.monkeyboarddabradio.activities.PlayerActivity">
+    tools:context="com.freshollie.monkeyboarddabradio.ui.PlayerActivity">
 
     <LinearLayout
         android:layout_width="0dp"

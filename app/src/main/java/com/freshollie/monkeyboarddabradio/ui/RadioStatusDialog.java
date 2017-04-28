@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.activities;
+package com.freshollie.monkeyboarddabradio.ui;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.freshollie.monkeyboarddabradio.R;
@@ -234,7 +233,6 @@ public class RadioStatusDialog extends DialogFragment{
                 progressIcon.setIndeterminate(false);
             }
             progressIcon.setProgress(progress);
-            Log.v(TAG, "Search progress updated "+ String.valueOf(numChannels) + " " + String.valueOf(progress));
         }
 
         @Override

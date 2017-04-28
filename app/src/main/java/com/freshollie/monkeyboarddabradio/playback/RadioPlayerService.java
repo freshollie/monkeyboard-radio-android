@@ -260,7 +260,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 Arrays.sort(radioStations, new Comparator<RadioStation>() {
                     @Override
                     public int compare(RadioStation radioStation, RadioStation t1) {
-                        return Integer.compare(radioStation.getChannelId(), t1.getChannelId());
+                        return Integer.valueOf(radioStation.getChannelId()).compareTo(t1.getChannelId());
                     }
                 });
 

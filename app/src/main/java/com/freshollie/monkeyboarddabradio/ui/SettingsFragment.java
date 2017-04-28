@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.activities;
+package com.freshollie.monkeyboarddabradio.ui;
 
 
 import android.app.FragmentManager;
