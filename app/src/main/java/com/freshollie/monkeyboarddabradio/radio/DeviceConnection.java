@@ -58,10 +58,10 @@ public class DeviceConnection {
             Log.v(TAG, "Attempting to reconnect to device");
 
             long startTime = System.currentTimeMillis();
-            Log.v(TAG, String.valueOf(System.currentTimeMillis() - startTime));
 
             while ((System.currentTimeMillis() - startTime) < RECONNECT_TIMEOUT && !Thread.interrupted()) {
                 if (getDevice() != null) {
+                    Log.v(TAG, "Success, reconnecting");
                     start();
                     return;
                 }
@@ -69,6 +69,7 @@ public class DeviceConnection {
 
             Log.v(TAG, "Reconnecting failed, closing connection");
 
+            running = true;
             stop();
         }
     };
@@ -158,6 +159,7 @@ public class DeviceConnection {
     private void attemptReconnect() {
         Log.v(TAG, "Lost connection, attempting to reestablish");
 
+        running = false;
         closeConnection();
 
         if (reconnectThread != null) {
@@ -189,6 +191,9 @@ public class DeviceConnection {
                 usbManager.requestPermission(device, usbPermissionIntent);
             }
         } else {
+            if (connectionStateListener != null) {
+                connectionStateListener.onFail();
+            }
             Log.v(TAG, "No device found");
         }
     }
@@ -197,13 +202,10 @@ public class DeviceConnection {
      * Used as API to start the connection
      */
     public void start() {
+        Log.v(TAG, "Start");
         if (!running) {
-            if (connectThread != null) {
-                if (!connectThread.isAlive()) {
-                    connectThread = new Thread(connectRunnable);
-                    connectThread.start();
-                }
-            }
+            connectThread = new Thread(connectRunnable);
+            connectThread.start();
         }
     }
 
@@ -211,11 +213,14 @@ public class DeviceConnection {
      * API used to stop the connection
      */
     public void stop() {
+        Log.v(TAG, "Stop");
         if (isRunning()) {
             closeConnection();
             running = false;
             context.unregisterReceiver(usbBroadcastReceiver);
-            connectionStateListener.onStop();
+            if (connectionStateListener != null) {
+                connectionStateListener.onStop();
+            }
         }
 
         if (reconnectThread != null) {
@@ -248,10 +253,15 @@ public class DeviceConnection {
             deviceSerialInterface.setRTS(true);
 
             running = true;
-            connectionStateListener.onStart();
+            if (connectionStateListener != null) {
+                connectionStateListener.onStart();
+            }
         } catch (IOException e){
             e.printStackTrace();
             closeConnection();
+            if (connectionStateListener != null) {
+                connectionStateListener.onFail();
+            }
         }
 
     }
