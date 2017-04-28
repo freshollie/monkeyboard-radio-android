@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.preference.PreferenceCategory;
 import android.util.Log;
 
 import com.freshollie.monkeyboarddabradio.R;
@@ -140,10 +141,10 @@ public class RadioDevice {
     private Runnable pollLoop = new Runnable() {
         @Override
         public void run() {
-            Log.v(TAG, " 100% Poll Loop started");
+            Log.v(TAG, "Poll Loop started");
             while (true) {
                 if (!poll() || !connection.isRunning() || Thread.currentThread().isInterrupted()) {
-                    Log.v(TAG, "100% Poll Loop stopped");
+                    Log.v(TAG, "Poll Loop stopped");
                     break;
                 }
             }
@@ -202,11 +203,14 @@ public class RadioDevice {
 
     public void startPollLoop() {
         Log.v(TAG, "startPollLoop()");
-        if (!pollThread.isAlive()) {
-            Log.v(TAG, "Starting poll loop");
-            pollThread = new Thread(pollLoop);
-            pollThread.start();
+
+        if (pollThread != null) {
+            pollThread.interrupt();
         }
+
+        Log.v(TAG, "Starting poll loop");
+        pollThread = new Thread(pollLoop);
+        pollThread.start();
     }
 
     public void stopPollLoop() {
@@ -284,7 +288,7 @@ public class RadioDevice {
 
             try {
                 response = connection.sendForResponse(Arrays.copyOfRange(buffer, 0, lastByteNum + 1));
-            } catch (DeviceConnection.NotConnectedException e) {
+            } catch (DeviceConnection.NotConnectedException|NullPointerException e) {
                 break;
             }
 
@@ -835,7 +839,7 @@ public class RadioDevice {
     }
 
     public boolean startDABSearch(DABSearchListener searchListener) {
-        Log.v(TAG, "startDABSearch");
+        Log.v(TAG, "startDABSearch()");
         if (getPlayStatus() != Values.PLAY_STATUS_SEARCHING) {
             new DABSearchTask().execute(searchListener);
             return true;
