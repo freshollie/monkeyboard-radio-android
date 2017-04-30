@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.playback;
+package com.freshollie.monkeyboard.keystoneradio.playback;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,8 +13,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.freshollie.monkeyboarddabradio.ui.PlayerActivity;
-import com.freshollie.monkeyboarddabradio.R;
+import com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity;
+import com.freshollie.monkeyboard.keystoneradio.R;
 
 /**
  * Created by Freshollie on 15/01/2017.

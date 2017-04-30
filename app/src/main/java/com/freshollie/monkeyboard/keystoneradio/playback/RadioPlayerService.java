@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.playback;
+package com.freshollie.monkeyboard.keystoneradio.playback;
 
 import android.app.Service;
 import android.content.Context;
@@ -8,7 +8,6 @@ import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -17,10 +16,10 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.freshollie.monkeyboarddabradio.R;
-import com.freshollie.monkeyboarddabradio.radio.ListenerManager;
-import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
-import com.freshollie.monkeyboarddabradio.radio.RadioStation;
+import com.freshollie.monkeyboard.keystoneradio.R;
+import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 import org.json.JSONException;
 import org.json.JSONObject;

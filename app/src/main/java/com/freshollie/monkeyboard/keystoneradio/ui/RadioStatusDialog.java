@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboarddabradio.ui;
+package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -10,10 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.freshollie.monkeyboarddabradio.R;
-import com.freshollie.monkeyboarddabradio.playback.RadioPlayerService;
-import com.freshollie.monkeyboarddabradio.radio.ListenerManager;
-import com.freshollie.monkeyboarddabradio.radio.RadioDevice;
+import com.freshollie.monkeyboard.keystoneradio.R;
+import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
+import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 /**

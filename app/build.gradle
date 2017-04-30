@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
-        applicationId "com.freshollie.monkeyboarddabradio"
+        applicationId "com.freshollie.monkeyboard.keystoneradio"
         minSdkVersion 16
         targetSdkVersion 24
         versionCode 2
