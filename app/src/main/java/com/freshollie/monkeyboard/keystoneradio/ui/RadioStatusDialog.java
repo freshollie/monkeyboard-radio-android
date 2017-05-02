@@ -233,7 +233,6 @@ public class RadioStatusDialog extends DialogFragment {
                 progressIcon.setIndeterminate(false);
             }
             progressIcon.setProgress(progress);
-            Log.v(TAG, "Search progress updated "+ String.valueOf(numChannels) + " " + String.valueOf(progress));
         }
 
         @Override
@@ -285,6 +284,11 @@ public class RadioStatusDialog extends DialogFragment {
         }
 
         @Override
+        public void onFail() {
+            dismiss();
+        }
+
+                @Override
         public void onStop() {
             dismiss();
         }

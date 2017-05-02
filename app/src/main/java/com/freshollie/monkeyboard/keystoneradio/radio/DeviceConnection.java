@@ -49,6 +49,42 @@ public class DeviceConnection {
 
     private Context context;
 
+    private int RECONNECT_TIMEOUT = 5000;
+
+    // Used in case the device disconnects for 5000ms
+    private Runnable reconnectRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Log.v(TAG, "Attempting to reconnect to device");
+
+            long startTime = System.currentTimeMillis();
+
+            while ((System.currentTimeMillis() - startTime) < RECONNECT_TIMEOUT && !Thread.interrupted()) {
+                if (getDevice() != null) {
+                    Log.v(TAG, "Success, reconnecting");
+                    start();
+                    return;
+                }
+            }
+
+            Log.v(TAG, "Reconnecting failed, closing connection");
+
+            running = true;
+            stop();
+        }
+    };
+
+    private Thread reconnectThread;
+
+    private Runnable connectRunnable = new Runnable() {
+        @Override
+        public void run() {
+            requestConnection();
+        }
+    };
+
+    private Thread connectThread;
+
     private boolean running = false;
 
     public class NotConnectedException extends IOException{
@@ -71,7 +107,7 @@ public class DeviceConnection {
                         if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                             if (device != null) {
                                 Log.v(TAG, "Permission for device granted");
-                                requestConnection();
+                                start();
                             }
                         }
                     }
@@ -82,7 +118,7 @@ public class DeviceConnection {
                     if (device != null) {
                         if (device.getVendorId() == RadioDevice.VENDOR_ID &&
                                 device.getProductId() == RadioDevice.PRODUCT_ID) {
-                            closeConnection();
+                            attemptReconnect();
                         }
                     }
 
@@ -118,6 +154,23 @@ public class DeviceConnection {
     }
 
     /**
+     * Will try an reconnect for 5000ms after disconnect.
+     */
+    private void attemptReconnect() {
+        Log.v(TAG, "Lost connection, attempting to reestablish");
+
+        running = false;
+        closeConnection();
+
+        if (reconnectThread != null) {
+            reconnectThread.interrupt();
+            reconnectThread = null;
+        }
+        reconnectThread = new Thread(reconnectRunnable);
+        reconnectThread.start();
+    }
+
+    /**
      * Checks the devices connected to android and finds the radio. It then attempts to get
      * permission to connect to the radio.
      */
@@ -138,6 +191,9 @@ public class DeviceConnection {
                 usbManager.requestPermission(device, usbPermissionIntent);
             }
         } else {
+            if (connectionStateListener != null) {
+                connectionStateListener.onFail();
+            }
             Log.v(TAG, "No device found");
         }
     }
@@ -146,15 +202,35 @@ public class DeviceConnection {
      * Used as API to start the connection
      */
     public void start() {
-        requestConnection();
+        Log.v(TAG, "Start");
+        if (!running) {
+            connectThread = new Thread(connectRunnable);
+            connectThread.start();
+        }
     }
 
     /**
      * API used to stop the connection
      */
     public void stop() {
+        Log.v(TAG, "Stop");
         if (isRunning()) {
             closeConnection();
+            running = false;
+            context.unregisterReceiver(usbBroadcastReceiver);
+            if (connectionStateListener != null) {
+                connectionStateListener.onStop();
+            }
+        }
+
+        if (reconnectThread != null) {
+            reconnectThread.interrupt();
+            reconnectThread = null;
+        }
+
+        if (connectThread != null) {
+            connectThread.interrupt();
+            connectThread = null;
         }
     }
 
@@ -177,10 +253,15 @@ public class DeviceConnection {
             deviceSerialInterface.setRTS(true);
 
             running = true;
-            connectionStateListener.onStart();
+            if (connectionStateListener != null) {
+                connectionStateListener.onStart();
+            }
         } catch (IOException e){
             e.printStackTrace();
             closeConnection();
+            if (connectionStateListener != null) {
+                connectionStateListener.onFail();
+            }
         }
 
     }
@@ -191,11 +272,6 @@ public class DeviceConnection {
      */
     private void closeConnection() {
         Log.v(TAG, "Closing connection to device");
-        if (isRunning()) {
-            running = false;
-            context.unregisterReceiver(usbBroadcastReceiver);
-            connectionStateListener.onStop();
-        }
 
         if (deviceSerialInterface != null) {
             try {

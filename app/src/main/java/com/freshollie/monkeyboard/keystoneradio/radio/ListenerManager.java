@@ -26,6 +26,7 @@ public class ListenerManager {
 
     public interface ConnectionStateChangeListener {
         void onStart();
+        void onFail();
         void onStop();
     }
 
@@ -42,8 +43,19 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (ConnectionStateChangeListener listener : connectionStateChangeListeners) {
+                for (ConnectionStateChangeListener listener : new ArrayList<>(connectionStateChangeListeners)) {
                     listener.onStop();
+                }
+            }
+        });
+    }
+
+    void informConnectionFail() {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (ConnectionStateChangeListener listener: new ArrayList<>(connectionStateChangeListeners)) {
+                    listener.onFail();
                 }
             }
         });
@@ -53,7 +65,7 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (ConnectionStateChangeListener listener : connectionStateChangeListeners) {
+                for (ConnectionStateChangeListener listener : new ArrayList<>(connectionStateChangeListeners)) {
                     listener.onStart();
                 }
             }
@@ -85,7 +97,7 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: dataListeners) {
+                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
                     dataListener.onProgramTextChanged(programText);
                 }
             }
@@ -96,7 +108,7 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: dataListeners) {
+                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
                     dataListener.onSignalQualityChanged(signalStrength);
                 }
             }
@@ -107,7 +119,7 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: dataListeners) {
+                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
                     dataListener.onPlayStatusChanged(playStatus);
                 }
             }
@@ -118,7 +130,7 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: dataListeners) {
+                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
                     dataListener.onProgramDataRateChanged(dataRate);
                 }
             }
@@ -129,7 +141,7 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: dataListeners) {
+                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
                     dataListener.onVolumeChanged(volume);
                 }
             }
@@ -140,7 +152,7 @@ public class ListenerManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: dataListeners) {
+                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
                     dataListener.onStereoStateChanged(stereoState);
                 }
             }

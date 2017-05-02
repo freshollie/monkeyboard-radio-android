@@ -8,7 +8,6 @@ import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -74,7 +73,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private int duckVolume = 3;
     private boolean muted = false;
 
-    enum AudioFocus {
+    private enum AudioFocus {
         NoFocusNoDuck,    // we don't have audio focus, and can't duck
         NoFocusCanDuck,   // we don't have focus, but can play at a low volume ("ducking")
         Focused           // we have full audio focus
@@ -184,11 +183,18 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             new ListenerManager.ConnectionStateChangeListener() {
         @Override
         public void onStart() {
+            openingConnection = false;
             onConnectedSequence();
         }
 
         @Override
+        public void onFail() {
+            openingConnection = false;
+        }
+
+        @Override
         public void onStop() {
+            openingConnection = false;
             if (connectThread.isAlive()) {
                 connectThread.interrupt();
             } else {
@@ -199,30 +205,27 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
     };
 
+    private boolean openingConnection = false;
     private Thread connectThread = new Thread();
     private Runnable connectRunnable =
             new Runnable() {
                 @Override
                 public void run() {
                     Log.v(TAG, "Starting a wait for attachment thread");
-                    long startTime = SystemClock.currentThreadTimeMillis();
+                    long startTime = System.currentTimeMillis();
 
                     while (!radio.isAttached()
-                            && (SystemClock.currentThreadTimeMillis() - startTime) < ATTACH_TIMEOUT) {
-                        if (Thread.currentThread().isInterrupted()) {
+                            && (System.currentTimeMillis() - startTime) < ATTACH_TIMEOUT) {
+                        if (Thread.interrupted()) {
                             return;
                         }
                     }
 
                     if (radio.isAttached()) {
-                        new Handler(getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.v(TAG, "Monkeyboard connected");
-                                radio.connect();
-                            }
-                        });
+                        Log.v(TAG, "Monkeyboard connected");
+                        radio.connect();
                     } else {
+                        openingConnection = false;
                         new Handler(getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
@@ -260,7 +263,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 Arrays.sort(radioStations, new Comparator<RadioStation>() {
                     @Override
                     public int compare(RadioStation radioStation, RadioStation t1) {
-                        return Integer.compare(radioStation.getChannelId(), t1.getChannelId());
+                        return Integer.valueOf(radioStation.getChannelId()).compareTo(t1.getChannelId());
                     }
                 });
 
@@ -372,12 +375,14 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void openConnection() {
-        Log.v(TAG, "Starting device connection");
-        if (playerNotification != null) {
-            playerNotification.update();
-        }
+        if (!connectThread.isAlive() && !openingConnection) {
+            Log.v(TAG, "Starting device connection");
 
-        if (!connectThread.isAlive()) {
+            if (playerNotification != null) {
+                playerNotification.update();
+            }
+
+            openingConnection = true;
             connectThread = new Thread(connectRunnable);
             connectThread.start();
         }
@@ -589,7 +594,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         // Used to make sure that the volume is lowered, command
         // is executed until the volume is confirmed lowered
-        while (!radio.setVolume(0) && radio.isConnected()) {}
+
+        //noinspection StatementWithEmptyBody
+        while (!radio.setVolume(0) && radio.isConnected());
         updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
     }
 
