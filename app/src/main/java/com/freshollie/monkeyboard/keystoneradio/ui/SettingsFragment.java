@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.ui;
 
 
 import android.app.FragmentManager;

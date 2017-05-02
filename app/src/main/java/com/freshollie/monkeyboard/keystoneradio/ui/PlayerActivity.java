@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;

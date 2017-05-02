@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".keystoneradio.activities.PlayerActivity"
+            android:name=".keystoneradio.ui.PlayerActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,11 +23,11 @@
         </activity>
 
         <activity
-            android:name=".keystoneradio.activities.SettingsActivity"
+            android:name=".keystoneradio.ui.SettingsActivity"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".keystoneradio.activities.PlayerActivity" />
+                android:value=".keystoneradio.ui.PlayerActivity" />
         </activity>
 
         <service

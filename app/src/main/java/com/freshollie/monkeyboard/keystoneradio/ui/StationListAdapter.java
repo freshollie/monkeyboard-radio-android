@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;

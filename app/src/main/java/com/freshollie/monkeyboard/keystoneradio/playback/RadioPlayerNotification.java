@@ -13,7 +13,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.freshollie.monkeyboard.keystoneradio.activities.PlayerActivity;
+import com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity;
 import com.freshollie.monkeyboard.R;
 
 /**

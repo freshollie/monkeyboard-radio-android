@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.activities;
+package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
