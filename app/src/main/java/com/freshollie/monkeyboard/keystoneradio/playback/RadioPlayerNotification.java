@@ -14,7 +14,7 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity;
-import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.R;
 
 /**
  * Created by Freshollie on 15/01/2017.

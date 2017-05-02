@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
 import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
