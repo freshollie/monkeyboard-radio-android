@@ -6,7 +6,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

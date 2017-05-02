@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
 import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
@@ -21,7 +21,7 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
  * Dialog used to show progress of a DAB search or channel copy
  */
 
-public class RadioStatusDialog extends DialogFragment{
+public class RadioStatusDialog extends DialogFragment {
     private final String TAG = getClass().getSimpleName();
     private RadioPlayerService playerService;
     private RadioDevice radio;

@@ -19,7 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 
-import com.freshollie.monkeyboard.R;
+import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
 
 public class SettingsFragment extends PreferenceFragment {
