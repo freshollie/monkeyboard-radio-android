@@ -73,6 +73,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private int duckVolume = 3;
     private boolean muted = false;
 
+    private enum RadioMode {
+        FM,
+        DAB
+    }
+
+    private RadioMode mode;
+
     private enum AudioFocus {
         NoFocusNoDuck,    // we don't have audio focus, and can't duck
         NoFocusCanDuck,   // we don't have focus, but can play at a low volume ("ducking")

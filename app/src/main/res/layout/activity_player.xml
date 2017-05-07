@@ -34,6 +34,17 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="@dimen/activity_vertical_margin" />
 
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/station_genre"
+                android:id="@+id/mode_switch"
+                android:layout_marginTop="10dp"
+                android:showText="true"
+                android:textOn="FM"
+                android:textOff="DAB"
+                android:layout_alignParentLeft="true"/>
+
             <TextView
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
