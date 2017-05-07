@@ -123,6 +123,26 @@
                 android:text="Pop"
                 android:textAppearance="?android:textAppearanceSmall" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/station_genre"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentLeft="true"
+                android:text="Mode"
+                android:id="@+id/mode_switch_label"/>
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/mode_switch_label"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/mode_switch"
+                android:layout_marginLeft="5dp"
+                android:showText="true"
+                android:textOn="FM"
+                android:textOff="DAB" />
+
             <ImageButton
                 android:layout_width="30dp"
                 android:layout_height="30dp"
