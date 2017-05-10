@@ -207,20 +207,21 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         Log.v(TAG, "On Resume");
         registerReceiver(controlInputReceiver, new IntentFilter(ACTION_SEND_KEYEVENT));
 
+        // Update the player attributes from the service
         if (playerBound) {
-            // Update the volume bar
+            // Update the volume
+            updateVolume(playerService.getPlayerVolume());
 
-            if (!playerService.isPlaying()) {
-                updateVolume(playerService.getPlayerVolume());
-            }
-
+            // Update the player with the new attributes from the station list
             if (!Arrays.equals(playerService.getRadioStations(), stationListAdapter.getStationList())) {
                 stationListAdapter.updateStationList(playerService.getRadioStations());
                 stationListAdapter.setCurrentStationIndex(playerService.getCurrentChannelIndex());
                 stationListAdapter.refreshCurrentStation();
             }
 
+            // Re-Register the callback
             playerService.registerCallback(this);
+
 
             if (preferencePlayOnOpen) {
                 playerService.handlePlayRequest();
@@ -716,13 +717,15 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     @Override
     public void onRadioVolumeChanged(int volume) {
         int icon = 0;
-        if (volume < playerService.getPlayerVolume() && playerService.isPlaying()) { // Ducking
-            if (volume == 0) {
-                // Full duck
-                icon = R.drawable.ic_volume_mute_white_24dp;
-            } else if (volume != 0) {
-                // Duck
-                icon = R.drawable.ic_volume_down_white_24dp;
+        if (playerBound) {
+            if (playerService.isDucked() && playerService.isPlaying()) { // Ducking
+                if (volume == 0) {
+                    // Full duck
+                    icon = R.drawable.ic_volume_mute_white_24dp;
+                } else {
+                    // Duck
+                    icon = R.drawable.ic_volume_down_white_24dp;
+                }
             }
         }
 
@@ -823,7 +826,9 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             playerService.getMediaController().unregisterCallback(mediaControllerCallback);
             radio.getListenerManager().unregisterDataListener(this);
             playerService.unregisterCallback(this);
+
             unbindService(serviceConnection);
+
             if (!playerService.isPlaying()) {
                 stopService(new Intent(this, RadioPlayerService.class));
             }
