@@ -173,14 +173,19 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
 
         bindPlayerService();
-
         setupPlayerAttributes(savedInstanceState);
         setupStationList();
+
         if (savedInstanceState == null) {
             clearPlayerAttributes();
+
         } else {
             isRestartedInstance = true;
         }
+    }
+
+    public void sendActionToService(String action) {
+        startService(new Intent(this, RadioPlayerService.class).setAction(action));
     }
 
     /**
@@ -203,16 +208,24 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         registerReceiver(controlInputReceiver, new IntentFilter(ACTION_SEND_KEYEVENT));
 
         if (playerBound) {
+            // Update the volume bar
+
+            if (!playerService.isPlaying()) {
+                updateVolume(playerService.getPlayerVolume());
+            }
+
             if (!Arrays.equals(playerService.getRadioStations(), stationListAdapter.getStationList())) {
                 stationListAdapter.updateStationList(playerService.getRadioStations());
                 stationListAdapter.setCurrentStationIndex(playerService.getCurrentChannelIndex());
                 stationListAdapter.refreshCurrentStation();
             }
+
             playerService.registerCallback(this);
 
             if (preferencePlayOnOpen) {
                 playerService.handlePlayRequest();
             }
+
         } else {
             bindPlayerService();
         }
@@ -242,6 +255,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         setupVolumeControls();
         setupSettingsButton();
 
+        updateVolume(playerService.getPlayerVolume());
+
         stationListAdapter.updateStationList(playerService.getRadioStations());
         stationListRecyclerView.scrollToPosition(playerService.getCurrentChannelIndex());
 
@@ -259,10 +274,6 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         if (preferencePlayOnOpen) {
             playerService.handlePlayRequest();
         }
-    }
-
-    public void sendActionToService(String action) {
-        startService(new Intent(this, RadioPlayerService.class).setAction(action));
     }
 
     public void setupStationList() {
@@ -323,20 +334,10 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         updatePlayIcon(playerService.getPlaybackState());
     }
 
-    public void openVolumeSeekBar() {
-        volumeSeekBar.setVisibility(View.VISIBLE);
-        volumeText.setVisibility(View.VISIBLE);
-    }
-
-    public void closeVolumeSeekBar() {
-        volumeSeekBar.setVisibility(View.INVISIBLE);
-        volumeText.setVisibility(View.INVISIBLE);
-    }
-
     private Runnable seekBarIdle = new Runnable() {
         @Override
         public void run() {
-            closeVolumeSeekBar();
+            onCloseVolumeSeekBar();
         }
     };
 
@@ -346,21 +347,26 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             @Override
             public void onClick(View v) {
                 if (volumeSeekBar.getVisibility() == View.VISIBLE) {
-                    closeVolumeSeekBar();
-                    volumeSeekBar.removeCallbacks(seekBarIdle);
+                    onCloseVolumeSeekBar();
+
                 } else {
-                    openVolumeSeekBar();
-                    volumeSeekBar.postDelayed(seekBarIdle, 2000);
+                    if (!playerService.isPlaying()) {
+                        updateVolume(playerService.getPlayerVolume());
+                    }
+                    onOpenVolumeSeekBar();
                 }
             }
         });
+
+        volumeSeekBar.setMax(RadioPlayerService.MAX_PLAYER_VOLUME);
 
         volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (playerBound) {
                     volumeText.setText(String.valueOf(progress));
-                    playerService.handleSetVolumeRequest(progress);
+                    playerService.setPlayerVolume(progress);
+                    updateVolumeIcon(progress);
                 }
             }
 
@@ -374,45 +380,44 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                 seekBar.postDelayed(seekBarIdle, 2000);
             }
         });
+
         if (playerBound) {
-            updateVolumeSeekBar(playerService.getPlayerVolume());
-            onVolumeChanged(radio.getVolume());
+            updateVolume(playerService.getPlayerVolume());
         }
     }
 
-    public void updateVolumeSeekBar(int volume){
+    public void onOpenVolumeSeekBar() {
+        volumeSeekBar.setVisibility(View.VISIBLE);
+        volumeText.setVisibility(View.VISIBLE);
+        volumeSeekBar.postDelayed(seekBarIdle, 2000);
+    }
+
+    public void onCloseVolumeSeekBar() {
+        volumeSeekBar.setVisibility(View.INVISIBLE);
+        volumeText.setVisibility(View.INVISIBLE);
+        volumeSeekBar.removeCallbacks(seekBarIdle);
+
+    }
+
+    public void updateVolume(int volume){
         volumeSeekBar.setProgress(volume);
         volumeText.setText(String.valueOf(volume));
+        updateVolumeIcon(volume);
     }
 
-    public boolean handleVolumeUp() {
-        if (playerBound) {
-            openVolumeSeekBar();
-            volumeSeekBar.removeCallbacks(seekBarIdle);
-            volumeSeekBar.postDelayed(seekBarIdle, 2000);
-            int newVolume = playerService.getPlayerVolume() + 1;
-            if (newVolume <= 16) {
-                updateVolumeSeekBar(newVolume);
-                playerService.handleSetVolumeRequest(newVolume);
-            }
-            return true;
-        }
-        return false;
-    }
+    public void updateVolumeIcon(int volume) {
+        int icon;
 
-    public boolean handleVolumeDown() {
-        if (playerBound) {
-            openVolumeSeekBar();
-            volumeSeekBar.removeCallbacks(seekBarIdle);
-            volumeSeekBar.postDelayed(seekBarIdle, 2000);
-            int newVolume = playerService.getPlayerVolume() - 1;
-            if (newVolume > -1) {
-                updateVolumeSeekBar(newVolume);
-                playerService.handleSetVolumeRequest(newVolume);
-            }
-            return true;
+        // At full volume
+        if (volume > 8) {
+            icon = R.drawable.ic_volume_up_white_24dp;
+        } else if (volume > 0) {
+            icon = R.drawable.ic_volume_down_white_24dp;
+        } else {
+            icon = R.drawable.ic_volume_mute_white_24dp;
         }
-        return false;
+
+        volumeButton.setImageResource(icon);
     }
 
     public void setupSettingsButton() {
@@ -514,7 +519,6 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         programTextTextView.setText("");
     }
 
-
     public void updatePlayIcon(int playState) {
         int icon;
         if (playState == PlaybackStateCompat.STATE_PLAYING) {
@@ -567,7 +571,12 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                     private void updateSelection() {
                         if (!done) {
                             done = true;
-                            stationListAdapter.refreshCurrentStation();
+                            stationListRecyclerView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    stationListAdapter.refreshCurrentStation();
+                                }
+                            });
                             stationListRecyclerView.removeOnScrollListener(this);
                         }
                     }
@@ -609,7 +618,12 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                     private void updateSelection() {
                         if (!done) {
                             done = true;
-                            stationListAdapter.setCursorIndex(newCursorIndex);
+                            stationListRecyclerView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    stationListAdapter.setCursorIndex(newCursorIndex);
+                                }
+                            });
                             stationListRecyclerView.removeOnScrollListener(this);
                         }
                     }
@@ -700,25 +714,15 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     }
 
     @Override
-    public void onVolumeChanged(int volume) {
+    public void onRadioVolumeChanged(int volume) {
         int icon = 0;
-        if (volume < playerService.getPlayerVolume()) { // Ducking
-            if (volume == 0 &&
-                    playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
+        if (volume < playerService.getPlayerVolume() && playerService.isPlaying()) { // Ducking
+            if (volume == 0) {
                 // Full duck
                 icon = R.drawable.ic_volume_mute_white_24dp;
             } else if (volume != 0) {
                 // Duck
                 icon = R.drawable.ic_volume_down_white_24dp;
-            }
-        } else {
-            // At full volume
-            if (volume > 8) {
-                icon = R.drawable.ic_volume_up_white_24dp;
-            } else if (volume > 0) {
-                icon = R.drawable.ic_volume_down_white_24dp;
-            } else {
-                icon = R.drawable.ic_volume_mute_white_24dp;
             }
         }
 
@@ -726,6 +730,11 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             // Sets the icon to the new icon
             volumeButton.setImageResource(icon);
         }
+    }
+
+    @Override
+    public void onPlayerVolumeChanged(int newVolume) {
+        updateVolume(newVolume);
     }
 
     public boolean isRadioStatusDialogOpen() {
@@ -870,16 +879,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         }
     };
 
-    public void handleKeyDown(int keyCode)  {
+    public boolean handleKeyDown(int keyCode)  {
         switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                handleVolumeDown();
-                break;
-
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                handleVolumeUp();
-                break;
-
             case KeyEvent.KEYCODE_ENTER:
                 if (stationListAdapter != null) {
                     if (playerBound) {
@@ -895,32 +896,40 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                         }
                     }
                 }
-                break;
+                return true;
 
             case KeyEvent.KEYCODE_TAB:
                 handleNextCursorPosition();
-                break;
+                return true;
 
             case KeyEvent.KEYCODE_DPAD_UP:
                 handlePreviousCursorPosition();
-                break;
+                return true;
 
             case KeyEvent.KEYCODE_BACK:
                 finish();
-                break;
+                return true;
         }
+
+        return false;
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
-        if (!preferenceControllerInput && keyCode != KeyEvent.KEYCODE_BACK) {
-            handleKeyDown(keyCode);
-            return true;
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            if (playerBound) {
+                if (!playerService.isPlaying()) {
+                    updateVolume(playerService.getPlayerVolume());
+                }
+            }
+        } else if (!preferenceControllerInput) {
+            if (handleKeyDown(keyCode)) {
+                return true;
+            }
         } else {
+            // Custom input has already been handled
             switch(keyCode) {
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    return true;
-                case KeyEvent.KEYCODE_VOLUME_UP:
+                case KeyEvent.ACTION_UP:
                     return true;
                 case KeyEvent.KEYCODE_TAB:
                     return true;

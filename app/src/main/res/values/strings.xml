@@ -65,6 +65,10 @@
     <string name="PLAY_ON_OPEN_KEY">play_on_open</string>
     <string name="HEADUNIT_MAIN_INPUT_KEY">headunit_main_input</string>
     <string name="SCROLL_WRAP_KEY">scroll_wrap</string>
+    <string name="SYNC_VOLUME_KEY">sync_volume</string>
+    <string name="pref_sync_volume_title">Sync radio and tablet volumes</string>
+    <string name="pref_sync_volume_summary_on">Radio volume and tablet music volume are synced</string>
+    <string name="pref_sync_volume_summary_off">Radio volume will be stored separately to tablet music volume</string>
 
 
     <string-array name="STATION_GENRES">

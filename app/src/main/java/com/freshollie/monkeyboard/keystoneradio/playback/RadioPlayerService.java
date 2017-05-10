@@ -9,7 +9,9 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.VolumeProviderCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -63,6 +65,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private AudioManager audioManager;
     private MediaSessionCompat mediaSession;
+    private VolumeProviderCompat volumeProvider;
     private PlaybackStateCompat.Builder playbackStateBuilder;
 
     private Runnable queuedAction;
@@ -75,11 +78,14 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private int duckVolume = 3;
     private boolean muted = false;
 
+    public static int MAX_PLAYER_VOLUME = 15;
+
 
     private enum AudioFocus {
         NoFocusNoDuck,    // we don't have audio focus, and can't duck
         NoFocusCanDuck,   // we don't have focus, but can play at a low volume ("ducking")
-        Focused           // we have full audio focus
+        Focused,           // we have full audio focus
+        Ducking
     }
 
     private AudioFocus audioFocusState = AudioFocus.NoFocusNoDuck;
@@ -87,6 +93,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private int currentChannelIndex = -1;
 
     public interface PlayerCallback {
+        void onPlayerVolumeChanged(int volume);
+
         void onNoStoredStations();
         void onAttachTimeout();
 
@@ -136,7 +144,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         @Override
         public void onProgressUpdate(int progress, int max) {
             Log.v(TAG, String.format("Collected %s/%s", progress, max));
-            onStationListCopyProgressUpdate(progress, max);
+            notifyStationListCopyProgressUpdate(progress, max);
         }
 
         @Override
@@ -158,9 +166,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             );
 
             if (radioStations.length > 0) {
-                onStationListCopyComplete();
+                notifyStationListCopyComplete();
             } else {
-                onNoStoredStations();
+                notifyNoStoredStations();
             }
         }
     };
@@ -168,17 +176,17 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private RadioDevice.DABSearchListener dabSearchListener = new RadioDevice.DABSearchListener() {
         @Override
         public void onProgressUpdate(int numPrograms, int progress) {
-            onChannelSearchProgressUpdate(numPrograms, progress);
+            notifyChannelSearchProgressUpdate(numPrograms, progress);
         }
 
         @Override
         public void onComplete(int numPrograms) {
-            onChannelSearchComplete(numPrograms);
+            notifyChannelSearchComplete(numPrograms);
         }
 
         @Override
         public void onStarted() {
-            onChannelSearchStart();
+            notifyChannelSearchStart();
         }
     };
 
@@ -198,8 +206,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         @Override
         public void onStop() {
             openingConnection = false;
-            if (connectThread.isAlive()) {
-                connectThread.interrupt();
+            if (waitForAttachThread.isAlive()) {
+                waitForAttachThread.interrupt();
             } else {
                 if (hasFocus()) {
                     handlePauseRequest();
@@ -209,8 +217,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     };
 
     private boolean openingConnection = false;
-    private Thread connectThread = new Thread();
-    private Runnable connectRunnable =
+    private Thread waitForAttachThread = new Thread();
+    private Runnable waitForAttachRunnable =
             new Runnable() {
                 @Override
                 public void run() {
@@ -225,14 +233,14 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     }
 
                     if (radio.isAttached()) {
-                        Log.v(TAG, "Monkeyboard connected");
+                        Log.v(TAG, "Keystone radio connected");
                         radio.connect();
                     } else {
                         openingConnection = false;
                         new Handler(getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
-                                onAttachTimeout();
+                                notifyAttachTimeout();
                             }
                         });
                     }
@@ -243,24 +251,94 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     @Override
     public void onCreate() {
         // Get preferences storage;
-        sharedPreferences = getSharedPreferences(getString(R.string.SHARED_PREFERENCES_KEY), Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
         // Get audio manager
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        // Set the player volume to the system volume
-        volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        if (!sharedPreferences.getBoolean(getString(R.string.SYNC_VOLUME_KEY), true)) {
+            volume = sharedPreferences.getInt(getString(R.string.VOLUME_KEY), 13);
+        } else {
+            // Set the player volume to the system volume
+            volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        }
+
+        Log.d(TAG, "Start volume: " + volume);
 
         // Build a media session for the radioplayer
-        mediaSession = new MediaSessionCompat(this, "RadioPlayerService");
+        mediaSession = new MediaSessionCompat(this, this.getClass().getSimpleName());
         mediaSession.setCallback(new MediaSessionCallback());
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        // Listen for settings changes and see if volume changes
+        // Only required before android 5.0
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // Make an observer of the settings, which notifies us if the volume changes
+            settingsVolumeObserver =
+                    new SettingsVolumeObserver(
+                            this,
+                            new Handler(getMainLooper()),
+                            new SettingsVolumeObserver.SettingsVolumeChangeListener() {
+                                @Override
+                                public void onChange(int newVolume) {
+                                    setPlayerVolume(newVolume);
+                                    Log.v(TAG, "Volume set: " + getPlayerVolume());
+                                    notifyPlayerVolumeChanged(getPlayerVolume());
+                                }
+                            }
+                    );
+
+            // Register the observer
+            getApplicationContext().getContentResolver()
+                    .registerContentObserver(
+                            android.provider.Settings.System.CONTENT_URI,
+                            true,
+                            settingsVolumeObserver
+                    );
+
+            mediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+            Log.v(TAG, "Registering settings content observer");
+        } else {
+            volumeProvider = new VolumeProviderCompat(
+                    VolumeProviderCompat.VOLUME_CONTROL_ABSOLUTE,
+                    MAX_PLAYER_VOLUME,
+                    volume
+            ) {
+                @Override
+                public void onSetVolumeTo(int volume) {
+                    super.onSetVolumeTo(volume);
+                    setPlayerVolume(volume);
+                    Log.v(TAG, "Volume set: " + getPlayerVolume());
+                    notifyPlayerVolumeChanged(getPlayerVolume());
+                }
+
+                @Override
+                public void onAdjustVolume(int direction) {
+                    super.onAdjustVolume(direction);
+                    if (direction != 0) {
+                        setPlayerVolume(getPlayerVolume() + direction);
+                        Log.v(TAG, "Volume adjusted: " + getPlayerVolume());
+                        notifyPlayerVolumeChanged(getPlayerVolume());
+                    }
+                }
+
+            };
+
+            mediaSession.setPlaybackToRemote(volumeProvider);
+        }
+
+
         mediaSession.setActive(true);
 
         // Build a playback state for the player
         playbackStateBuilder = new PlaybackStateCompat.Builder();
+
+        // Update info of the current session
+        updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
+        updateMetadata(new RadioStation("", -1, -1, ""));
 
         // Connect to the radio API
         radio = new RadioDevice(getApplicationContext());
@@ -269,31 +347,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         radio.getListenerManager().registerDataListener(dataListener);
         radio.getListenerManager().registerConnectionStateChangedListener(connectionStateListener);
 
-        // Listen for settings changes and see if volume changes
-        // Only required before android 5.0
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            settingsVolumeObserver = new SettingsVolumeObserver(
-                    this,
-                    new Handler(getMainLooper()),
-                    new SettingsVolumeObserver.SettingsVolumeChangeListener() {
-                        @Override
-                        public void onChange(int newVolume) {
-                            if (radio.isConnected()) {
-                                handleSetVolumeRequest(newVolume);
-                            } else {
-                                volume = newVolume;
-                            }
-                        }
-                    });
-            getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, settingsVolumeObserver);
-        }
-
-        // Update info of the current session
-        updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
-        updateMetadata(new RadioStation("", -1, -1, ""));
-
         // Make the notification
         playerNotification = new RadioPlayerNotification(this);
+
+        saveVolume(volume);
 
         loadPreferences();
 
@@ -310,8 +367,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             switch (intent.getAction()) {
                 case ACTION_STOP:
                     Log.v(TAG, "Received stop intent");
-                    onDismissed();
+                    notifyDismissed();
                     closeConnection();
+                    stopSelf();
                     break;
                 case ACTION_NEXT:
                     handleNextChannelRequest();
@@ -383,6 +441,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 );
         currentChannelIndex = sharedPreferences.getInt(getString(R.string.CURRENT_CHANNEL_KEY), 0);
         duckVolume = sharedPreferences.getInt(getString(R.string.DUCK_VOLUME_KEY), 3);
+
+        if (!sharedPreferences.getBoolean(getString(R.string.SYNC_VOLUME_KEY), true)) {
+            volume = sharedPreferences.getInt(getString(R.string.VOLUME_KEY), 13);
+        }
     }
 
     private void saveStationList() {
@@ -409,28 +471,24 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         editor.apply();
     }
 
-    private void saveVolume() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(getString(R.string.VOLUME_KEY), volume);
-        editor.apply();
-    }
-
     public void startStationListCopyTask() {
         radio.copyStationList(copyProgramsListener);
         setCurrentChannelIndex(0);
-        onStationListCopyStart();
+        notifyStationListCopyStart();
     }
 
     private void onConnectedSequence() {
+
         // If the our internal database is dramatically different to that on the board, we will try
         // and sync our copies
         if (getRadioStations().length < 1
                 || Math.abs(getRadioStations().length - radio.getTotalPrograms()) > 8) {
             if (radio.getTotalPrograms() > 0) {
                 startStationListCopyTask();
+
             } else {
                 Log.v(TAG, "No stations stored, need to perform channel search");
-                onNoStoredStations();
+                notifyNoStoredStations();
             }
 
         } else {
@@ -446,7 +504,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void openConnection() {
-        if (!connectThread.isAlive() && !openingConnection) {
+        if (!waitForAttachThread.isAlive() && !openingConnection) {
             Log.v(TAG, "Starting device connection");
 
             if (playerNotification != null) {
@@ -454,8 +512,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             }
 
             openingConnection = true;
-            connectThread = new Thread(connectRunnable);
-            connectThread.start();
+            waitForAttachThread = new Thread(waitForAttachRunnable);
+            waitForAttachThread.start();
         }
     }
 
@@ -480,7 +538,34 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public int getPlayerVolume() {
-        return volume;
+        if (sharedPreferences.getBoolean(getString(R.string.SYNC_VOLUME_KEY), true)) {
+            return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        } else {
+            return volume;
+        }
+    }
+
+    public void setPlayerVolume(int volume) {
+        if (-1 < volume && volume < 17) {
+            if (radio.isConnected()) {
+                handleSetVolumeRequest(volume);
+            } else {
+                this.volume = volume;
+            }
+        }
+
+        saveVolume(volume);
+    }
+
+    public void saveVolume(int volume) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(getString(R.string.VOLUME_KEY), volume);
+        editor.apply();
+
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+        if (volumeProvider != null) {
+            volumeProvider.setCurrentVolume(volume);
+        }
     }
 
     public RadioStation getCurrentStation() {
@@ -587,17 +672,18 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
     }
 
-    public void handleSetVolumeRequest(final int newVolume) {
+    private void handleSetVolumeRequest(final int newVolume) {
         volume = newVolume;
-        saveVolume();
-        handleAction(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        radio.setVolume(volume);
+        if (isPlaying()) {
+            handleAction(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            radio.setVolume(volume);
+                        }
                     }
-                }
-        );
+            );
+        }
     }
 
     public void handleMuteRequest() {
@@ -618,7 +704,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     @Override
                     public void run() {
                         muted = false;
-                        radio.setVolume(volume);
+                        radio.setVolume(getPlayerVolume());
                     }
                 }
         );
@@ -671,7 +757,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void handleFocusGain() {
-        radio.setVolume(volume);
+        radio.setVolume(getPlayerVolume());
     }
 
     public void handleFocusLost() {
@@ -794,26 +880,40 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void closeConnection() {
-        if (connectThread.isAlive()) {
-            connectThread.interrupt();
+        if (waitForAttachThread.isAlive()) {
+            waitForAttachThread.interrupt();
         }
         abandonAudioFocus();
 
         if (radio.isConnected()) {
             handlePauseRequest();
+            radio.disconnect();
         }
 
-        radio.disconnect();
         playerNotification.cancel();
     }
 
     @Override
     public void onDestroy() {
         Log.v(TAG, "Stopping service");
-        connectThread.interrupt();
+        closeConnection();
+        if (waitForAttachThread.isAlive()) {
+            waitForAttachThread.interrupt();
+        }
+
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+
+        if (settingsVolumeObserver != null) {
+            getApplicationContext().getContentResolver()
+                    .unregisterContentObserver(settingsVolumeObserver);
+        } else if (volumeProvider != null) {
+            mediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+        }
+
         mediaSession.setCallback(null);
         mediaSession.release();
+
+
 
         radio.getListenerManager().unregisterDataListener(dataListener);
         radio.getListenerManager().unregisterConnectionStateChangedListener(connectionStateListener);
@@ -836,7 +936,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         @Override
-        public void onStop() { onDismissed();
+        public void onStop() { notifyDismissed();
         }
 
         @Override
@@ -915,7 +1015,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         @Override
-        public void onVolumeChanged(int volume) {
+        public void onRadioVolumeChanged(int volume) {
 
         }
 
@@ -933,56 +1033,62 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         playerCallbacks.remove(callback);
     }
 
-    private void onAttachTimeout() {
+    private void notifyPlayerVolumeChanged(int newVolume) {
+        for (PlayerCallback playerCallback: playerCallbacks) {
+            playerCallback.onPlayerVolumeChanged(newVolume);
+        }
+    }
+
+    private void notifyAttachTimeout() {
         Log.v(TAG, "Timed out waiting for device to attach");
         for (PlayerCallback playerCallback: playerCallbacks) {
             playerCallback.onAttachTimeout();
         }
     }
 
-    private void onStationListCopyStart() {
+    private void notifyStationListCopyStart() {
         for (PlayerCallback callback: playerCallbacks) {
             callback.onStationListCopyStart();
         }
     }
 
-    private void onChannelSearchStart() {
+    private void notifyChannelSearchStart() {
         for (PlayerCallback callback: playerCallbacks) {
             callback.onSearchStart();
         }
     }
 
-    private void onNoStoredStations() {
+    private void notifyNoStoredStations() {
         for (PlayerCallback callback: playerCallbacks) {
             callback.onNoStoredStations();
         }
     }
 
-    private void onChannelSearchProgressUpdate(int channelsFound, int progress) {
+    private void notifyChannelSearchProgressUpdate(int channelsFound, int progress) {
         for (PlayerCallback callback: playerCallbacks) {
             callback.onSearchProgressUpdate(channelsFound, progress);
         }
     }
 
-    private void onChannelSearchComplete(int numChannels) {
+    private void notifyChannelSearchComplete(int numChannels) {
         for (PlayerCallback callback: playerCallbacks) {
             callback.onSearchComplete(numChannels);
         }
     }
 
-    private void onStationListCopyProgressUpdate(int progress, int max) {
+    private void notifyStationListCopyProgressUpdate(int progress, int max) {
         for (PlayerCallback callback: playerCallbacks) {
             callback.onStationListCopyProgressUpdate(progress, max);
         }
     }
 
-    public void onStationListCopyComplete() {
+    public void notifyStationListCopyComplete() {
         for (PlayerCallback callback: playerCallbacks) {
             callback.onStationListCopyComplete();
         }
     }
 
-    public void onDismissed() {
+    public void notifyDismissed() {
         for (PlayerCallback playerCallback: playerCallbacks) {
             playerCallback.onDismissed();
         }
