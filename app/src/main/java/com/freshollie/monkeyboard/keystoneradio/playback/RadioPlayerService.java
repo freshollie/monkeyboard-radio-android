@@ -77,6 +77,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private int volume = 13;
     private int duckVolume = 3;
     private boolean muted = false;
+    private boolean ducked = false;
 
     public static int MAX_PLAYER_VOLUME = 15;
 
@@ -330,9 +331,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             mediaSession.setPlaybackToRemote(volumeProvider);
         }
 
-
-        mediaSession.setActive(true);
-
         // Build a playback state for the player
         playbackStateBuilder = new PlaybackStateCompat.Builder();
 
@@ -497,6 +495,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 queuedAction.run();
                 queuedAction = null;
             }
+            handleSetChannel(getCurrentChannelIndex());
         }
         if (playerNotification != null) {
             playerNotification.update();
@@ -538,15 +537,24 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public int getPlayerVolume() {
+        int volume = this.volume;
+
         if (sharedPreferences.getBoolean(getString(R.string.SYNC_VOLUME_KEY), true)) {
-            return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        } else {
-            return volume;
+            volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+            if (volumeProvider != null) {
+                if (volume != volumeProvider.getCurrentVolume()) {
+                    volumeProvider.setCurrentVolume(volume);
+                }
+            }
         }
+
+        return volume;
+
     }
 
     public void setPlayerVolume(int volume) {
-        if (-1 < volume && volume < 17) {
+        if (-1 < volume && volume < (MAX_PLAYER_VOLUME + 1) && volume != getPlayerVolume()) {
             if (radio.isConnected()) {
                 handleSetVolumeRequest(volume);
             } else {
@@ -562,7 +570,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         editor.putInt(getString(R.string.VOLUME_KEY), volume);
         editor.apply();
 
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+        if (sharedPreferences.getBoolean(getString(R.string.SYNC_VOLUME_KEY), true)) {
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+        }
+
         if (volumeProvider != null) {
             volumeProvider.setCurrentVolume(volume);
         }
@@ -604,6 +615,18 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public boolean isMuted() {
         return muted;
+    }
+
+    public boolean hasFocus() {
+        return audioFocusState == AudioFocus.Focused;
+    }
+
+    public boolean isPlaying() {
+        return getPlaybackState() == PlaybackStateCompat.STATE_PLAYING;
+    }
+
+    public boolean isDucked() {
+        return ducked;
     }
 
     private void handleAction(Runnable action) {
@@ -752,29 +775,23 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         );
     }
 
-    public void handleFocusDuck() {
+    private void handleFocusDuck() {
+        ducked = true;
         radio.setVolume(duckVolume);
     }
 
-    public void handleFocusGain() {
+    private void handleFocusGain() {
+        ducked = false;
         radio.setVolume(getPlayerVolume());
     }
 
-    public void handleFocusLost() {
+    private void handleFocusLost() {
         handlePauseRequest();
         abandonAudioFocus();
     }
 
     public void startChannelSearchTask() {
         radio.startDABSearch(dabSearchListener);
-    }
-
-    public boolean hasFocus() {
-        return audioFocusState == AudioFocus.Focused;
-    }
-
-    public boolean isPlaying() {
-        return getPlaybackState() == PlaybackStateCompat.STATE_PLAYING;
     }
 
     private void updatePlaybackState(int state) {

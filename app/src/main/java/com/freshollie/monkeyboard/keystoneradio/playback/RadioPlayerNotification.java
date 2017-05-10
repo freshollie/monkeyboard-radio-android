@@ -34,6 +34,7 @@ public class RadioPlayerNotification {
 
 
         Log.d("RadioPlayerNotification", "Starting foreground");
+        playerService.getMediaSession().setActive(true);
         update();
     }
 
@@ -137,7 +138,6 @@ public class RadioPlayerNotification {
                     buildNotification()
             );
         } else {
-            playerService.stopForeground(false);
             notificationManager.notify(
                     NOTIFICATION_ID,
                     buildNotification()
@@ -146,6 +146,7 @@ public class RadioPlayerNotification {
     }
 
     public void cancel() {
+        playerService.getMediaSession().setActive(false);
         notificationManager.cancel(NOTIFICATION_ID);
         playerService.stopForeground(true);
     }
