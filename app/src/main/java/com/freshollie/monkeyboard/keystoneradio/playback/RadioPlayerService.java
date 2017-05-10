@@ -85,8 +85,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private enum AudioFocus {
         NoFocusNoDuck,    // we don't have audio focus, and can't duck
         NoFocusCanDuck,   // we don't have focus, but can play at a low volume ("ducking")
-        Focused,           // we have full audio focus
-        Ducking
+        Focused           // we have full audio focus
     }
 
     private AudioFocus audioFocusState = AudioFocus.NoFocusNoDuck;
