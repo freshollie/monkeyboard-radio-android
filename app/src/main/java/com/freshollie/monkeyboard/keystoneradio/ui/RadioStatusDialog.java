@@ -273,6 +273,11 @@ public class RadioStatusDialog extends DialogFragment{
         public void onDismissed() {
             dismiss();
         }
+
+        @Override
+        public void onPlayerVolumeChanged(int newVolume) {
+
+        }
     };
 
     private ListenerManager.ConnectionStateChangeListener connectionStateChangeListener =
