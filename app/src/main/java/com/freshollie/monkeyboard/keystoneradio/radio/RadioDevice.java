@@ -793,7 +793,7 @@ public class RadioDevice {
             dabSearchListener = searchListeners[0];
             dabSearchListener.onStarted();
 
-            if (getTotalPrograms() > 0) { // TODO needs to be fixed after debuging
+            if (getTotalPrograms() > 0) {
                 reset(Values.RESET_TYPE_CLEAR);
             }
 
@@ -850,6 +850,8 @@ public class RadioDevice {
         }
         return false;
     }
+
+    /
 
     private boolean isResponse(byte[] response) {
         return response[0] == ByteValues.START_BYTE;
