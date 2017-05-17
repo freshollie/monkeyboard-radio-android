@@ -216,8 +216,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             updateVolume(playerService.getPlayerVolume());
 
             // Update the player with the new attributes from the station list
-            if (!Arrays.equals(playerService.getRadioStations(), stationListAdapter.getStationList())) {
-                stationListAdapter.updateStationList(playerService.getRadioStations());
+            if (!Arrays.equals(playerService.getDabRadioStations(), stationListAdapter.getStationList())) {
+                stationListAdapter.updateStationList(playerService.getDabRadioStations());
                 stationListAdapter.setCurrentStationIndex(playerService.getCurrentChannelIndex());
                 stationListAdapter.refreshCurrentStation();
             }
@@ -261,7 +261,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
         updateVolume(playerService.getPlayerVolume());
 
-        stationListAdapter.updateStationList(playerService.getRadioStations());
+        stationListAdapter.updateStationList(playerService.getDabRadioStations());
         stationListRecyclerView.scrollToPosition(playerService.getCurrentChannelIndex());
 
         // Scrolls to the currently playing track instantly
@@ -811,7 +811,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     public void onStationListCopyComplete() {
         if (playerBound) {
-            stationListAdapter.updateStationList(playerService.getRadioStations());
+            stationListAdapter.updateStationList(playerService.getDabRadioStations());
             playerService.handlePlayRequest();
         }
     }
