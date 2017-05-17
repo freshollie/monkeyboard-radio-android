@@ -60,8 +60,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private RadioPlayerNotification playerNotification;
 
     private RadioDevice radio;
-    private RadioStation[] radioStations = new RadioStation[0];
-
+    private RadioStation[] dabRadioStations = new RadioStation[0];
+    private RadioStation[] fmRadioStations = new RadioStation[0];
 
     private AudioManager audioManager;
     private MediaSessionCompat mediaSession;
@@ -81,13 +81,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public static int MAX_PLAYER_VOLUME = 15;
 
-
-    private enum RadioMode {
-        FM,
-        DAB
-    }
-
-    private RadioMode mode;
+    private int radioMode;
 
     private enum AudioFocus {
         NoFocusNoDuck,    // we don't have audio focus, and can't duck
@@ -172,7 +166,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     )
             );
 
-            if (radioStations.length > 0) {
+            if (dabRadioStations.length > 0) {
                 notifyStationListCopyComplete();
             } else {
                 notifyNoStoredStations();
@@ -273,69 +267,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         Log.d(TAG, "Start volume: " + volume);
 
-        // Build a media session for the radioplayer
+        // Build a media session for the RadioPlayer
         mediaSession = new MediaSessionCompat(this, this.getClass().getSimpleName());
         mediaSession.setCallback(new MediaSessionCallback());
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        // Listen for settings changes and see if volume changes
-        // Only required before android 5.0
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            // Make an observer of the settings, which notifies us if the volume changes
-            settingsVolumeObserver =
-                    new SettingsVolumeObserver(
-                            this,
-                            new Handler(getMainLooper()),
-                            new SettingsVolumeObserver.SettingsVolumeChangeListener() {
-                                @Override
-                                public void onChange(int newVolume) {
-                                    setPlayerVolume(newVolume);
-                                    Log.v(TAG, "Volume set: " + getPlayerVolume());
-                                    notifyPlayerVolumeChanged(getPlayerVolume());
-                                }
-                            }
-                    );
-
-            // Register the observer
-            getApplicationContext().getContentResolver()
-                    .registerContentObserver(
-                            android.provider.Settings.System.CONTENT_URI,
-                            true,
-                            settingsVolumeObserver
-                    );
-
-            mediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
-            Log.v(TAG, "Registering settings content observer");
-        } else {
-            volumeProvider = new VolumeProviderCompat(
-                    VolumeProviderCompat.VOLUME_CONTROL_ABSOLUTE,
-                    MAX_PLAYER_VOLUME,
-                    volume
-            ) {
-                @Override
-                public void onSetVolumeTo(int volume) {
-                    super.onSetVolumeTo(volume);
-                    setPlayerVolume(volume);
-                    Log.v(TAG, "Volume set: " + getPlayerVolume());
-                    notifyPlayerVolumeChanged(getPlayerVolume());
-                }
-
-                @Override
-                public void onAdjustVolume(int direction) {
-                    super.onAdjustVolume(direction);
-                    if (direction != 0) {
-                        setPlayerVolume(getPlayerVolume() + direction);
-                        Log.v(TAG, "Volume adjusted: " + getPlayerVolume());
-                        notifyPlayerVolumeChanged(getPlayerVolume());
-                    }
-                }
-
-            };
-
-            mediaSession.setPlaybackToRemote(volumeProvider);
-        }
+        setupVolumeControls();
 
         // Build a playback state for the player
         playbackStateBuilder = new PlaybackStateCompat.Builder();
@@ -399,21 +337,81 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return binder;
     }
 
+    private void setupVolumeControls() {
+        // Listen for settings changes and see if volume changes
+        // Only required before android 5.0
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // Make an observer of the settings, which notifies us if the volume changes
+            settingsVolumeObserver =
+                    new SettingsVolumeObserver(
+                            this,
+                            new Handler(getMainLooper()),
+                            new SettingsVolumeObserver.SettingsVolumeChangeListener() {
+                                @Override
+                                public void onChange(int newVolume) {
+                                    setPlayerVolume(newVolume);
+                                    Log.v(TAG, "Volume set: " + getPlayerVolume());
+                                    notifyPlayerVolumeChanged(getPlayerVolume());
+                                }
+                            }
+                    );
+
+            // Register the observer
+            getApplicationContext().getContentResolver()
+                    .registerContentObserver(
+                            android.provider.Settings.System.CONTENT_URI,
+                            true,
+                            settingsVolumeObserver
+                    );
+
+            mediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+            Log.v(TAG, "Registering settings content observer");
+
+        } else {
+            volumeProvider = new VolumeProviderCompat(
+                    VolumeProviderCompat.VOLUME_CONTROL_ABSOLUTE,
+                    MAX_PLAYER_VOLUME,
+                    volume
+            ) {
+                @Override
+                public void onSetVolumeTo(int volume) {
+                    super.onSetVolumeTo(volume);
+                    setPlayerVolume(volume);
+                    Log.v(TAG, "Volume set: " + getPlayerVolume());
+                    notifyPlayerVolumeChanged(getPlayerVolume());
+                }
+
+                @Override
+                public void onAdjustVolume(int direction) {
+                    super.onAdjustVolume(direction);
+                    if (direction != 0) {
+                        setPlayerVolume(getPlayerVolume() + direction);
+                        Log.v(TAG, "Volume adjusted: " + getPlayerVolume());
+                        notifyPlayerVolumeChanged(getPlayerVolume());
+                    }
+                }
+
+            };
+
+            mediaSession.setPlaybackToRemote(volumeProvider);
+        }
+    }
+
     private void loadPreferences() {
         Set<String> stationsJsonList =
                 sharedPreferences.getStringSet(
-                        getString(R.string.STATION_LIST_KEY),
+                        getString(R.string.DAB_STATION_LIST_KEY),
                         null
                 );
 
         if (stationsJsonList != null) {
-            radioStations = new RadioStation[stationsJsonList.size()];
+            dabRadioStations = new RadioStation[stationsJsonList.size()];
             try {
                 int i = 0;
                 for (String stationJsonString: stationsJsonList) {
                     JSONObject stationJson = new JSONObject(stationJsonString);
 
-                    radioStations[i] =
+                    dabRadioStations[i] =
                             new RadioStation(
                                     stationJson.getString("name"),
                                     stationJson.getInt("channelNumber"),
@@ -423,7 +421,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     i++;
                 }
 
-                Arrays.sort(radioStations, new Comparator<RadioStation>() {
+                Arrays.sort(dabRadioStations, new Comparator<RadioStation>() {
                     @Override
                     public int compare(RadioStation radioStation, RadioStation t1) {
                         return Integer.valueOf(radioStation.getChannelId()).compareTo(t1.getChannelId());
@@ -435,7 +433,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 Log.e(TAG, "Could not load station list");
             }
         } else {
-            radioStations = new RadioStation[0];
+            dabRadioStations = new RadioStation[0];
         }
 
         controllerInput =
@@ -443,35 +441,47 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                         getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
                         false
                 );
-        currentChannelIndex = sharedPreferences.getInt(getString(R.string.CURRENT_CHANNEL_KEY), 0);
+        currentChannelIndex = sharedPreferences.getInt(getString(R.string.DAB_CURRENT_CHANNEL_KEY), 0);
         duckVolume = sharedPreferences.getInt(getString(R.string.DUCK_VOLUME_KEY), 3);
+
+        // Gets the last radio preference
+        radioMode = sharedPreferences.getBoolean(getString(R.string.RADIO_MODE_KEY), true)?
+                RadioDevice.Values.STREAM_MODE_DAB:
+                RadioDevice.Values.STREAM_MODE_FM;
 
         if (!sharedPreferences.getBoolean(getString(R.string.SYNC_VOLUME_KEY), true)) {
             volume = sharedPreferences.getInt(getString(R.string.VOLUME_KEY), 13);
         }
     }
 
-    private void saveStationList() {
+    private void saveDabStationList() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         Set<String> stringSet = new HashSet<>();
-        for (RadioStation station: radioStations) {
+        for (RadioStation station: dabRadioStations) {
             stringSet.add(station.toJsonString());
         }
 
-        editor.putStringSet(getString(R.string.STATION_LIST_KEY), stringSet);
+        editor.putStringSet(getString(R.string.DAB_STATION_LIST_KEY), stringSet);
 
         editor.apply();
     }
 
     private void setStationList(RadioStation[] stationList) {
-        radioStations = stationList;
-        saveStationList();
+        dabRadioStations = stationList;
+        saveDabStationList();
+    }
+
+    private void saveRadioMode() {
+        sharedPreferences
+                .edit()
+                .putBoolean(getString(R.string.RADIO_MODE_KEY), radioMode == RadioMode.DAB)
+                .apply();
     }
 
     private void saveCurrentChannel() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(getString(R.string.CURRENT_CHANNEL_KEY), currentChannelIndex);
+        editor.putInt(getString(R.string.DAB_CURRENT_CHANNEL_KEY), currentChannelIndex);
         editor.apply();
     }
 
@@ -482,11 +492,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void onConnectedSequence() {
-
         // If the our internal database is dramatically different to that on the board, we will try
         // and sync our copies
-        if (getRadioStations().length < 1
-                || Math.abs(getRadioStations().length - radio.getTotalPrograms()) > 8) {
+        if (getDabRadioStations().length < 1
+                || Math.abs(getDabRadioStations().length - radio.getTotalPrograms()) > 8) {
             if (radio.getTotalPrograms() > 0) {
                 startStationListCopyTask();
 
@@ -542,6 +551,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return getMediaController().getMetadata();
     }
 
+    public int getRadioMode() {
+        return radioMode;
+    }
+
     public int getPlayerVolume() {
         int volume = this.volume;
 
@@ -586,15 +599,15 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public RadioStation getCurrentStation() {
-        if (radioStations.length > 0) {
-            return radioStations[getCurrentChannelIndex()];
+        if (dabRadioStations.length > 0) {
+            return dabRadioStations[getCurrentChannelIndex()];
         } else {
             return null;
         }
     }
 
     public RadioStation getStationFromId(int channelId) {
-        for (RadioStation station: radioStations) {
+        for (RadioStation station: dabRadioStations) {
             if (station.getChannelId() == channelId) {
                 return station;
             }
@@ -603,11 +616,15 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public RadioStation getStationFromIndex(int stationIndex) {
-        return radioStations[stationIndex];
+        return dabRadioStations[stationIndex];
     }
 
-    public RadioStation[] getRadioStations() {
-        return radioStations;
+    public RadioStation[] getDabRadioStations() {
+        return dabRadioStations;
+    }
+
+    public RadioStation[] getFmRadioStations() {
+        return fmRadioStations;
     }
 
     public int getCurrentChannelIndex() {
@@ -645,9 +662,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public boolean setChannelAction(int channelIndex) {
-        if (getRadioStations().length > 0) {
+        if (getDabRadioStations().length > 0) {
             Log.v(TAG, "Requesting board to play: " + getCurrentStation().getName());
-            if (radio.play(getStationFromIndex(channelIndex).getChannelId())) {
+            if (radio.play(getRadioMode(), getStationFromIndex(channelIndex).getChannelId())) {
                 setCurrentChannelIndex(channelIndex);
                 Log.v(TAG, "Approved, updating meta");
                 updateMetadata(getCurrentStation());
@@ -674,7 +691,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void handlePlayRequest() {
         Log.v(TAG, "Handling a play request");
-        if (currentChannelIndex == -1 || getRadioStations().length < 1) {
+        if (currentChannelIndex == -1 || getDabRadioStations().length < 1) {
             Log.v(TAG, "No station to play, ignoring request");
         } else {
             handleAction(
@@ -756,7 +773,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 new Runnable() {
                     @Override
                     public void run() {
-                        if (currentChannelIndex < getRadioStations().length - 1) {
+                        if (currentChannelIndex < getDabRadioStations().length - 1) {
                             handleSetChannel(currentChannelIndex + 1);
                         } else {
                             handleSetChannel(0);
@@ -774,7 +791,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                         if (currentChannelIndex > 0) {
                             handleSetChannel(currentChannelIndex - 1);
                         } else {
-                            handleSetChannel(getRadioStations().length - 1);
+                            handleSetChannel(getDabRadioStations().length - 1);
                         }
                     }
                 }

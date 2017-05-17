@@ -70,8 +70,6 @@ public class RadioDevice {
         static byte STREAM_GetEnsembleName = 0x15; // Name of the DAB collection
         static byte STREAM_GetTotalProgram = 0x16;
         static byte STREAM_GetSearchProgram = 0x1B;
-
-        static byte STREAM_MODE_DAB = 0x00;
     }
 
     public static class Values {
@@ -85,6 +83,9 @@ public class RadioDevice {
         public static int RESET_TYPE_CLEAR = 2;
 
         public static int MAX_CHANNEL_BAND = 70; // Includes china
+
+        public static byte STREAM_MODE_DAB = 0x00;
+        public static byte STREAM_MODE_FM = 0x01;
     }
 
 
@@ -222,6 +223,13 @@ public class RadioDevice {
         pollThread.interrupt();
     }
 
+    private byte[] getBytesFromInt(int integer, int numBytes) {
+        byte[] bytes = new byte[numBytes];
+        ByteBuffer wrapped = ByteBuffer.wrap(bytes);
+        wrapped.putInt(integer);
+        return bytes;
+    }
+
     private int getIntFromBytes(byte[] bytes){
         ByteBuffer wrapped = ByteBuffer.wrap(bytes);
         int value;
@@ -357,16 +365,20 @@ public class RadioDevice {
         return play(channelNum);
     }
 
-    public boolean play(int channelNum) {
+    public boolean play(int playMode, int channel) {
         if (DEBUG_OUT_COMMANDS) {
-            Log.v(TAG, "play(" + String.valueOf(channelNum) + ")");
+            Log.v(TAG, "play(" + playMode + ", " + channel + ")");
         }
+        byte[] channelBytes = getBytesFromInt(channel, 4);
         return call(
                 ByteValues.CLASS_STREAM,
                 ByteValues.STREAM_Play,
                 new byte[]{
-                        ByteValues.STREAM_MODE_DAB,
-                        0x00, 0x00, 0x00, (byte) channelNum, // 0x000000NN
+                        (byte) playMode,
+                        channelBytes[0],
+                        channelBytes[1],
+                        channelBytes[2],
+                        channelBytes[3]
                 }
         ) != null;
     }

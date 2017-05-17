@@ -58,8 +58,8 @@
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
     <string name="SHARED_PREFERENCES_KEY">98asfa98as8ffd</string>
-    <string name="CURRENT_CHANNEL_KEY">current_channel</string>
-    <string name="STATION_LIST_KEY">station_list</string>
+    <string name="DAB_CURRENT_CHANNEL_KEY">dab_current_channel</string>
+    <string name="DAB_STATION_LIST_KEY">dab_station_list</string>
     <string name="VOLUME_KEY">volume</string>
     <string name="DUCK_VOLUME_KEY">duck_volume</string>
     <string name="PLAY_ON_OPEN_KEY">play_on_open</string>
@@ -69,6 +69,7 @@
     <string name="pref_sync_volume_title">Sync radio and tablet volumes</string>
     <string name="pref_sync_volume_summary_on">Radio volume and tablet music volume are synced</string>
     <string name="pref_sync_volume_summary_off">Radio volume will be stored separately to tablet music volume</string>
+    <string name="RADIO_MODE_KEY">radio_mode</string>
 
 
     <string-array name="STATION_GENRES">
