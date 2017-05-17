@@ -793,7 +793,7 @@ public class RadioDevice {
             dabSearchListener = searchListeners[0];
             dabSearchListener.onStarted();
 
-            if (getTotalPrograms() > 0 || true) { // TODO needs to be fixed after debuging
+            if (getTotalPrograms() > 0) {
                 reset(Values.RESET_TYPE_CLEAR);
             }
 

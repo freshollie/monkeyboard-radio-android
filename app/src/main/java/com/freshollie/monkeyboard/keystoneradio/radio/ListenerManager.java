@@ -20,7 +20,7 @@ public class ListenerManager {
         void onPlayStatusChanged(int playStatus);
         void onSignalQualityChanged(int signalStrength);
         void onProgramDataRateChanged(int dataRate);
-        void onVolumeChanged(int volume);
+        void onRadioVolumeChanged(int volume);
         void onStereoStateChanged(int stereoState);
     }
 
@@ -142,7 +142,7 @@ public class ListenerManager {
             @Override
             public void run() {
                 for (DataListener dataListener: new ArrayList<>(dataListeners)) {
-                    dataListener.onVolumeChanged(volume);
+                    dataListener.onRadioVolumeChanged(volume);
                 }
             }
         });
