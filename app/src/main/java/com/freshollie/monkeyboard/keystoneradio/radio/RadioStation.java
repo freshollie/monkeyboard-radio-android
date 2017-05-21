@@ -10,14 +10,30 @@ import org.json.JSONObject;
 
 public class RadioStation {
 
+    private class JsonKeys {
+        static final String name = "name";
+        static final String channelFrequency = "channelFrequency";
+        static final String genreId = "genreId";
+        static final String ensemble = "ensemble";
+    }
+
     private String name;
-    private int channelNumber;
+    private int channelFrequency;
     private int genre;
     private String ensemble;
 
-    public RadioStation(String stationName, int channelNum, int stationGenre, String stationEnsemble) {
+    public RadioStation(JSONObject stationJson) throws JSONException {
+        this(
+                stationJson.getString(JsonKeys.name),
+                stationJson.getInt(JsonKeys.channelFrequency),
+                stationJson.getInt(JsonKeys.genreId),
+                stationJson.getString(JsonKeys.ensemble)
+        );
+    }
+
+    public RadioStation(String stationName, int channelFreq, int stationGenre, String stationEnsemble) {
         name = stationName;
-        channelNumber = channelNum;
+        channelFrequency = channelFreq;
         genre = stationGenre;
         ensemble = stationEnsemble;
     }
@@ -26,8 +42,8 @@ public class RadioStation {
         return name;
     }
 
-    public int getChannelId() {
-        return channelNumber;
+    public int getChannelFrequency() {
+        return channelFrequency;
     }
 
     public int getGenreId() {
@@ -41,10 +57,10 @@ public class RadioStation {
     public String toJsonString() {
         try {
             return new JSONObject()
-                    .put("name", getName())
-                    .put("channelNumber", getChannelId())
-                    .put("genreId", getGenreId())
-                    .put("ensemble", getEnsemble())
+                    .put(JsonKeys.name, getName())
+                    .put(JsonKeys.channelFrequency, getChannelFrequency())
+                    .put(JsonKeys.genreId, getGenreId())
+                    .put(JsonKeys.ensemble, getEnsemble())
                     .toString();
         } catch (JSONException e) {
             e.printStackTrace();

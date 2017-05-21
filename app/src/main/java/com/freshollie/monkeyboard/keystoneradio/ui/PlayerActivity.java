@@ -218,7 +218,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             // Update the player with the new attributes from the station list
             if (!Arrays.equals(playerService.getDabRadioStations(), stationListAdapter.getStationList())) {
                 stationListAdapter.updateStationList(playerService.getDabRadioStations());
-                stationListAdapter.setCurrentStationIndex(playerService.getCurrentChannelIndex());
+                stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
                 stationListAdapter.refreshCurrentStation();
             }
 
@@ -262,7 +262,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         updateVolume(playerService.getPlayerVolume());
 
         stationListAdapter.updateStationList(playerService.getDabRadioStations());
-        stationListRecyclerView.scrollToPosition(playerService.getCurrentChannelIndex());
+        stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
 
         // Scrolls to the currently playing track instantly
         stationListLayoutManager.setSnapDuration(1);
@@ -504,7 +504,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                 updateCurrentChannelName(currentStation.getName());
                 updateEnsembleName(currentStation.getEnsemble());
                 updateGenreName(RadioDevice.StringValues.getGenreFromId(currentStation.getGenreId()));
-                updateStationListSelection(playerService.getCurrentChannelIndex());
+                updateStationListSelection(playerService.getCurrentDabChannelIndex());
             }
         } else {
             updateCurrentChannelName("");
@@ -643,7 +643,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     public void handleSetChannel(int channel) {
         if (playerBound) {
-            playerService.handleSetChannel(channel);
+            playerService.handleSetDabChannel(channel);
             playerService.handlePlayRequest();
         }
     }
@@ -715,6 +715,16 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     @Override
     public void onStereoStateChanged(int stereoState) {
         stereoStateTextView.setText(RadioDevice.StringValues.getStereoModeFromId(stereoState));
+    }
+
+    @Override
+    public void onSignalStrengthChanged(int signalStrength) {
+
+    }
+
+    @Override
+    public void onFmSearchFrequencyChanged(int frequency) {
+
     }
 
     @Override
@@ -892,8 +902,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             case KeyEvent.KEYCODE_ENTER:
                 if (stationListAdapter != null) {
                     if (playerBound) {
-                        int lastChannel = playerService.getCurrentChannelIndex();
-                        playerService.handleSetChannel(stationListAdapter.getCursorIndex());
+                        int lastChannel = playerService.getCurrentDabChannelIndex();
+                        playerService.handleSetDabChannel(stationListAdapter.getCursorIndex());
 
                         // Pause the channel if we have not switched channels
                         if (playerService.isPlaying() &&

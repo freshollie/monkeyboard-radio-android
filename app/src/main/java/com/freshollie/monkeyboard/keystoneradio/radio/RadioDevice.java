@@ -28,10 +28,15 @@ public class RadioDevice {
     private int lastProgramDataRate;
     private int lastPlayStatus;
     private String lastProgramText;
-    private int lastSignalQuality;
+    private int lastSignalQuality; // For DAB
     private int lastStereoState;
+    private int lastFmSignalStrength; // For FM
+    private int lastFmFrequency; // For FM
+    private String lastFmProgramName;
 
     private int pollNumber = 0;
+
+    private int currentStreamMode = 1;
 
     private int COMMAND_ATTEMPTS_TIMEOUT = 300;
 
@@ -52,6 +57,7 @@ public class RadioDevice {
         static byte CLASS_STREAM = 0x01;
         static byte STREAM_Play = 0x00;
         static byte STREAM_Stop = 0x01;
+        static byte STREAM_SEARCH = 0x02;
         static byte STREAM_AutoSearch = 0x03;
         static byte STREAM_StopSearch = 0x04;
         static byte STREAM_GetPlayStatus = 0x05;
@@ -73,19 +79,25 @@ public class RadioDevice {
     }
 
     public static class Values {
-        public static int PLAY_STATUS_PLAYING = 0;
-        public static int PLAY_STATUS_SEARCHING = 1;
-        public static int PLAY_STATUS_TUNING = 2;
-        public static int PLAY_STATUS_STREAM_STOP = 3;
+        public static final int PLAY_STATUS_PLAYING = 0;
+        public static final int PLAY_STATUS_SEARCHING = 1;
+        public static final int PLAY_STATUS_TUNING = 2;
+        public static final int PLAY_STATUS_STREAM_STOP = 3;
 
-        public static int RESET_TYPE_REBOOT = 0;
-        public static int RESET_TYPE_CLEAR_REBOOT = 1;
-        public static int RESET_TYPE_CLEAR = 2;
+        public static final int RESET_TYPE_REBOOT = 0;
+        public static final int RESET_TYPE_CLEAR_REBOOT = 1;
+        public static final int RESET_TYPE_CLEAR = 2;
 
-        public static int MAX_CHANNEL_BAND = 70; // Includes china
+        public static final int MAX_CHANNEL_BAND = 70; // Includes china
 
-        public static byte STREAM_MODE_DAB = 0x00;
-        public static byte STREAM_MODE_FM = 0x01;
+        public static final byte STREAM_MODE_DAB = 0x00;
+        public static final byte STREAM_MODE_FM = 0x01;
+
+        public static final int MAX_FM_FREQUENCY = 108000;
+        public static final int MIN_FM_FREQUENCY = 87500;
+
+        public static final int SEARCH_BACKWARDS = 0;
+        public static final int SEARCH_FORWARDS = 1;
     }
 
 
@@ -178,17 +190,17 @@ public class RadioDevice {
             public void onStart() {
                 Log.v(TAG, "Connection opened");
                 startPollLoop();
-                listenerManager.informConnectionStart();
+                listenerManager.notifyConnectionStart();
             }
 
             @Override
             public void onFail() {
-                listenerManager.informConnectionFail();
+                listenerManager.notifyConnectionFail();
             }
 
             @Override
             public void onStop() {
-                listenerManager.informConnectionStop();
+                listenerManager.notifyConnectionStop();
                 disconnect();
             }
         });
@@ -361,14 +373,16 @@ public class RadioDevice {
         }
     }
 
-    public boolean setChannel(int channelNum) {
-        return play(channelNum);
+    public boolean setChannel(int playMode, int channel) {
+        return play(playMode, channel);
     }
 
     public boolean play(int playMode, int channel) {
         if (DEBUG_OUT_COMMANDS) {
             Log.v(TAG, "play(" + playMode + ", " + channel + ")");
         }
+        currentStreamMode = playMode;
+
         byte[] channelBytes = getBytesFromInt(channel, 4);
         return call(
                 ByteValues.CLASS_STREAM,
@@ -401,6 +415,19 @@ public class RadioDevice {
                 new byte[]{
                         (byte) startBand,
                         (byte) stopBand
+                }
+        ) != null;
+    }
+
+    public boolean search(int direction) {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "search(" + direction + ")");
+        }
+        return call(
+                ByteValues.CLASS_STREAM,
+                ByteValues.STREAM_SEARCH,
+                new byte[]{
+                        (byte) direction
                 }
         ) != null;
     }
@@ -472,18 +499,17 @@ public class RadioDevice {
         }
     }
 
-    public int getProgramType(int channelId) {
+    public int getProgramType(int frequency) {
         if (DEBUG_OUT_COMMANDS) {
-            Log.v(TAG, "getProgramType(" + String.valueOf(channelId) + ")");
+            Log.v(TAG, "getProgramType(" + String.valueOf(frequency) + ")");
         }
+
+        byte[] frequencyBytes = getBytesFromInt(frequency, 4);
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
                         ByteValues.STREAM_GetProgramType,
-                        new byte[]{
-                                0,0,0,
-                                (byte) channelId
-                        }
+                        frequencyBytes
                 );
 
         if (response != null) {
@@ -493,18 +519,27 @@ public class RadioDevice {
         }
     }
 
-    public String getProgramName(int channelId, boolean abbreviated) {
+    public String getProgramName(int frequency, boolean abbreviated) {
         if (DEBUG_OUT_COMMANDS) {
-            Log.v(TAG, "getProgramName(" + String.valueOf(channelId) + ", " +
+            Log.v(TAG, "getProgramName(" + String.valueOf(frequency) + ", " +
                     ""+ String.valueOf(abbreviated) +")");
         }
+        byte[] frequencyBytes;
+        if (frequency >= Values.MIN_FM_FREQUENCY) {
+            frequencyBytes = new byte[] {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
+        } else {
+            frequencyBytes = new byte[] {0, 0, 0, (byte) frequency};
+        }
+
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
                         ByteValues.STREAM_GetProgramName,
-                        new byte[]{
-                                0,0,0,
-                                (byte) channelId,
+                        new byte[] {
+                                frequencyBytes[0],
+                                frequencyBytes[1],
+                                frequencyBytes[2],
+                                frequencyBytes[3],
                                 (byte) ((abbreviated) ? 0: 1)
                         }
                 );
@@ -527,7 +562,6 @@ public class RadioDevice {
     }
 
     public String getProgramText() {
-
         if (DEBUG_OUT_COMMANDS) {
             Log.v(TAG, "getProgramText()");
         }
@@ -849,8 +883,8 @@ public class RadioDevice {
 
     }
 
-    public void copyStationList(final CopyProgramsListener copyListener) {
-        Log.v(TAG, "copyStationList");
+    public void copyDabStationList(final CopyProgramsListener copyListener) {
+        Log.v(TAG, "copyDabStationList");
         new CopyStationsTask().execute(copyListener);
     }
 
@@ -887,7 +921,7 @@ public class RadioDevice {
     }
 
     /**
-     * Runs all of the commands needed to poll information from a dab radio.
+     * Runs all of the commands needed to poll information from a DAB/FM radio.
      *
      * @return
      */
@@ -896,7 +930,7 @@ public class RadioDevice {
             int newVolume = getVolume();
             if (newVolume != lastVolume && newVolume != -1) {
                 Log.v(TAG, "new Volume: " + newVolume);
-                listenerManager.informVolumeChanged(newVolume);
+                listenerManager.notifyVolumeChanged(newVolume);
                 lastVolume = newVolume;
             }
 
@@ -904,30 +938,59 @@ public class RadioDevice {
                 int newProgramDataRate = getProgramDataRate();
                 if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
                     Log.v(TAG, "new DataRate: " + newProgramDataRate);
-                    listenerManager.informProgramDataRateChanged(newProgramDataRate);
+                    listenerManager.notifyProgramDataRateChanged(newProgramDataRate);
                     lastProgramDataRate = newProgramDataRate;
                 }
 
                 int newStereoState = getStereo();
                 if (newStereoState != lastStereoState && newStereoState != -1) {
                     Log.v(TAG, "new NewStereoState: " + newStereoState);
-                    listenerManager.informStereoStateChanged(newStereoState);
+                    listenerManager.notifyStereoStateChanged(newStereoState);
                     lastStereoState = newStereoState;
                 }
             }
 
-            int newSignalQuality = getSignalQuality();
-            if (newSignalQuality != lastSignalQuality && newSignalQuality != -1) {
-                Log.v(TAG, "new Signal Quality: " + newSignalQuality);
-                listenerManager.informSignalQualityChanged(newSignalQuality);
-                lastSignalQuality = newSignalQuality;
+            if (currentStreamMode == Values.STREAM_MODE_DAB) {
+                int newSignalQuality = getSignalQuality();
+                if (newSignalQuality != lastSignalQuality && newSignalQuality != -1) {
+                    Log.v(TAG, "new Signal Quality: " + newSignalQuality);
+                    listenerManager.notifySignalQualityChanged(newSignalQuality);
+                    lastSignalQuality = newSignalQuality;
+                }
+
+            } else {
+                int newSignalStrength = getSignalStrength();
+                if (newSignalStrength != lastFmSignalStrength && newSignalStrength != -1) {
+                    Log.v(TAG, "new Signal strength: " + newSignalStrength);
+                    listenerManager.notifySignalStrengthChanged(newSignalStrength);
+                    lastFmSignalStrength = newSignalStrength;
+                }
+
+                String newFmProgramName = getProgramName(Values.MIN_FM_FREQUENCY, false);
+                if (newFmProgramName != lastFmProgramName && !newFmProgramName.isEmpty()) {
+                    Log.v(TAG, "new Program Name: " + newSignalStrength);
+                    listenerManager.notifySignalStrengthChanged(newSignalStrength);
+                    lastFmSignalStrength = newSignalStrength;
+                }
+
+                // We are currently searching in FM mode so show the frequency
+                if (lastPlayStatus == Values.PLAY_STATUS_SEARCHING) {
+                    int newFrequency = getPlayIndex();
+                    if (newFrequency != lastFmFrequency && newFrequency != -1) {
+                        Log.v(TAG, "new Frequency: " + newFrequency);
+                        listenerManager.notifyFmSearchFrequencyChanged(newSignalStrength);
+                        lastFmFrequency = newFrequency;
+                    }
+                }
+
             }
+
 
             String newProgramText = getProgramText();
             if (newProgramText != null) {
                 if (!newProgramText.equals(lastProgramText) && !newProgramText.isEmpty()) {
                     Log.v(TAG, "new ProgramText: " + newProgramText);
-                    listenerManager.informProgramTextChanged(newProgramText);
+                    listenerManager.notifyProgramTextChanged(newProgramText);
                     lastProgramText = newProgramText;
                 }
             }
@@ -936,7 +999,7 @@ public class RadioDevice {
 
             if (newPlayStatus != lastPlayStatus && newPlayStatus != -1) {
                 Log.v(TAG, "new PlayStatus: " + newPlayStatus);
-                listenerManager.informPlayStatusChanged(newPlayStatus);
+                listenerManager.notifyPlayStatusChanged(newPlayStatus);
                 lastPlayStatus = newPlayStatus;
             }
         } catch (Exception e) {

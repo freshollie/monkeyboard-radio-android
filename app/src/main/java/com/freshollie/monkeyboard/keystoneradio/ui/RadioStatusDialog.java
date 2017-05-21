@@ -237,7 +237,7 @@ public class RadioStatusDialog extends DialogFragment {
 
         @Override
         public void onSearchComplete(int numChannels) {
-            playerService.startStationListCopyTask();
+            playerService.startDabStationListCopyTask();
         }
 
         @Override
