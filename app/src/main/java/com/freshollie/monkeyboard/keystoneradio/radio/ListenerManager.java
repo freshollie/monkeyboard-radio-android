@@ -22,6 +22,8 @@ public class ListenerManager {
         void onProgramDataRateChanged(int dataRate);
         void onRadioVolumeChanged(int volume);
         void onStereoStateChanged(int stereoState);
+        void onSignalStrengthChanged(int signalStrength);
+        void onFmSearchFrequencyChanged(int frequency);
     }
 
     public interface ConnectionStateChangeListener {
@@ -31,42 +33,55 @@ public class ListenerManager {
     }
 
     private Handler mainHandler;
-    private ArrayList<ConnectionStateChangeListener> connectionStateChangeListeners;
-    private ArrayList<DataListener> dataListeners;
+    private final ArrayList<ConnectionStateChangeListener> connectionStateChangeListeners =
+            new ArrayList<>();
+    private final ArrayList<DataListener> dataListeners =
+            new ArrayList<>();;
 
     public ListenerManager(Handler handler) {
         mainHandler = handler;
         unregisterAll();
     }
 
-    void informConnectionStop() {
+    public void unregisterAll() {
+        connectionStateChangeListeners.clear();
+        dataListeners.clear();
+    }
+
+    void notifyConnectionStop() {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (ConnectionStateChangeListener listener : new ArrayList<>(connectionStateChangeListeners)) {
-                    listener.onStop();
+                synchronized (connectionStateChangeListeners) {
+                    for (ConnectionStateChangeListener listener : new ArrayList<>(connectionStateChangeListeners)) {
+                        listener.onStop();
+                    }
                 }
             }
         });
     }
 
-    void informConnectionFail() {
+    void notifyConnectionFail() {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (ConnectionStateChangeListener listener: new ArrayList<>(connectionStateChangeListeners)) {
-                    listener.onFail();
+                synchronized (connectionStateChangeListeners) {
+                    for (ConnectionStateChangeListener listener : new ArrayList<>(connectionStateChangeListeners)) {
+                        listener.onFail();
+                    }
                 }
             }
         });
     }
 
-    void informConnectionStart() {
+    void notifyConnectionStart() {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (ConnectionStateChangeListener listener : new ArrayList<>(connectionStateChangeListeners)) {
-                    listener.onStart();
+                synchronized (connectionStateChangeListeners) {
+                    for (ConnectionStateChangeListener listener : new ArrayList<>(connectionStateChangeListeners)) {
+                        listener.onStart();
+                    }
                 }
             }
         });
@@ -80,11 +95,6 @@ public class ListenerManager {
         connectionStateChangeListeners.remove(listener);
     }
 
-    private void unregisterAll() {
-        connectionStateChangeListeners = new ArrayList<>();
-        dataListeners = new ArrayList<>();
-    }
-
     public void registerDataListener(DataListener dataListener) {
         dataListeners.add(dataListener);
     }
@@ -93,67 +103,105 @@ public class ListenerManager {
         dataListeners.remove(dataListener);
     }
 
-    void informProgramTextChanged(final String programText){
+    void notifyProgramTextChanged(final String programText){
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
-                    dataListener.onProgramTextChanged(programText);
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onProgramTextChanged(programText);
+                    }
                 }
             }
         });
     }
 
-    void informSignalQualityChanged(final int signalStrength) {
+    void notifySignalQualityChanged(final int signalQuality) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
-                    dataListener.onSignalQualityChanged(signalStrength);
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onSignalQualityChanged(signalQuality);
+                    }
                 }
             }
         });
     }
 
-    void informPlayStatusChanged(final int playStatus) {
+    void notifySignalStrengthChanged(final int signalStrength) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
-                    dataListener.onPlayStatusChanged(playStatus);
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onSignalStrengthChanged(signalStrength);
+                    }
                 }
             }
         });
     }
 
-    void informProgramDataRateChanged(final int dataRate) {
+    void notifyPlayStatusChanged(final int playStatus) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
-                    dataListener.onProgramDataRateChanged(dataRate);
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onPlayStatusChanged(playStatus);
+                    }
                 }
             }
         });
     }
 
-    void informVolumeChanged(final int volume) {
+    void notifyFmSearchFrequencyChanged(final int frequency) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
-                    dataListener.onRadioVolumeChanged(volume);
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onFmSearchFrequencyChanged(frequency);
+                    }
                 }
             }
         });
     }
 
-    void informStereoStateChanged(final int stereoState) {
+    void notifyProgramDataRateChanged(final int dataRate) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (DataListener dataListener: new ArrayList<>(dataListeners)) {
-                    dataListener.onStereoStateChanged(stereoState);
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onProgramDataRateChanged(dataRate);
+                    }
+                }
+            }
+        });
+    }
+
+    void notifyVolumeChanged(final int volume) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onRadioVolumeChanged(volume);
+                    }
+                }
+            }
+        });
+    }
+
+    void notifyStereoStateChanged(final int stereoState) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onStereoStateChanged(stereoState);
+                    }
                 }
             }
         });
