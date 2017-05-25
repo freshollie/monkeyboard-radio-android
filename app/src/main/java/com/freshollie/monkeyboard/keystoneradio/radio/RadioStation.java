@@ -22,6 +22,10 @@ public class RadioStation {
     private int genre;
     private String ensemble;
 
+    public RadioStation() {
+        this("", -1, -1, "");
+    }
+
     public RadioStation(JSONObject stationJson) throws JSONException {
         this(
                 stationJson.getString(JsonKeys.name),
@@ -42,12 +46,24 @@ public class RadioStation {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public int getChannelFrequency() {
         return channelFrequency;
     }
 
+    public void setChannelFrequency(int channelFrequency) {
+        this.channelFrequency = channelFrequency;
+    }
+
     public int getGenreId() {
         return genre;
+    }
+
+    public void setGenreId(int genreId) {
+        this.genre = genreId;
     }
 
     public String getEnsemble() {

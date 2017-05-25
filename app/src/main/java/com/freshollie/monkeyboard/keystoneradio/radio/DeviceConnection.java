@@ -45,7 +45,7 @@ public class DeviceConnection {
     private UsbDeviceConnection usbDeviceConnection;
     private UsbSerialPort deviceSerialInterface;
 
-    private ListenerManager.ConnectionStateChangeListener connectionStateListener;
+    private RadioDeviceListenerManager.ConnectionStateChangeListener connectionStateListener;
 
     private Context context;
 
@@ -413,7 +413,7 @@ public class DeviceConnection {
         return responseBytes;
     }
 
-    public void setConnectionStateListener(ListenerManager.ConnectionStateChangeListener listener) {
+    public void setConnectionStateListener(RadioDeviceListenerManager.ConnectionStateChangeListener listener) {
         connectionStateListener = listener;
     }
 

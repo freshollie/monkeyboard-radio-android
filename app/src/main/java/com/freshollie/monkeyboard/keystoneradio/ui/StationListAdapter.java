@@ -139,7 +139,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         cursorIndex = channelIndex;
         notifyItemChanged(channelIndex);
         notifyItemChanged(lastChannel);
-        refreshCurrentStation();
+        notifyCurrentStationChanged();
     }
 
     public void setCurrentStationIndex(int channelIndex) {
@@ -150,7 +150,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         return currentStationIndex;
     }
 
-    public void refreshCurrentStation() {
+    public void notifyCurrentStationChanged() {
         Log.v("StationListAdapter", "Updating current playing station " + String.valueOf(currentStationIndex));
 
         if (currentStationIndex == lastStationIndex) {

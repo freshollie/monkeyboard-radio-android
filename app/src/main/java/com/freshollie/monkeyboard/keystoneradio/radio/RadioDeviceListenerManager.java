@@ -9,7 +9,33 @@ import java.util.ArrayList;
  *
  */
 
-public class ListenerManager {
+public class RadioDeviceListenerManager {
+
+    public void notifyFmProgramNameUpdated(final String newFmProgramName) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onFmProgramNameUpdated(newFmProgramName);
+                    }
+                }
+            }
+        });
+    }
+
+    public void notifyFmProgramTypeUpdated(final int newFmProgramType) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (dataListeners) {
+                    for (DataListener dataListener : new ArrayList<>(dataListeners)) {
+                        dataListener.onFmProgramTypeUpdated(newFmProgramType);
+                    }
+                }
+            }
+        });
+    }
 
     /**
      * Manager used to notify given listeners when attributes about the connected radio change
@@ -18,12 +44,15 @@ public class ListenerManager {
     public interface DataListener {
         void onProgramTextChanged(String programText);
         void onPlayStatusChanged(int playStatus);
-        void onSignalQualityChanged(int signalStrength);
-        void onProgramDataRateChanged(int dataRate);
+        void onDabSignalQualityChanged(int signalStrength);
+        void onDabProgramDataRateChanged(int dataRate);
         void onRadioVolumeChanged(int volume);
         void onStereoStateChanged(int stereoState);
-        void onSignalStrengthChanged(int signalStrength);
+
+        void onFmSignalStrengthChanged(int signalStrength);
         void onFmSearchFrequencyChanged(int frequency);
+        void onFmProgramNameUpdated(String newFmProgramName);
+        void onFmProgramTypeUpdated(int newFmProgramType);
     }
 
     public interface ConnectionStateChangeListener {
@@ -38,7 +67,7 @@ public class ListenerManager {
     private final ArrayList<DataListener> dataListeners =
             new ArrayList<>();;
 
-    public ListenerManager(Handler handler) {
+    public RadioDeviceListenerManager(Handler handler) {
         mainHandler = handler;
         unregisterAll();
     }
@@ -116,26 +145,26 @@ public class ListenerManager {
         });
     }
 
-    void notifySignalQualityChanged(final int signalQuality) {
+    void notifyDabSignalQualityChanged(final int signalQuality) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
                 synchronized (dataListeners) {
                     for (DataListener dataListener : new ArrayList<>(dataListeners)) {
-                        dataListener.onSignalQualityChanged(signalQuality);
+                        dataListener.onDabSignalQualityChanged(signalQuality);
                     }
                 }
             }
         });
     }
 
-    void notifySignalStrengthChanged(final int signalStrength) {
+    void notifyFmSignalStrengthChanged(final int signalStrength) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
                 synchronized (dataListeners) {
                     for (DataListener dataListener : new ArrayList<>(dataListeners)) {
-                        dataListener.onSignalStrengthChanged(signalStrength);
+                        dataListener.onFmSignalStrengthChanged(signalStrength);
                     }
                 }
             }
@@ -168,13 +197,13 @@ public class ListenerManager {
         });
     }
 
-    void notifyProgramDataRateChanged(final int dataRate) {
+    void notifyDabProgramDataRateChanged(final int dataRate) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
                 synchronized (dataListeners) {
                     for (DataListener dataListener : new ArrayList<>(dataListeners)) {
-                        dataListener.onProgramDataRateChanged(dataRate);
+                        dataListener.onDabProgramDataRateChanged(dataRate);
                     }
                 }
             }
