@@ -72,6 +72,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private Runnable queuedAction;
 
+    private int radioMode;
+    private boolean playGranted;
+
     private SettingsVolumeObserver settingsVolumeObserver;
 
     private boolean controllerInput = false;
@@ -82,8 +85,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private boolean ducked = false;
 
     public static int MAX_PLAYER_VOLUME = 15;
+    private boolean actionComplete;
 
-    private int radioMode;
 
     private enum AudioFocus {
         NoFocusNoDuck,    // we don't have audio focus, and can't duck
@@ -283,7 +286,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         // Update info of the current session
         updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
-        updateDabMetadata(new RadioStation("", -1, -1, ""));
+        updateMetadata(new RadioStation("", -1, -1, ""));
 
         // Connect to the radio API
         radio = new RadioDevice(getApplicationContext());
@@ -723,72 +726,80 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return ducked;
     }
 
-    private void handleAction(Runnable action) {
+    private void handleAction(final Runnable action) {
+        Runnable newRunnable = new Runnable() {
+            @Override
+            public void run() {
+                action.run();
+                actionComplete = true;
+            }
+        };
+
+        actionComplete = false;
+
         if (radio.isConnected()) {
-            new Thread(action).start();
+            new Thread(newRunnable).start();
         } else {
+            actionComplete = true;
             queuedAction = action;
             openConnection();
         }
     }
 
-    private boolean setFmFrequencyAction(int frequency) {
-        Log.v(TAG, "Requesting board to play: " + frequency);
-        if (radio.play(getRadioMode(), frequency)) {
-            setCurrentFmChannelFrequency(frequency);
-            Log.v(TAG, "Approved, updating meta");
-            updateDabMetadata(new RadioStation(String.valueOf(frequency), -1, -1, ""));
-            return true;
-        }
-        return false;
+    private boolean isActionComplete() {
+        return actionComplete;
     }
 
-    private boolean setDabChannelAction(int channelIndex) {
+    private void setFmFrequencyAction(int frequency) {
+        Log.v(TAG, "Requesting board to play: " + frequency);
+        if (radio.play(getRadioMode(), frequency)) {
+            Log.v(TAG, "Approved, updating meta");
+            playGranted = true;
+        } else {
+            playGranted = false;
+        }
+    }
+
+    private void setDabChannelAction(int channelIndex) {
         if (getDabRadioStations().length > 0) {
             Log.v(TAG, "Requesting board to play: " + getCurrentStation().getName());
             if (radio.play(getRadioMode(), getStationFromIndex(channelIndex).getChannelFrequency())) {
-                setCurrentDabChannelIndex(channelIndex);
                 Log.v(TAG, "Approved, updating meta");
-                updateDabMetadata(getCurrentStation());
-                return true;
+                updateMetadata(getCurrentStation());
+                playGranted = true;
+                return;
             }
         }
-        return false;
+        playGranted = false;
     }
 
-    public boolean handleSetDabChannelRequest(final int channelIndex) {
-        if (radio.isConnected()) {
-            return setDabChannelAction(channelIndex);
-        } else {
-            queuedAction = new Runnable() {
+    public void handleSetDabChannelRequest(final int channelIndex) {
+        setCurrentDabChannelIndex(channelIndex);
+        handleAction(new Runnable() {
                 @Override
                 public void run() {
                     setDabChannelAction(channelIndex);
                 }
-            };
-            openConnection();
-            return false;
-        }
+        });
     }
 
-    public boolean handleSetFmFrequencyRequest(final int frequency) {
+    public void handleSetFmFrequencyRequest(final int frequency) {
+        setCurrentFmChannelFrequency(frequency);
         currentFmRadioStation = new RadioStation();
         currentFmRadioStation.setName(String.valueOf(frequency));
         currentFmRadioStation.setChannelFrequency(frequency);
-        updateDabMetadata(currentFmRadioStation);
+        updateMetadata(currentFmRadioStation);
 
-        if (radio.isConnected()) {
-            return setFmFrequencyAction(frequency);
-        } else {
-            queuedAction = new Runnable() {
-                @Override
-                public void run() {
-                    setFmFrequencyAction(frequency);
-                }
-            };
-            openConnection();
-            return false;
-        }
+        handleAction(new Runnable() {
+            @Override
+            public void run() {
+                setFmFrequencyAction(frequency);
+            }
+        });
+    }
+
+    private boolean playWasGranted() {
+        return playGranted;
     }
 
     public void handlePlayRequest() {
@@ -814,15 +825,16 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                             }
 
                             if (hasFocus()) {
-                                boolean granted;
                                 if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                                    granted = handleSetDabChannelRequest(currentDabChannelIndex);
+                                    handleSetDabChannelRequest(currentDabChannelIndex);
 
                                 } else {
-                                    granted = handleSetFmFrequencyRequest(currentFmFrequency);
+                                    handleSetFmFrequencyRequest(currentFmFrequency);
                                 }
 
-                                if (granted) {
+                                while (!isActionComplete()){}
+
+                                if (playWasGranted()) {
                                     Log.v(TAG, "Updating playstate");
                                     handleUnmuteRequest();
                                     updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
@@ -882,7 +894,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         // is executed until the volume is confirmed lowered
 
         //noinspection StatementWithEmptyBody
-        while (!radio.setVolume(0) && radio.isConnected());
+        while (!radio.setVolume(0) && radio.isConnected()){}
+
         if (radio.isConnected() && radio.getPlayMode() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
             Log.v(TAG, "" + radio.getPlayMode());
             radio.stopSearch();
@@ -992,7 +1005,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     }
 
-    private void updateDabMetadata(RadioStation station) {
+    private void updateMetadata(RadioStation station) {
         if (mediaSession != null) {
             if (getMediaController().getMetadata() != null) {
                 if (getMediaController()
@@ -1234,7 +1247,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             setCurrentFmChannelFrequency(frequency);
             currentFmRadioStation.setName(String.valueOf(frequency));
             currentFmRadioStation.setChannelFrequency(frequency);
-            updateDabMetadata(currentFmRadioStation);
+            updateMetadata(currentFmRadioStation);
         }
 
         @Override
@@ -1246,7 +1259,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             }
 
             currentFmRadioStation.setName(newFmProgramName);
-            updateDabMetadata(currentFmRadioStation);
+            updateMetadata(currentFmRadioStation);
         }
 
         @Override
@@ -1258,7 +1271,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             }
 
             currentFmRadioStation.setChannelFrequency(newFmProgramType);
-            updateDabMetadata(currentFmRadioStation);
+            updateMetadata(currentFmRadioStation);
         }
     };
 
