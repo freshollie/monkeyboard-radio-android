@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -21,24 +22,26 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
-import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 import java.util.Arrays;
 
-public class PlayerActivity extends AppCompatActivity implements ListenerManager.DataListener,
+public class PlayerActivity extends AppCompatActivity implements RadioDeviceListenerManager.DataListener,
         RadioPlayerService.PlayerCallback {
     private String TAG = this.getClass().getSimpleName();
 
-    public static final String ACTION_SEND_KEYEVENT =
+    public static final String HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT =
             "com.freshollie.headunitcontroller.action.SEND_KEYEVENT";
 
     private RadioPlayerService playerService;
@@ -52,7 +55,12 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private ImageButton volumeButton;
     private ImageButton settingsButton;
 
+    private Switch modeSwitch;
+
     private SeekBar volumeSeekBar;
+
+    private SeekBar fmSeekbar;
+
 
     private TextView currentChannelView;
     private TextView programTextTextView;
@@ -86,7 +94,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     private BroadcastReceiver controlInputReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ACTION_SEND_KEYEVENT)) {
+            if (intent.getAction().equals(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT)) {
                 if (intent.hasExtra("keyCode") && preferenceControllerInput) {
                     handleKeyDown(intent.getIntExtra("keyCode", -1));
                 }
@@ -157,7 +165,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
         setContentView(R.layout.activity_player);
 
-        sharedPreferences = getSharedPreferences(getString(R.string.SHARED_PREFERENCES_KEY), Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
         preferenceControllerInput = sharedPreferences.getBoolean(
                 getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
@@ -208,7 +216,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     public void onResume() {
         super.onResume();
         Log.v(TAG, "On Resume");
-        registerReceiver(controlInputReceiver, new IntentFilter(ACTION_SEND_KEYEVENT));
+        registerReceiver(controlInputReceiver, new IntentFilter(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT));
 
         // Update the player attributes from the service
         if (playerBound) {
@@ -216,20 +224,20 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
             updateVolume(playerService.getPlayerVolume());
 
             // Update the player with the new attributes from the station list
-            if (!Arrays.equals(playerService.getDabRadioStations(), stationListAdapter.getStationList())) {
+            if (!Arrays.equals(playerService.getDabRadioStations(),
+                    stationListAdapter.getStationList()) &&
+                    playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
                 stationListAdapter.updateStationList(playerService.getDabRadioStations());
                 stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
-                stationListAdapter.refreshCurrentStation();
+                stationListAdapter.notifyCurrentStationChanged();
             }
 
             // Re-Register the callback
             playerService.registerCallback(this);
 
-
             if (preferencePlayOnOpen) {
                 playerService.handlePlayRequest();
             }
-
         } else {
             bindPlayerService();
         }
@@ -292,6 +300,52 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     }
 
     public void setupPlaybackControls() {
+        modeSwitch = (Switch) findViewById(R.id.mode_switch);
+
+        modeSwitch.setChecked(!sharedPreferences.getBoolean(
+                getString(R.string.RADIO_MODE_KEY), true)
+        );
+
+        modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                sharedPreferences.edit()
+                        .putBoolean(getString(R.string.RADIO_MODE_KEY), !b)
+                        .apply();
+                if (playerBound) {
+                    playerService.handleSetRadioMode(
+                            !b ?
+                                    RadioDevice.Values.STREAM_MODE_DAB:
+                                    RadioDevice.Values.STREAM_MODE_FM
+                    );
+                    onRadioModeChanged(playerService.getRadioMode());
+                }
+            }
+        });
+        fmSeekbar = (SeekBar) findViewById(R.id.fm_seek_bar);
+        fmSeekbar.setMax(RadioDevice.Values.MAX_FM_FREQUENCY - RadioDevice.Values.MIN_FM_FREQUENCY);
+        fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+        fmSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
+                Log.v(TAG, ""+ i + RadioDevice.Values.MIN_FM_FREQUENCY);
+                if (playerBound && fromUser) {
+                    playerService.handleSetFmFrequencyRequest(i + RadioDevice.Values.MIN_FM_FREQUENCY);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        fmSeekbar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.INVISIBLE);
+
         nextButton = (ImageButton) findViewById(R.id.skip_next_button);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -390,6 +444,16 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         }
     }
 
+    public void onRadioModeChanged(int mode) {
+        if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
+            fmSeekbar.setVisibility(View.INVISIBLE);
+        } else {
+            fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+        }
+
+        clearPlayerAttributes();
+    }
+
     public void onOpenVolumeSeekBar() {
         volumeSeekBar.setVisibility(View.VISIBLE);
         volumeText.setVisibility(View.VISIBLE);
@@ -480,7 +544,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                     savedInstanceState.getString(String.valueOf(R.id.volume_text))
             );
 
-            onSignalQualityChanged(savedInstanceState.getInt(String.valueOf(R.id.signal_strength)));
+            onDabSignalQualityChanged(savedInstanceState.getInt(String.valueOf(R.id.signal_strength)));
         }
     }
 
@@ -488,8 +552,8 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
         signalStrengthView.setText("");
         programTextTextView.setText("");
         stereoStateTextView.setText("");
-        onProgramDataRateChanged(0);
-        onSignalQualityChanged(0);
+        onDabProgramDataRateChanged(0);
+        onDabSignalQualityChanged(0);
         onPlayStatusChanged(RadioDevice.Values.PLAY_STATUS_STREAM_STOP);
         genreTextView.setText("");
         ensembleTextView.setText("");
@@ -505,12 +569,19 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                 updateEnsembleName(currentStation.getEnsemble());
                 updateGenreName(RadioDevice.StringValues.getGenreFromId(currentStation.getGenreId()));
                 updateStationListSelection(playerService.getCurrentDabChannelIndex());
+
+                if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
+                    fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+                }
             }
         } else {
             updateCurrentChannelName("");
             updateEnsembleName("");
             updateGenreName("");
             updateStationListSelection(0);
+            if (fmSeekbar != null) {
+                fmSeekbar.setProgress(0);
+            }
         }
 
         if (clearProgramText) {
@@ -519,8 +590,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     }
 
     public void updatePlayerFromMetadata() {
-        updatePlayerFromMetadata(false);
-        programTextTextView.setText("");
+        updatePlayerFromMetadata(true);
     }
 
     public void updatePlayIcon(int playState) {
@@ -578,7 +648,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                             stationListRecyclerView.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    stationListAdapter.refreshCurrentStation();
+                                    stationListAdapter.notifyCurrentStationChanged();
                                 }
                             });
                             stationListRecyclerView.removeOnScrollListener(this);
@@ -643,7 +713,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
 
     public void handleSetChannel(int channel) {
         if (playerBound) {
-            playerService.handleSetDabChannel(channel);
+            playerService.handleSetDabChannelRequest(channel);
             playerService.handlePlayRequest();
         }
     }
@@ -688,7 +758,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     }
 
     @Override
-    public void onSignalQualityChanged(int signalStrength) {
+    public void onDabSignalQualityChanged(int signalStrength) {
         signalStrengthView.setText(String.valueOf(signalStrength) + "%");
 
         int iconResId;
@@ -708,7 +778,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     }
 
     @Override
-    public void onProgramDataRateChanged(int dataRate) {
+    public void onDabProgramDataRateChanged(int dataRate) {
         dataRateTextView.setText(getString(R.string.program_datarate_placeholder, dataRate));
     }
 
@@ -718,12 +788,22 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
     }
 
     @Override
-    public void onSignalStrengthChanged(int signalStrength) {
-
+    public void onFmSignalStrengthChanged(int signalStrength) {
+        onDabSignalQualityChanged(signalStrength);
     }
 
     @Override
     public void onFmSearchFrequencyChanged(int frequency) {
+
+    }
+
+    @Override
+    public void onFmProgramNameUpdated(String newFmProgramName) {
+
+    }
+
+    @Override
+    public void onFmProgramTypeUpdated(int newFmProgramType) {
 
     }
 
@@ -903,7 +983,7 @@ public class PlayerActivity extends AppCompatActivity implements ListenerManager
                 if (stationListAdapter != null) {
                     if (playerBound) {
                         int lastChannel = playerService.getCurrentDabChannelIndex();
-                        playerService.handleSetDabChannel(stationListAdapter.getCursorIndex());
+                        playerService.handleSetDabChannelRequest(stationListAdapter.getCursorIndex());
 
                         // Pause the channel if we have not switched channels
                         if (playerService.isPlaying() &&

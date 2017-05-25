@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
-import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
@@ -280,8 +280,8 @@ public class RadioStatusDialog extends DialogFragment {
         }
     };
 
-    private ListenerManager.ConnectionStateChangeListener connectionStateChangeListener =
-            new ListenerManager.ConnectionStateChangeListener() {
+    private RadioDeviceListenerManager.ConnectionStateChangeListener connectionStateChangeListener =
+            new RadioDeviceListenerManager.ConnectionStateChangeListener() {
         @Override
         public void onStart() {
             setState(State.Searching);

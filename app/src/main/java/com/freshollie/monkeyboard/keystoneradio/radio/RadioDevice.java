@@ -33,10 +33,9 @@ public class RadioDevice {
     private int lastFmSignalStrength; // For FM
     private int lastFmFrequency; // For FM
     private String lastFmProgramName;
+    private int lastFmProgramType;
 
     private int pollNumber = 0;
-
-    private int currentStreamMode = 1;
 
     private int COMMAND_ATTEMPTS_TIMEOUT = 300;
 
@@ -61,6 +60,7 @@ public class RadioDevice {
         static byte STREAM_AutoSearch = 0x03;
         static byte STREAM_StopSearch = 0x04;
         static byte STREAM_GetPlayStatus = 0x05;
+        static byte STREAM_GetPlayMode = 0x06;
         static byte STREAM_GetPlayIndex = 0x07;
         static byte STREAM_GetSignalStrength = 0x08;
         static byte STREAM_SetStereoMode = 0x09;
@@ -148,7 +148,7 @@ public class RadioDevice {
     private DeviceConnection connection;
     private Context context;
 
-    private ListenerManager listenerManager;
+    private RadioDeviceListenerManager listenerManager;
 
     private Runnable pollLoop = new Runnable() {
         @Override
@@ -168,7 +168,7 @@ public class RadioDevice {
     public RadioDevice(Context serviceContext) {
         context = serviceContext;
         connection = new DeviceConnection(serviceContext);
-        listenerManager = new ListenerManager(new Handler(serviceContext.getMainLooper()));
+        listenerManager = new RadioDeviceListenerManager(new Handler(serviceContext.getMainLooper()));
 
         StringValues.genres =
                 context.getResources().getStringArray(R.array.STATION_GENRES);
@@ -179,13 +179,13 @@ public class RadioDevice {
 
     }
 
-    public ListenerManager getListenerManager() {
+    public RadioDeviceListenerManager getListenerManager() {
         return listenerManager;
     }
 
     public void connect() {
         Log.v(TAG, "Connecting");
-        connection.setConnectionStateListener(new ListenerManager.ConnectionStateChangeListener() {
+        connection.setConnectionStateListener(new RadioDeviceListenerManager.ConnectionStateChangeListener() {
             @Override
             public void onStart() {
                 Log.v(TAG, "Connection opened");
@@ -381,7 +381,6 @@ public class RadioDevice {
         if (DEBUG_OUT_COMMANDS) {
             Log.v(TAG, "play(" + playMode + ", " + channel + ")");
         }
-        currentStreamMode = playMode;
 
         byte[] channelBytes = getBytesFromInt(channel, 4);
         return call(
@@ -395,6 +394,24 @@ public class RadioDevice {
                         channelBytes[3]
                 }
         ) != null;
+    }
+
+    public int getPlayMode() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getPlayMode()");
+        }
+        byte[] response =
+                call(
+                        ByteValues.CLASS_STREAM,
+                        ByteValues.STREAM_GetPlayMode,
+                        new byte[]{}
+                );
+
+        if (response != null) {
+            return response[6];
+        } else {
+            return -1;
+        }
     }
 
     public boolean stop() {
@@ -468,7 +485,7 @@ public class RadioDevice {
                 );
 
         if (response != null) {
-            return response[9];
+            return getIntFromBytes(Arrays.copyOfRange(response, 6, 10));
         } else {
             return -1;
         }
@@ -504,7 +521,13 @@ public class RadioDevice {
             Log.v(TAG, "getProgramType(" + String.valueOf(frequency) + ")");
         }
 
-        byte[] frequencyBytes = getBytesFromInt(frequency, 4);
+        byte[] frequencyBytes;
+        if (frequency >= Values.MIN_FM_FREQUENCY) {
+            frequencyBytes = new byte[] {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
+        } else {
+            frequencyBytes = new byte[] {0, 0, 0, (byte) frequency};
+        }
+
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -624,13 +647,20 @@ public class RadioDevice {
     }
 
     public int getSignalStrength() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getSignalStrength()");
+        }
+
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
                         ByteValues.STREAM_GetSignalStrength,
                         new byte[]{}
                 );
-        Log.v(TAG, Arrays.toString(response));
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, Arrays.toString(response));
+        }
+
         if (response != null) {
             return response[6];
         } else {
@@ -927,6 +957,8 @@ public class RadioDevice {
      */
     private boolean poll() {
         try {
+            int currentStreamMode = getPlayMode();
+
             int newVolume = getVolume();
             if (newVolume != lastVolume && newVolume != -1) {
                 Log.v(TAG, "new Volume: " + newVolume);
@@ -934,12 +966,22 @@ public class RadioDevice {
                 lastVolume = newVolume;
             }
 
-            if (pollNumber % 20 == 0) { // Only poll this every 20 polls
-                int newProgramDataRate = getProgramDataRate();
-                if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
-                    Log.v(TAG, "new DataRate: " + newProgramDataRate);
-                    listenerManager.notifyProgramDataRateChanged(newProgramDataRate);
-                    lastProgramDataRate = newProgramDataRate;
+            // Only poll this every 20 polls
+            if (pollNumber % 20 == 0) {
+                if (currentStreamMode == Values.STREAM_MODE_DAB) {
+                    int newProgramDataRate = getProgramDataRate();
+                    if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
+                        Log.v(TAG, "new DataRate: " + newProgramDataRate);
+                        listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
+                        lastProgramDataRate = newProgramDataRate;
+                    }
+
+                    int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
+                    if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
+                        Log.v(TAG, "new Program Type: " + newFmProgramType);
+                        listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
+                        lastFmProgramType = newFmProgramType;
+                    }
                 }
 
                 int newStereoState = getStereo();
@@ -954,34 +996,42 @@ public class RadioDevice {
                 int newSignalQuality = getSignalQuality();
                 if (newSignalQuality != lastSignalQuality && newSignalQuality != -1) {
                     Log.v(TAG, "new Signal Quality: " + newSignalQuality);
-                    listenerManager.notifySignalQualityChanged(newSignalQuality);
+                    listenerManager.notifyDabSignalQualityChanged(newSignalQuality);
                     lastSignalQuality = newSignalQuality;
                 }
 
             } else {
+                // We only need to search this stuff for FM
+
                 int newSignalStrength = getSignalStrength();
                 if (newSignalStrength != lastFmSignalStrength && newSignalStrength != -1) {
                     Log.v(TAG, "new Signal strength: " + newSignalStrength);
-                    listenerManager.notifySignalStrengthChanged(newSignalStrength);
+                    listenerManager.notifyFmSignalStrengthChanged(newSignalStrength);
                     lastFmSignalStrength = newSignalStrength;
                 }
 
                 String newFmProgramName = getProgramName(Values.MIN_FM_FREQUENCY, false);
-                if (newFmProgramName != lastFmProgramName && !newFmProgramName.isEmpty()) {
-                    Log.v(TAG, "new Program Name: " + newSignalStrength);
-                    listenerManager.notifySignalStrengthChanged(newSignalStrength);
-                    lastFmSignalStrength = newSignalStrength;
+                if (newFmProgramName != null &&
+                        !newFmProgramName.equals(lastFmProgramName) &&
+                        !newFmProgramName.isEmpty()) {
+                    Log.v(TAG, "new Program Name: " + newFmProgramName);
+                    listenerManager.notifyFmProgramNameUpdated(newFmProgramName);
+                    lastFmProgramName = newFmProgramName;
                 }
+
 
                 // We are currently searching in FM mode so show the frequency
                 if (lastPlayStatus == Values.PLAY_STATUS_SEARCHING) {
-                    int newFrequency = getPlayIndex();
-                    if (newFrequency != lastFmFrequency && newFrequency != -1) {
-                        Log.v(TAG, "new Frequency: " + newFrequency);
-                        listenerManager.notifyFmSearchFrequencyChanged(newSignalStrength);
-                        lastFmFrequency = newFrequency;
+                    int newSearchFrequency = getPlayIndex();
+                    if (newSearchFrequency != lastFmFrequency && newSearchFrequency != -1) {
+                        Log.v(TAG, "new Frequency: " + newSearchFrequency);
+                        listenerManager.notifyFmSearchFrequencyChanged(newSearchFrequency);
+                        lastFmFrequency = newSearchFrequency;
                     }
                 }
+
+
+
 
             }
 

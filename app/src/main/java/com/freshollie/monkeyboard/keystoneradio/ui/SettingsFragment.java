@@ -14,6 +14,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -55,11 +56,7 @@ public class SettingsFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getActivity()
-                .getSharedPreferences(
-                        getActivity().getString(R.string.SHARED_PREFERENCES_KEY),
-                        Context.MODE_PRIVATE
-                );
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);

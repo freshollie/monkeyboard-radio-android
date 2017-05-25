@@ -138,6 +138,7 @@ public class RadioPlayerNotification {
                     buildNotification()
             );
         } else {
+            playerService.stopForeground(false);
             notificationManager.notify(
                     NOTIFICATION_ID,
                     buildNotification()
