@@ -59,8 +59,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     private SeekBar volumeSeekBar;
 
-    private SeekBar fmSeekbar;
+    private SeekBar fmSeekBar;
 
+    private boolean userChangingFmFrequency = false;
 
     private TextView currentChannelView;
     private TextView programTextTextView;
@@ -216,7 +217,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onResume() {
         super.onResume();
         Log.v(TAG, "On Resume");
-        registerReceiver(controlInputReceiver, new IntentFilter(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT));
+        registerReceiver(controlInputReceiver,
+                new IntentFilter(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT));
+
+        userChangingFmFrequency = false;
 
         // Update the player attributes from the service
         if (playerBound) {
@@ -280,7 +284,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
         stationListRecyclerView.getItemAnimator().setAddDuration(100);
 
-        updatePlayerFromMetadata(!isRestartedInstance);
+        updatePlayerAttributesFromMetadata(!isRestartedInstance);
 
         if (preferencePlayOnOpen) {
             playerService.handlePlayRequest();
@@ -321,10 +325,12 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 }
             }
         });
-        fmSeekbar = (SeekBar) findViewById(R.id.fm_seek_bar);
-        fmSeekbar.setMax(RadioDevice.Values.MAX_FM_FREQUENCY - RadioDevice.Values.MIN_FM_FREQUENCY);
-        fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
-        fmSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+        fmSeekBar = (SeekBar) findViewById(R.id.fm_seek_bar);
+        fmSeekBar.setMax(RadioDevice.Values.MAX_FM_FREQUENCY - RadioDevice.Values.MIN_FM_FREQUENCY);
+        fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+
+        fmSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
                 Log.v(TAG, ""+ i + RadioDevice.Values.MIN_FM_FREQUENCY);
@@ -335,15 +341,15 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                userChangingFmFrequency = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                userChangingFmFrequency = false;
             }
         });
-        fmSeekbar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.INVISIBLE);
+        fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.INVISIBLE);
 
         nextButton = (ImageButton) findViewById(R.id.skip_next_button);
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -445,18 +451,18 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void onRadioModeChanged(int mode) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
-            fmSeekbar.setVisibility(View.INVISIBLE);
+            fmSeekBar.setVisibility(View.INVISIBLE);
             stationListAdapter.updateStationList(playerService.getDabRadioStations());
             stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
         } else {
-            fmSeekbar.setVisibility(View.VISIBLE);
+            fmSeekBar.setVisibility(View.VISIBLE);
             if (selectChannelScrollRunnable != null) {
                 stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
             }
             stationListAdapter.updateStationList(playerService.getFmRadioStations());
             stationListAdapter.setCurrentStationIndex(-1);
             stationListAdapter.notifyCurrentStationChanged();
-            fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+            fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
         }
         clearPlayerAttributes();
     }
@@ -565,10 +571,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         genreTextView.setText("");
         ensembleTextView.setText("");
         currentChannelView.setText("");
-        updatePlayerFromMetadata();
+        updatePlayerAttributesFromMetadata();
     }
 
-    public void updatePlayerFromMetadata(boolean clearProgramText) {
+    public void updatePlayerAttributesFromMetadata(boolean clearProgramText) {
         if (playerBound) {
             RadioStation currentStation = playerService.getCurrentStation();
             if (currentStation != null) {
@@ -581,15 +587,17 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 }
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
-                    fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+                    if (!userChangingFmFrequency) {
+                        fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+                    }
                 }
             }
         } else {
             updateCurrentChannelName("");
             updateEnsembleName("");
             updateGenreName("");
-            if (fmSeekbar != null) {
-                fmSeekbar.setProgress(0);
+            if (fmSeekBar != null) {
+                fmSeekBar.setProgress(0);
             }
         }
 
@@ -598,8 +606,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
     }
 
-    public void updatePlayerFromMetadata() {
-        updatePlayerFromMetadata(true);
+    public void updatePlayerAttributesFromMetadata() {
+        updatePlayerAttributesFromMetadata(true);
     }
 
     public void updatePlayIcon(int playState) {
@@ -983,7 +991,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
-            updatePlayerFromMetadata();
+            updatePlayerAttributesFromMetadata();
         }
 
         @Override
