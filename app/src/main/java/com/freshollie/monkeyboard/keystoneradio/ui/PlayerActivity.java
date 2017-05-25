@@ -269,8 +269,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         updateVolume(playerService.getPlayerVolume());
 
-        stationListAdapter.updateStationList(playerService.getDabRadioStations());
-        stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
+        onRadioModeChanged(playerService.getRadioMode());
 
         // Scrolls to the currently playing track instantly
         stationListLayoutManager.setSnapDuration(1);
@@ -447,10 +446,18 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onRadioModeChanged(int mode) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
             fmSeekbar.setVisibility(View.INVISIBLE);
+            stationListAdapter.updateStationList(playerService.getDabRadioStations());
+            stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
         } else {
+            fmSeekbar.setVisibility(View.VISIBLE);
+            if (selectChannelScrollRunnable != null) {
+                stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
+            }
+            stationListAdapter.updateStationList(playerService.getFmRadioStations());
+            stationListAdapter.setCurrentStationIndex(-1);
+            stationListAdapter.notifyCurrentStationChanged();
             fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
         }
-
         clearPlayerAttributes();
     }
 
@@ -568,7 +575,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 updateCurrentChannelName(currentStation.getName());
                 updateEnsembleName(currentStation.getEnsemble());
                 updateGenreName(RadioDevice.StringValues.getGenreFromId(currentStation.getGenreId()));
-                updateStationListSelection(playerService.getCurrentDabChannelIndex());
+
+                if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+                    updateStationListSelection(playerService.getCurrentDabChannelIndex());
+                }
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
                     fmSeekbar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
@@ -578,7 +588,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             updateCurrentChannelName("");
             updateEnsembleName("");
             updateGenreName("");
-            updateStationListSelection(0);
             if (fmSeekbar != null) {
                 fmSeekbar.setProgress(0);
             }
@@ -655,9 +664,15 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                         }
                     }
                 });
-                stationListRecyclerView.smoothScrollToPosition(
-                        stationListAdapter.getCurrentStationIndex()
-                );
+
+                if (playerBound &&
+                        playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB &&
+                        stationListAdapter.getCurrentStationIndex() < stationListAdapter.getItemCount()
+                        ) {
+                    stationListRecyclerView.smoothScrollToPosition(
+                            stationListAdapter.getCurrentStationIndex()
+                    );
+                }
             }
         };
 
