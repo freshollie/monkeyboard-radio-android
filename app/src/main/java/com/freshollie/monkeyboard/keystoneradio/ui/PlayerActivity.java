@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -60,6 +61,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private SeekBar volumeSeekBar;
 
     private SeekBar fmSeekBar;
+
+    private FloatingActionButton addChannelFab;
 
     private boolean userChangingFmFrequency = false;
 
@@ -303,6 +306,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void setupPlaybackControls() {
+        addChannelFab = (FloatingActionButton) findViewById(R.id.add_channel_fab);
+
         modeSwitch = (Switch) findViewById(R.id.mode_switch);
 
         modeSwitch.setChecked(!sharedPreferences.getBoolean(
@@ -349,7 +354,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 userChangingFmFrequency = false;
             }
         });
+
         fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.INVISIBLE);
+        addChannelFab.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
 
         nextButton = (ImageButton) findViewById(R.id.skip_next_button);
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -452,6 +459,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onRadioModeChanged(int mode) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
             fmSeekBar.setVisibility(View.INVISIBLE);
+            addChannelFab.hide();
             stationListAdapter.updateStationList(playerService.getDabRadioStations());
             stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
         } else {
@@ -459,6 +467,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             if (selectChannelScrollRunnable != null) {
                 stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
             }
+            addChannelFab.show();
+            stationListRecyclerView.stopScroll();
             stationListAdapter.updateStationList(playerService.getFmRadioStations());
             stationListAdapter.setCurrentStationIndex(-1);
             stationListAdapter.notifyCurrentStationChanged();
@@ -571,7 +581,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         genreTextView.setText("");
         ensembleTextView.setText("");
         currentChannelView.setText("");
-        updatePlayerAttributesFromMetadata();
+        //updatePlayerAttributesFromMetadata();
     }
 
     public void updatePlayerAttributesFromMetadata(boolean clearProgramText) {
