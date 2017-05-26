@@ -759,6 +759,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private boolean updateBoardFmFrequencyAction() {
         Log.v(TAG, "Requesting board to play: " + currentFmFrequency);
+        if (radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
+            radio.stopSearch();
+        }
         if (radio.play(getRadioMode(), currentFmFrequency)) {
             Log.v(TAG, "Approved, updating meta");
             currentFmRadioStation = new RadioStation();
@@ -905,8 +908,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         //noinspection StatementWithEmptyBody
         while (!radio.setVolume(0) && radio.isConnected()){}
 
-        if (radio.isConnected() && radio.getPlayMode() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
-            Log.v(TAG, "" + radio.getPlayMode());
+        if (radio.isConnected() && radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
             radio.stopSearch();
         }
         updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
@@ -1216,6 +1218,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
     }
 
+    private boolean searchPauseState = false;
+
     private RadioDeviceListenerManager.DataListener dataListener =
             new RadioDeviceListenerManager.DataListener() {
         @Override
@@ -1225,12 +1229,18 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         @Override
         public void onPlayStatusChanged(int playStatus) {
-            if (playStatus == RadioDevice.Values.PLAY_STATUS_SEARCHING &&
-                    isPlaying()) {
-                updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
-            } else {
-                if (!isPlaying() && playStatus != RadioDevice.Values.PLAY_STATUS_STREAM_STOP) {
-                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
+            if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
+                if (playStatus == RadioDevice.Values.PLAY_STATUS_SEARCHING &&
+                        isPlaying()) {
+                    searchPauseState = true;
+                    updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
+                } else {
+                    if (!isPlaying() && playStatus != RadioDevice.Values.PLAY_STATUS_STREAM_STOP &&
+                            playStatus != RadioDevice.Values.PLAY_STATUS_SEARCHING &&
+                            searchPauseState) {
+                        searchPauseState = false;
+                        updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                    }
                 }
             }
         }
