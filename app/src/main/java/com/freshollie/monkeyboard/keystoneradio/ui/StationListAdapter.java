@@ -23,6 +23,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     private int cursorIndex = 0;
     private int currentStationIndex = 0;
     private int lastStationIndex = 0;
+    private int lastCursorIndex;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -135,11 +136,14 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     public void setCursorIndex(int channelIndex) {
         Log.v("StationListAdapter", "Setting new cursorPosition " + String.valueOf(channelIndex));
-        int lastChannel = cursorIndex;
         cursorIndex = channelIndex;
-        notifyItemChanged(channelIndex);
-        notifyItemChanged(lastChannel);
+    }
+
+    public void notifyCursorPositionChanged() {
+        notifyItemChanged(lastCursorIndex);
+        notifyItemChanged(cursorIndex);
         notifyCurrentStationChanged();
+        lastCursorIndex = cursorIndex;
     }
 
     public void setCurrentStationIndex(int channelIndex) {

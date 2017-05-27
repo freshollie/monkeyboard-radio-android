@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -165,8 +166,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        }
         setContentView(R.layout.activity_player);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -649,6 +652,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
         }
 
+        stationListRecyclerView.stopScroll();
         stationListRecyclerView.clearOnScrollListeners();
 
         selectChannelScrollRunnable =  new Runnable() {
@@ -672,12 +676,14 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                     private void updateSelection() {
                         if (!done) {
                             done = true;
-                            stationListRecyclerView.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    stationListAdapter.notifyCurrentStationChanged();
-                                }
-                            });
+                            if (channelIndex == stationListAdapter.getCurrentStationIndex()) {
+                                stationListRecyclerView.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        stationListAdapter.notifyCurrentStationChanged();
+                                        }
+                                });
+                            }
                             stationListRecyclerView.removeOnScrollListener(this);
                         }
                     }
@@ -702,42 +708,51 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             stationListRecyclerView.removeCallbacks(cursorScrollRunnable);
         }
 
+        stationListAdapter.setCursorIndex(newCursorIndex);
+        stationListRecyclerView.stopScroll();
         stationListRecyclerView.clearOnScrollListeners();
 
         cursorScrollRunnable =  new Runnable() {
             @Override
             public void run() {
-                stationListRecyclerView.clearOnScrollListeners();
-                stationListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    private boolean done = false;
-                    @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                        updateSelection();
-                    }
+                if (newCursorIndex == stationListAdapter.getCursorIndex()) {
+                    stationListRecyclerView.clearOnScrollListeners();
+                    stationListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                        private boolean done = false;
 
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        updateSelection();
-                    }
-
-                    private void updateSelection() {
-                        if (!done) {
-                            done = true;
-                            stationListRecyclerView.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    stationListAdapter.setCursorIndex(newCursorIndex);
-                                }
-                            });
-                            stationListRecyclerView.removeOnScrollListener(this);
+                        @Override
+                        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                            super.onScrollStateChanged(recyclerView, newState);
+                            updateSelection();
                         }
-                    }
-                });
-                stationListLayoutManager.setSnapDuration(1);
-                stationListRecyclerView.smoothScrollToPosition(newCursorIndex);
-                stationListLayoutManager.setSnapDuration(250);
+
+                        @Override
+                        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                            super.onScrolled(recyclerView, dx, dy);
+                            updateSelection();
+                        }
+
+                        private void updateSelection() {
+                            if (!done) {
+                                done = true;
+                                if (newCursorIndex == stationListAdapter.getCursorIndex()) {
+                                    stationListRecyclerView.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            stationListAdapter.notifyCursorPositionChanged();
+                                        }
+                                    });
+                                }
+
+                                stationListRecyclerView.removeOnScrollListener(this);
+                            }
+                        }
+                    });
+
+                    stationListLayoutManager.setSnapDuration(1);
+                    stationListRecyclerView.smoothScrollToPosition(stationListAdapter.getCursorIndex());
+                    stationListLayoutManager.setSnapDuration(250);
+                }
             }
         };
 

@@ -968,20 +968,21 @@ public class RadioDevice {
 
             // Only poll this every 20 polls
             if (pollNumber % 20 == 0) {
-                if (currentStreamMode == Values.STREAM_MODE_DAB) {
+                if (getPlayMode() == Values.STREAM_MODE_DAB) {
                     int newProgramDataRate = getProgramDataRate();
                     if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
                         Log.v(TAG, "new DataRate: " + newProgramDataRate);
                         listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
                         lastProgramDataRate = newProgramDataRate;
                     }
+                }
 
-                    int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
-                    if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
-                        Log.v(TAG, "new Program Type: " + newFmProgramType);
-                        listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
-                        lastFmProgramType = newFmProgramType;
-                    }
+                int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
+                if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
+                    Log.v(TAG, "new Program Type: " + newFmProgramType);
+                    listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
+                    lastFmProgramType = newFmProgramType;
+
                 }
 
                 int newStereoState = getStereo();
