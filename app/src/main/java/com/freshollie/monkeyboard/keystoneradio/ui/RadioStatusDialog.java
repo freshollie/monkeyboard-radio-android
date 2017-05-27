@@ -177,9 +177,7 @@ public class RadioStatusDialog extends DialogFragment {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (getActivity().getClass().getSimpleName()
                                         .equals("PlayerActivity")) {
-                                    playerService.closeConnection();
                                     dismiss();
-                                    getActivity().finish();
                                 }
                             }
                         })

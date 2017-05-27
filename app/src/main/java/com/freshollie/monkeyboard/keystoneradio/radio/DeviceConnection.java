@@ -29,7 +29,7 @@ public class DeviceConnection {
 
     private final String TAG = this.getClass().getSimpleName();
 
-    static boolean DEBUG_OUTPUT = false;
+    static boolean DEBUG_OUTPUT = true;
     static boolean GET_RESPONSE_DEBUG = false;
 
     public static final int MAX_PACKET_LENGTH = 255;
@@ -37,7 +37,7 @@ public class DeviceConnection {
     public final int RESPONSE_TIMEOUT_LENGTH = 200;
 
     private final String ACTION_USB_PERMISSION =
-            "com.freshollie.monkeyboarddabradio.radio.deviceconnection.action.USB_PERMISSION";
+            "com.freshollie.monkeyboard.keystoneradio.radio.deviceconnection.action.USB_PERMISSION";
 
     private int commandSerialNumber = 0;
     private UsbManager usbManager;
