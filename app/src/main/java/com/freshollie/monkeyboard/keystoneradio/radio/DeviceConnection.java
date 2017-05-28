@@ -29,7 +29,7 @@ public class DeviceConnection {
 
     private final String TAG = this.getClass().getSimpleName();
 
-    static boolean DEBUG_OUTPUT = true;
+    static boolean DEBUG_OUTPUT = false;
     static boolean GET_RESPONSE_DEBUG = false;
 
     public static final int MAX_PACKET_LENGTH = 255;

@@ -27,6 +27,7 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -548,31 +549,20 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private void onConnectedSequence() {
         // If the our internal database is dramatically different to that on the board, we will try
         // and sync our copies
-        if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB &&
-                (getDabRadioStations().length < 1 ||
-                        Math.abs(getDabRadioStations().length - radio.getTotalPrograms()) > 8)
-                ) {
-            if (radio.getTotalPrograms() > 0) {
-                startDabStationListCopyTask();
 
-            } else {
-                Log.v(TAG, "No stations stored, need to perform channel search");
-                notifyNoStoredStations();
-            }
+        radio.setStereoMode(1);
 
-
-        } else {
-            radio.setStereoMode(1);
-            if (queuedAction != null) {
-                new Thread(queuedAction).start();
-                queuedAction = null;
-            }
-            if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                handleSetDabChannelRequest(getCurrentDabChannelIndex());
-            } else {
-                handleSetFmFrequencyRequest(getCurrentFmFrequency());
-            }
+        if (queuedAction != null) {
+            new Thread(queuedAction).start();
+            queuedAction = null;
         }
+
+        if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+            handleSetDabChannelRequest(getCurrentDabChannelIndex());
+        } else {
+            handleSetFmFrequencyRequest(getCurrentFmFrequency());
+        }
+
         if (playerNotification != null) {
             playerNotification.update();
         }
@@ -618,7 +608,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private void setRadioMode(int newRadioMode) {
         radioMode = newRadioMode;
-        currentFmRadioStation = new RadioStation();
+        updateFmFrequencyMetadata(currentFmFrequency);
         saveRadioMode();
     }
 
@@ -764,9 +754,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
         if (radio.play(getRadioMode(), currentFmFrequency)) {
             Log.v(TAG, "Approved, updating meta");
-            currentFmRadioStation = new RadioStation();
-            currentFmRadioStation.setName(String.valueOf(currentFmFrequency));
-            currentFmRadioStation.setChannelFrequency(currentFmFrequency);
+            updateFmFrequencyMetadata(currentFmFrequency);
             updateMetadata(currentFmRadioStation);
             return true;
         }
@@ -774,7 +762,16 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private boolean updateBoardDabChannelAction() {
-        if (getDabRadioStations().length > 0) {
+        if (Math.abs(getDabRadioStations().length - radio.getTotalPrograms()) > 8) {
+            if (radio.getTotalPrograms() > 0) {
+                startDabStationListCopyTask();
+
+            } else {
+                Log.v(TAG, "No stations stored, need to perform channel search");
+                notifyNoStoredStations();
+            }
+
+        } else if (getDabRadioStations().length > 0) {
             Log.v(TAG, "Requesting board to play: " + getCurrentStation().getName());
             if (radio.play(getRadioMode(),
                     getStationFromIndex(currentDabChannelIndex).getChannelFrequency())) {
@@ -1017,7 +1014,33 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void updateFmFrequencyMetadata(int frequency) {
+        currentFmRadioStation = new RadioStation();
+        DecimalFormat df = new DecimalFormat("#.00");
 
+        currentFmRadioStation.setName(
+                getString(R.string.fm_frequency_placeholder, df.format(frequency / 1000.0))
+        );
+        currentFmRadioStation.setChannelFrequency(frequency);
+
+        updateMetadata(currentFmRadioStation);
+    }
+
+    private void updateFmStationNameMetadata(String name) {
+        if (currentFmRadioStation == null) {
+            updateFmFrequencyMetadata(currentFmFrequency);
+        }
+
+        currentFmRadioStation.setName(name);
+        updateMetadata(currentFmRadioStation);
+    }
+
+    private void updateFmStationTypeMetadata(int genreId) {
+        if (currentFmRadioStation == null) {
+            updateFmFrequencyMetadata(currentFmFrequency);
+        }
+
+        currentFmRadioStation.setGenreId(genreId);
+        updateMetadata(currentFmRadioStation);
     }
 
     private void updateMetadata(RadioStation station) {
@@ -1274,33 +1297,17 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         public void onFmSearchFrequencyChanged(int frequency) {
             Log.v(TAG, "Search frequency changed");
             setCurrentFmChannelFrequency(frequency);
-            currentFmRadioStation.setName(String.valueOf(frequency));
-            currentFmRadioStation.setChannelFrequency(frequency);
-            updateMetadata(currentFmRadioStation);
+            updateFmFrequencyMetadata(frequency);
         }
 
         @Override
         public void onFmProgramNameUpdated(String newFmProgramName) {
-            if (currentFmRadioStation == null) {
-                currentFmRadioStation = new RadioStation();
-                currentFmRadioStation.setChannelFrequency(currentFmFrequency);
-                currentFmRadioStation.setName(String.valueOf(currentFmFrequency));
-            }
-
-            currentFmRadioStation.setName(newFmProgramName);
-            updateMetadata(currentFmRadioStation);
+            updateFmStationNameMetadata(newFmProgramName);
         }
 
         @Override
         public void onFmProgramTypeUpdated(int newFmProgramType) {
-            if (currentFmRadioStation == null) {
-                currentFmRadioStation = new RadioStation();
-                currentFmRadioStation.setChannelFrequency(currentFmFrequency);
-                currentFmRadioStation.setName(String.valueOf(currentFmFrequency));
-            }
-
-            currentFmRadioStation.setChannelFrequency(newFmProgramType);
-            updateMetadata(currentFmRadioStation);
+            updateFmStationTypeMetadata(newFmProgramType);
         }
     };
 

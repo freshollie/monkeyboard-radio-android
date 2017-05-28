@@ -24,6 +24,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -45,6 +46,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public static final String HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT =
             "com.freshollie.headunitcontroller.action.SEND_KEYEVENT";
+
+    private static int SNAP_SPEED = 250;
 
     private RadioPlayerService playerService;
     private Boolean playerBound = false;
@@ -167,6 +170,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
@@ -281,11 +286,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         onRadioModeChanged(playerService.getRadioMode());
 
-        // Scrolls to the currently playing track instantly
-        stationListLayoutManager.setSnapDuration(1);
-
         // then sets the animations back to normal
-        stationListLayoutManager.setSnapDuration(250);
+        stationListLayoutManager.setSnapDuration(SNAP_SPEED);
         stationListRecyclerView.getItemAnimator().setChangeDuration(100);
         stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
         stationListRecyclerView.getItemAnimator().setAddDuration(100);
@@ -751,7 +753,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
                     stationListLayoutManager.setSnapDuration(1);
                     stationListRecyclerView.smoothScrollToPosition(stationListAdapter.getCursorIndex());
-                    stationListLayoutManager.setSnapDuration(250);
+                    stationListLayoutManager.setSnapDuration(SNAP_SPEED);
                 }
             }
         };
@@ -961,6 +963,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     @Override
     public void onDestroy() {
         super.onDestroy();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
         if (playerBound) {
