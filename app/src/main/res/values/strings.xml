@@ -74,6 +74,7 @@
     <string name="pref_sync_volume_summary_off">Radio volume will be stored separately to tablet music volume</string>
 
     <string name="RADIO_MODE_KEY">radio_mode</string>
+    <string name="fm_frequency_placeholder">%s MHz</string>
 
 
     <string-array name="STATION_GENRES">
