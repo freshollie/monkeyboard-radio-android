@@ -240,11 +240,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
             // Update the player with the new attributes from the station list
             if (!Arrays.equals(playerService.getDabRadioStations(),
-                    stationListAdapter.getStationList()) &&
+                    stationListAdapter.getDabStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                stationListAdapter.updateStationList(playerService.getDabRadioStations());
-                stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
-                stationListAdapter.notifyCurrentStationChanged();
+                refreshStationList(playerService.getRadioMode());
             }
 
             // Re-Register the callback
@@ -362,6 +360,15 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.INVISIBLE);
         addChannelFab.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
+        addChannelFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (playerBound) {
+                    playerService.saveCurrentFmStation();
+                    refreshStationList(playerService.getRadioMode());
+                }
+            }
+        });
 
         nextButton = (ImageButton) findViewById(R.id.skip_next_button);
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -465,20 +472,15 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
             fmSeekBar.setVisibility(View.INVISIBLE);
             addChannelFab.hide();
-            stationListAdapter.updateStationList(playerService.getDabRadioStations());
-            stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
         } else {
             fmSeekBar.setVisibility(View.VISIBLE);
             if (selectChannelScrollRunnable != null) {
                 stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
             }
             addChannelFab.show();
-            stationListRecyclerView.stopScroll();
-            stationListAdapter.updateStationList(playerService.getFmRadioStations());
-            stationListAdapter.setCurrentStationIndex(-1);
-            stationListAdapter.notifyCurrentStationChanged();
             fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
         }
+        refreshStationList(mode);
         clearPlayerAttributes();
     }
 
@@ -645,6 +647,19 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void updateGenreName(String genre) {
         genreTextView.setText(genre);
+    }
+
+    public void refreshStationList(int radioMode) {
+        stationListRecyclerView.stopScroll();
+        if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
+            stationListAdapter.updateStationList(playerService.getFmRadioStations());
+            stationListAdapter.setCurrentStationIndex(-1);
+            stationListAdapter.notifyCurrentStationChanged();
+        } else {
+            stationListAdapter.updateStationList(playerService.getDabRadioStations());
+            stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
+            stationListAdapter.notifyCurrentStationChanged();
+        }
     }
 
     public void updateStationListSelection(final int channelIndex) {
@@ -951,7 +966,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void onStationListCopyComplete() {
         if (playerBound) {
-            stationListAdapter.updateStationList(playerService.getDabRadioStations());
+            if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+                refreshStationList(playerService.getRadioMode());
+            }
             playerService.handlePlayRequest();
         }
     }
