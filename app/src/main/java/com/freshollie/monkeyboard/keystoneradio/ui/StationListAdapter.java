@@ -129,7 +129,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         notifyDataSetChanged();
     }
 
-    public RadioStation[] getStationList() {
+    public RadioStation[] getDabStationList() {
         return stationList;
     }
 

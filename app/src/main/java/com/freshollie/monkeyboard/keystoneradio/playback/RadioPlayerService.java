@@ -68,7 +68,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private RadioDevice radio;
     private RadioStation[] dabRadioStations = new RadioStation[0];
-    private RadioStation[] fmRadioStations = new RadioStation[0];
+    private ArrayList<RadioStation> fmRadioStations = new ArrayList<>();
 
     private RadioStation currentFmRadioStation;
 
@@ -173,7 +173,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 }
             }
 
-            setStationList(
+            setDabStationList(
                     newStationList.toArray(
                             new RadioStation[newStationList.size()]
                     )
@@ -445,23 +445,17 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         if (fmStationsJsonList != null) {
-            fmRadioStations = new RadioStation[fmStationsJsonList.size()];
+            fmRadioStations.clear();
             try {
                 int i = 0;
                 for (String stationJsonString: fmStationsJsonList) {
                     JSONObject stationJson = new JSONObject(stationJsonString);
 
-                    fmRadioStations[i] = new RadioStation(stationJson);
+                    fmRadioStations.add(new RadioStation(stationJson));
                     i++;
                 }
 
-                Arrays.sort(fmRadioStations, new Comparator<RadioStation>() {
-                    @Override
-                    public int compare(RadioStation radioStation, RadioStation t1) {
-                        return Integer.valueOf(radioStation.getChannelFrequency())
-                                .compareTo(t1.getChannelFrequency());
-                    }
-                });
+                sortFmRadioStations();
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -511,12 +505,35 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             stringSet.add(station.toJsonString());
         }
 
-        editor.putStringSet(getString(R.string.DAB_STATION_LIST_KEY), stringSet);
+        editor.putStringSet(getString(R.string.FM_STATION_LIST_KEY), stringSet);
 
         editor.apply();
     }
 
-    private void setStationList(RadioStation[] stationList) {
+    public void saveCurrentFmStation() {
+        if (currentFmRadioStation != null) {
+            fmRadioStations.add(currentFmRadioStation);
+            sortFmRadioStations();
+            saveFmStationList();
+        }
+    }
+
+    private void sortFmRadioStations() {
+        RadioStation[] radioStationsArray =
+                fmRadioStations.toArray(new RadioStation[fmRadioStations.size()]);
+
+        Arrays.sort(radioStationsArray, new Comparator<RadioStation>() {
+            @Override
+            public int compare(RadioStation radioStation, RadioStation t1) {
+                return Integer.valueOf(radioStation.getChannelFrequency())
+                        .compareTo(t1.getChannelFrequency());
+            }
+        });
+
+        fmRadioStations = new ArrayList<>(Arrays.asList(radioStationsArray));
+    }
+
+    private void setDabStationList(RadioStation[] stationList) {
         dabRadioStations = stationList;
         saveDabStationList();
     }
@@ -685,7 +702,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public RadioStation[] getFmRadioStations() {
-        return fmRadioStations;
+        return fmRadioStations.toArray(new RadioStation[fmRadioStations.size()]);
     }
 
     public int getCurrentDabChannelIndex() {
