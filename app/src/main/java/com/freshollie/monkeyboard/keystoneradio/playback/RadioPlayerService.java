@@ -510,12 +510,25 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         editor.apply();
     }
 
-    public void saveCurrentFmStation() {
+    public boolean saveCurrentFmStation() {
         if (currentFmRadioStation != null) {
+            for (RadioStation station: fmRadioStations) {
+                if (((station.getChannelFrequency()) / 100) * 100
+                        == ((currentFmRadioStation.getChannelFrequency()) / 100) * 100) {
+                    return false;
+                }
+            }
             fmRadioStations.add(currentFmRadioStation);
             sortFmRadioStations();
             saveFmStationList();
+            return true;
         }
+        return false;
+    }
+
+    public void removeFmRadioStation(RadioStation radioStation) {
+        fmRadioStations.remove(radioStation);
+        saveFmStationList();
     }
 
     private void sortFmRadioStations() {
@@ -772,7 +785,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (radio.play(getRadioMode(), currentFmFrequency)) {
             Log.v(TAG, "Approved, updating meta");
             updateFmFrequencyMetadata(currentFmFrequency);
-            updateMetadata(currentFmRadioStation);
             return true;
         }
         return false;
