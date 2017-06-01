@@ -88,6 +88,13 @@ public class SettingsFragment extends PreferenceFragment {
                 .show();
     }
 
+    public void showModeAlert() {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.mode_alert_message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
     public void inform(String message) {
         Snackbar.make(getActivity().findViewById(R.id.content_settings), message, Snackbar.LENGTH_SHORT)
                 .setAction("Dismiss", new View.OnClickListener() {
@@ -118,6 +125,35 @@ public class SettingsFragment extends PreferenceFragment {
                         return true;
                     }
                 });
+
+        final CheckBoxPreference dabEnabledPreference =
+                (CheckBoxPreference) findPreference(getString(R.string.pref_dab_mode_enabled_key));
+        final CheckBoxPreference fmEnabledPreference =
+                (CheckBoxPreference) findPreference(getString(R.string.pref_fm_mode_enabled_key));
+
+        dabEnabledPreference.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                if (!fmEnabledPreference.isChecked() && !((boolean) o)) {
+                    showModeAlert();
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        fmEnabledPreference.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                if (!dabEnabledPreference.isChecked() && !((boolean) o)) {
+                    showModeAlert();
+                    return false;
+                }
+                return true;
+            }
+        });
 
         // Play on open checkbox
         CheckBoxPreference playInputPreference =
