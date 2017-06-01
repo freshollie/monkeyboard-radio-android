@@ -10,12 +10,21 @@
     android:clipChildren="false"
     tools:context="com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity">
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:clipToPadding="false"
         android:background="@color/backgroundDarkAccent"
         android:id="@+id/station_list_container">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No saved stations"
+            android:gravity="center"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:id="@+id/no_saved_stations_text"
+            android:visibility="gone"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/station_list"
             android:scrollbars="vertical"
@@ -23,9 +32,9 @@
             android:layout_height="match_parent"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:fadeScrollbars="false"
+            android:clickable="true"
             android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
             android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"/>
-            <!--android:background="@color/stationListBackgroundColor" -->
     </LinearLayout>
 
     <android.support.design.widget.CoordinatorLayout

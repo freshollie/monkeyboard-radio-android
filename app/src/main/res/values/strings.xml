@@ -75,6 +75,8 @@
 
     <string name="RADIO_MODE_KEY">radio_mode</string>
     <string name="fm_frequency_placeholder">%s MHz</string>
+    <string name="remove_station_description">Remove this channel</string>
+    <string name="channel_already_exists_message">Channel already saved</string>
 
 
     <string-array name="STATION_GENRES">
