@@ -108,7 +108,7 @@ public class RadioDevice {
 
         public static String getGenreFromId(int genreId) {
             if (genreId > genres.length - 1 || genreId < 0) {
-                return "Unknown";
+                return "";
             } else {
                 return genres[genreId];
             }
@@ -751,6 +751,9 @@ public class RadioDevice {
         if (DEBUG_OUT_COMMANDS) {
             Log.v(TAG, "getTotalPrograms()");
         }
+
+        return -1;
+        /*
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -763,6 +766,7 @@ public class RadioDevice {
         } else {
             return -1;
         }
+        */
     }
 
     public boolean getSysReady() {

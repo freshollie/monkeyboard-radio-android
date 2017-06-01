@@ -3,7 +3,9 @@ package com.freshollie.monkeyboard.keystoneradio.ui;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -175,9 +177,28 @@ public class RadioStatusDialog extends DialogFragment {
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                // Check if this dialog is being run in the player activity
                                 if (getActivity().getClass().getSimpleName()
                                         .equals("PlayerActivity")) {
-                                    dismiss();
+
+                                    // Switch back to FM mode if possible
+                                    SharedPreferences sharedPreferences =
+                                            PreferenceManager
+                                                    .getDefaultSharedPreferences(getActivity());
+                                    if (sharedPreferences
+                                            .getBoolean(
+                                                    getString(R.string.pref_fm_mode_enabled_key),
+                                                    true
+                                            )) {
+                                        playerService
+                                                .handleSetRadioMode(
+                                                        RadioDevice.Values.STREAM_MODE_FM
+                                                );
+                                        ((PlayerActivity) getActivity())
+                                                .onRadioModeChanged(
+                                                        RadioDevice.Values.STREAM_MODE_FM
+                                                );
+                                    }
                                 }
                             }
                         })

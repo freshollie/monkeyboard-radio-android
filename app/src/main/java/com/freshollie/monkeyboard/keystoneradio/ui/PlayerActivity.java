@@ -250,6 +250,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             // Re-Register the callback
             playerService.registerCallback(this);
 
+            refreshSwitchControls();
+
             if (preferencePlayOnOpen) {
                 playerService.handlePlayRequest();
             }
@@ -299,6 +301,36 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
     }
 
+    public void refreshSwitchControls() {
+        boolean fmModeEnabled =
+                sharedPreferences.getBoolean(getString(R.string.pref_fm_mode_enabled_key), true);
+        boolean dabModeEnabled =
+                sharedPreferences.getBoolean(getString(R.string.pref_dab_mode_enabled_key), true);
+
+        TextView modeSwitchLabel = (TextView) findViewById(R.id.mode_switch_label);
+
+        if (!fmModeEnabled) {
+            if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
+                playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_DAB);
+                onRadioModeChanged(playerService.getRadioMode());
+            }
+            modeSwitchLabel.setVisibility(View.GONE);
+            modeSwitch.setVisibility(View.GONE);
+        } else if (!dabModeEnabled) {
+            if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+                playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
+                onRadioModeChanged(playerService.getRadioMode());
+            }
+            modeSwitchLabel.setVisibility(View.GONE);
+            modeSwitch.setVisibility(View.GONE);
+        } else {
+            modeSwitch.setChecked(playerService.getRadioMode() ==
+                    RadioDevice.Values.STREAM_MODE_FM);
+            modeSwitch.setVisibility(View.VISIBLE);
+            modeSwitchLabel.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void setupStationList() {
         stationListLayoutManager = new StationListLayoutManager(this);
 
@@ -314,17 +346,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         addChannelFab = (FloatingActionButton) findViewById(R.id.add_channel_fab);
 
         modeSwitch = (Switch) findViewById(R.id.mode_switch);
-
-        modeSwitch.setChecked(!sharedPreferences.getBoolean(
-                getString(R.string.RADIO_MODE_KEY), true)
-        );
-
+        modeSwitch.setChecked(playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM);
         modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                sharedPreferences.edit()
-                        .putBoolean(getString(R.string.RADIO_MODE_KEY), !b)
-                        .apply();
                 if (playerBound) {
                     playerService.handleSetRadioMode(
                             !b ?
@@ -335,6 +360,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 }
             }
         });
+        refreshSwitchControls();
 
         fmSeekBar = (SeekBar) findViewById(R.id.fm_seek_bar);
         fmSeekBar.setMax(RadioDevice.Values.MAX_FM_FREQUENCY - RadioDevice.Values.MIN_FM_FREQUENCY);
@@ -343,7 +369,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         fmSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
-                Log.v(TAG, ""+ i + RadioDevice.Values.MIN_FM_FREQUENCY);
                 if (playerBound && fromUser) {
                     playerService.handleSetFmFrequencyRequest(i + RadioDevice.Values.MIN_FM_FREQUENCY);
                 }
@@ -610,7 +635,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 updateGenreName(RadioDevice.StringValues.getGenreFromId(currentStation.getGenreId()));
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                    updateStationListSelection(playerService.getCurrentDabChannelIndex());
+                    updateStationListSelection(playerService.getCurrentDabChannelFrequency());
                 }
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
@@ -673,7 +698,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             }
         } else {
             stationListAdapter.updateStationList(playerService.getDabRadioStations(), radioMode);
-            stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
+            stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelFrequency());
             stationListAdapter.notifyCurrentStationChanged();
 
             if (playerService.getDabRadioStations().length < 1) {
@@ -878,7 +903,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     @Override
     public void onDabProgramDataRateChanged(int dataRate) {
-        dataRateTextView.setText(getString(R.string.program_datarate_placeholder, dataRate));
+        if (dataRate > 0) {
+            dataRateTextView.setText(getString(R.string.program_datarate_placeholder, dataRate));
+        } else {
+            dataRateTextView.setText("");
+        }
     }
 
     @Override
@@ -1084,7 +1113,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             case KeyEvent.KEYCODE_ENTER:
                 if (stationListAdapter != null) {
                     if (playerBound) {
-                        int lastChannel = playerService.getCurrentDabChannelIndex();
+                        int lastChannel = playerService.getCurrentDabChannelFrequency();
                         playerService.handleSetDabChannelRequest(stationListAdapter.getCursorIndex());
 
                         // Pause the channel if we have not switched channels

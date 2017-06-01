@@ -103,7 +103,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private AudioFocus audioFocusState = AudioFocus.NoFocusNoDuck;
 
-    private int currentDabChannelIndex = -1;
+    private int currentDabChannelFrequency = -1;
     private int currentFmFrequency = 88000;
 
     public interface PlayerCallback {
@@ -132,7 +132,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
             if (s.equals(getString(R.string.DUCK_VOLUME_KEY))) {
@@ -142,7 +143,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 3
                         );
                 Log.v(TAG, "Duck volume set to " + String.valueOf(duckVolume));
-            } else if (s.equals(getString(R.string.HEADUNIT_MAIN_INPUT_KEY))){
+            } else if (s.equals(getString(R.string.HEADUNIT_MAIN_INPUT_KEY))) {
                 controllerInput =
                         sharedPreferences.getBoolean(
                                 getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
@@ -468,14 +469,14 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                         getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
                         false
                 );
-        currentDabChannelIndex = sharedPreferences.getInt(getString(R.string.DAB_CURRENT_CHANNEL_INDEX_KEY), 0);
+        currentDabChannelFrequency = sharedPreferences.getInt(getString(R.string.DAB_CURRENT_CHANNEL_FREQUENCY_KEY), 0);
         currentFmFrequency = sharedPreferences.getInt(getString(R.string.FM_CURRENT_FREQUENCY_KEY),
                 RadioDevice.Values.MIN_FM_FREQUENCY);
 
         duckVolume = sharedPreferences.getInt(getString(R.string.DUCK_VOLUME_KEY), 3);
 
         // Gets the last radio mode preference
-        radioMode = sharedPreferences.getBoolean(getString(R.string.RADIO_MODE_KEY), true)?
+        radioMode = sharedPreferences.getBoolean(getString(R.string.RADIO_MODE_KEY), false)?
                 RadioDevice.Values.STREAM_MODE_DAB:
                 RadioDevice.Values.STREAM_MODE_FM;
 
@@ -558,9 +559,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 .apply();
     }
 
-    private void saveCurrentDabChannelIndex() {
+    private void saveCurrentDabChannelFrequency() {
         sharedPreferences.edit()
-                .putInt(getString(R.string.DAB_CURRENT_CHANNEL_INDEX_KEY), currentDabChannelIndex)
+                .putInt(getString(R.string.DAB_CURRENT_CHANNEL_FREQUENCY_KEY), currentDabChannelFrequency)
                 .apply();
     }
 
@@ -572,7 +573,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void startDabStationListCopyTask() {
         radio.copyDabStationList(copyProgramsListener);
-        setCurrentDabChannelIndex(0);
+        setCurrentDabChannelFrequency(0);
         notifyDabStationListCopyStart();
     }
 
@@ -588,7 +589,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-            handleSetDabChannelRequest(getCurrentDabChannelIndex());
+            handleSetDabChannelRequest(getCurrentDabChannelFrequency());
         } else {
             handleSetFmFrequencyRequest(getCurrentFmFrequency());
         }
@@ -688,7 +689,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     public RadioStation getCurrentStation() {
         if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
             if (dabRadioStations.length > 0) {
-                return dabRadioStations[getCurrentDabChannelIndex()];
+                return dabRadioStations[getCurrentDabChannelFrequency()];
             } else {
                 return null;
             }
@@ -718,17 +719,17 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return fmRadioStations.toArray(new RadioStation[fmRadioStations.size()]);
     }
 
-    public int getCurrentDabChannelIndex() {
-        return currentDabChannelIndex;
+    public int getCurrentDabChannelFrequency() {
+        return currentDabChannelFrequency;
     }
 
     public int getCurrentFmFrequency() {
         return currentFmFrequency;
     }
 
-    private void setCurrentDabChannelIndex(int channelIndex) {
-        currentDabChannelIndex = channelIndex;
-        saveCurrentDabChannelIndex();
+    private void setCurrentDabChannelFrequency(int channelFrequency) {
+        currentDabChannelFrequency = channelFrequency;
+        saveCurrentDabChannelFrequency();
     }
 
     private void setCurrentFmChannelFrequency(int frequency) {
@@ -802,8 +803,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         } else if (getDabRadioStations().length > 0) {
             Log.v(TAG, "Requesting board to play: " + getCurrentStation().getName());
-            if (radio.play(getRadioMode(),
-                    getStationFromIndex(currentDabChannelIndex).getChannelFrequency())) {
+            if (radio.play(getRadioMode(), currentDabChannelFrequency)) {
                 Log.v(TAG, "Approved, updating meta");
                 updateMetadata(getCurrentStation());
                 return true;
@@ -812,15 +812,15 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return false;
     }
 
-    public void handleSetDabChannelRequest(final int channelIndex) {
+    public void handleSetDabChannelRequest(final int channelFrequency) {
         // Saves the new current channel
-        setCurrentDabChannelIndex(channelIndex);
+        setCurrentDabChannelFrequency(channelFrequency);
 
         handleAction(new Runnable() {
                 @Override
                 public void run() {
                     // Only execute final thread
-                    if (channelIndex == currentDabChannelIndex) {
+                    if (channelFrequency == currentDabChannelFrequency) {
                         updateBoardDabChannelAction();
                     }
                 }
@@ -845,10 +845,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         Log.v(TAG, "Handling a play request");
         int channel = -1;
         if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-            if (currentDabChannelIndex == -1 || getDabRadioStations().length < 1) {
+            if (currentDabChannelFrequency == -1 || getDabRadioStations().length < 1) {
                 Log.v(TAG, "No station to play, ignoring request");
             } else {
-                channel = currentDabChannelIndex;
+                channel = currentDabChannelFrequency;
             }
         } else {
             channel = currentFmFrequency;
@@ -947,8 +947,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     @Override
                     public void run() {
                         if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                            if (currentDabChannelIndex < getDabRadioStations().length - 1) {
-                                handleSetDabChannelRequest(currentDabChannelIndex + 1);
+                            if (currentDabChannelFrequency < getDabRadioStations().length - 1) {
+                                handleSetDabChannelRequest(currentDabChannelFrequency + 1);
                             } else {
                                 handleSetDabChannelRequest(0);
                             }
@@ -966,8 +966,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     @Override
                     public void run() {
                         if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                            if (currentDabChannelIndex > 0) {
-                                handleSetDabChannelRequest(currentDabChannelIndex - 1);
+                            if (currentDabChannelFrequency > 0) {
+                                handleSetDabChannelRequest(currentDabChannelFrequency - 1);
                             } else {
                                 handleSetDabChannelRequest(getDabRadioStations().length - 1);
                             }
@@ -997,7 +997,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     public void handleSetRadioMode(int newRadioMode) {
         setRadioMode(newRadioMode);
         if (newRadioMode == RadioDevice.Values.STREAM_MODE_DAB) {
-            handleSetDabChannelRequest(currentDabChannelIndex);
+            handleSetDabChannelRequest(currentDabChannelFrequency);
         } else {
             handleSetFmFrequencyRequest(currentFmFrequency);
         }

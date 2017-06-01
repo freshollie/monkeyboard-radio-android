@@ -57,7 +57,7 @@
 
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
-    <string name="DAB_CURRENT_CHANNEL_INDEX_KEY">dab_current_channel_index</string>
+    <string name="DAB_CURRENT_CHANNEL_FREQUENCY_KEY">dab_current_channel_frequency</string>
     <string name="FM_CURRENT_FREQUENCY_KEY">fm_current_frequency</string>
 
     <string name="DAB_STATION_LIST_KEY">dab_station_list</string>
@@ -77,6 +77,13 @@
     <string name="fm_frequency_placeholder">%s MHz</string>
     <string name="remove_station_description">Remove this channel</string>
     <string name="channel_already_exists_message">Channel already saved</string>
+    <string name="pref_dab_mode_enabled_key">dab_mode_enabled</string>
+    <string name="pref_dab_mode_enabled_title">DAB mode</string>
+    <string name="pref_dab_mode_enabled_summary_on">Enabled</string>
+    <string name="pref_dab_mode_enabled_summary_off">Disabled</string>
+    <string name="pref_fm_mode_enabled_key">pref_fm_mode_enabled</string>
+    <string name="pref_fm_mode_enabled_title">FM mode</string>
+    <string name="mode_alert_message">At least one mode must be enabled</string>
 
 
     <string-array name="STATION_GENRES">
