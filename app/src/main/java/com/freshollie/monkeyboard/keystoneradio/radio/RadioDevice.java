@@ -752,8 +752,6 @@ public class RadioDevice {
             Log.v(TAG, "getTotalPrograms()");
         }
 
-        return -1;
-        /*
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -766,7 +764,6 @@ public class RadioDevice {
         } else {
             return -1;
         }
-        */
     }
 
     public boolean getSysReady() {

@@ -514,6 +514,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             addChannelFab.show();
             fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
         }
+        modeSwitch.setChecked(mode == RadioDevice.Values.STREAM_MODE_FM);
         refreshStationList(mode);
         clearPlayerAttributes();
     }
@@ -623,7 +624,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         genreTextView.setText("");
         ensembleTextView.setText("");
         currentChannelView.setText("");
-        //updatePlayerAttributesFromMetadata();
+        updatePlayerAttributesFromMetadata();
     }
 
     public void updatePlayerAttributesFromMetadata(boolean clearProgramText) {
@@ -979,7 +980,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         openRadioStatusDialog(RadioStatusDialog.State.Connecting);
     }
 
-    public void onAttachTimeout() {
+    public void onDeviceAttachTimeout() {
         if (!isRadioStatusDialogOpen()) {
             new AlertDialog.Builder(this)
                     .setMessage(getString(R.string.device_connection_timed_out_try_again))

@@ -77,7 +77,7 @@ public class RadioStatusDialog extends DialogFragment {
             progressIcon.setMaxProgress(RadioDevice.Values.MAX_CHANNEL_BAND);
             progressText.setText(getString(R.string.dialog_dab_search_found_channels_progress, 0));
             if (radio.isConnected()) {
-                playerService.startChannelSearchTask();
+                playerService.startDabChannelSearchTask();
             }
 
         } else if (currentState == State.Copying) {
@@ -110,6 +110,12 @@ public class RadioStatusDialog extends DialogFragment {
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        playerService.getRadio().stopSearch();
+                    }
+                });
                 dismiss();
             }
         });
@@ -178,8 +184,9 @@ public class RadioStatusDialog extends DialogFragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 // Check if this dialog is being run in the player activity
-                                if (getActivity().getClass().getSimpleName()
-                                        .equals("PlayerActivity")) {
+                                if (getActivity() != null &&
+                                        getActivity().getClass().getSimpleName()
+                                                .equals("PlayerActivity")) {
 
                                     // Switch back to FM mode if possible
                                     SharedPreferences sharedPreferences =
@@ -199,7 +206,9 @@ public class RadioStatusDialog extends DialogFragment {
                                                         RadioDevice.Values.STREAM_MODE_FM
                                                 );
                                     }
+                                    dismiss();
                                 }
+
                             }
                         })
                         .show();
@@ -209,7 +218,7 @@ public class RadioStatusDialog extends DialogFragment {
         }
 
         @Override
-        public void onAttachTimeout() {
+        public void onDeviceAttachTimeout() {
             statusText.setText(getString(R.string.dialog_dab_search_status_failed));
             progressIcon.setVisibility(View.INVISIBLE);
             progressText.setText(getString(R.string.dialog_dab_search_failed_timed_out));

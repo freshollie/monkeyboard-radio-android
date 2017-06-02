@@ -110,7 +110,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         void onPlayerVolumeChanged(int volume);
 
         void onNoStoredStations();
-        void onAttachTimeout();
+        void onDeviceAttachTimeout();
 
         void onSearchStart();
         void onSearchProgressUpdate(int numChannels, int progress);
@@ -792,7 +792,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private boolean updateBoardDabChannelAction() {
-        if (Math.abs(getDabRadioStations().length - radio.getTotalPrograms()) > 8) {
+        if (Math.abs(getDabRadioStations().length - radio.getTotalPrograms()) > 8 ||
+                getDabRadioStations().length < 1) {
             if (radio.getTotalPrograms() > 0) {
                 startDabStationListCopyTask();
 
@@ -847,6 +848,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
             if (currentDabChannelFrequency == -1 || getDabRadioStations().length < 1) {
                 Log.v(TAG, "No station to play, ignoring request");
+                handleAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateBoardDabChannelAction();
+                    }
+                });
             } else {
                 channel = currentDabChannelFrequency;
             }
@@ -1021,7 +1028,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         });
     }
 
-    public void startChannelSearchTask() {
+    public void startDabChannelSearchTask() {
         radio.startDABSearch(dabSearchListener);
     }
 
@@ -1357,7 +1364,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private void notifyAttachTimeout() {
         Log.v(TAG, "Timed out waiting for device to attach");
         for (PlayerCallback playerCallback: playerCallbacks) {
-            playerCallback.onAttachTimeout();
+            playerCallback.onDeviceAttachTimeout();
         }
     }
 
@@ -1368,8 +1375,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void notifyChannelSearchStart() {
-        for (PlayerCallback callback: playerCallbacks) {
-            callback.onSearchStart();
+        for (final PlayerCallback callback: playerCallbacks) {
+            new Handler(getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onSearchStart();
+                }
+            });
         }
     }
 
