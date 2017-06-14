@@ -184,13 +184,36 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     }
 
     public void openDeleteMode() {
-        deleteMode = true;
-        notifyItemRangeChanged(0, getItemCount());
+        if (!isDeleteMode()) {
+            deleteMode = true;
+            if (recyclerView != null) {
+                recyclerView.getItemAnimator().setChangeDuration(200);
+                recyclerView.getItemAnimator().setRemoveDuration(200);
+                recyclerView.getItemAnimator().setMoveDuration(200);
+                recyclerView.getItemAnimator().setAddDuration(200);
+                notifyItemRangeChanged(0, getItemCount());
+            }
+            playerActivity.onChannelListDeleteModeChanged(deleteMode);
+        }
     }
 
     public void closeDeleteMode() {
-        deleteMode = false;
-        notifyItemRangeChanged(0, getItemCount());
+        if (isDeleteMode()) {
+            deleteMode = false;
+            if (recyclerView != null) {
+                notifyItemRangeChanged(0, getItemCount());
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.getItemAnimator().setChangeDuration(0);
+                        recyclerView.getItemAnimator().setRemoveDuration(0);
+                        recyclerView.getItemAnimator().setMoveDuration(0);
+                        recyclerView.getItemAnimator().setAddDuration(0);
+                    }
+                }, 300);
+            }
+            playerActivity.onChannelListDeleteModeChanged(deleteMode);
+        }
     }
 
     public boolean isDeleteMode() {

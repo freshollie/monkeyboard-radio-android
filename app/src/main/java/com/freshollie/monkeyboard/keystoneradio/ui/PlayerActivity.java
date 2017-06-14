@@ -26,6 +26,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -63,6 +65,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private ImageButton volumeButton;
     private ImageButton settingsButton;
 
+    private Animation fadeInAnimation;
+    private Animation fadeOutAnimation;
+
     private Switch modeSwitch;
 
     private SeekBar volumeSeekBar;
@@ -70,6 +75,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private SeekBar fmSeekBar;
 
     private FloatingActionButton addChannelFab;
+    private Animation fabForwardsAnimation;
+    private Animation fabBackwardsAnimation;
 
     private boolean userChangingFmFrequency = false;
 
@@ -293,9 +300,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         // then sets the animations back to normal
         stationListLayoutManager.setSnapDuration(SNAP_SPEED);
-        stationListRecyclerView.getItemAnimator().setChangeDuration(100);
-        stationListRecyclerView.getItemAnimator().setRemoveDuration(100);
-        stationListRecyclerView.getItemAnimator().setAddDuration(100);
+        stationListRecyclerView.getItemAnimator().setChangeDuration(0);
+        stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
+        stationListRecyclerView.getItemAnimator().setMoveDuration(0);
+        stationListRecyclerView.getItemAnimator().setAddDuration(0);
 
         updatePlayerAttributesFromMetadata(!isRestartedInstance);
 
@@ -347,6 +355,12 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void setupPlaybackControls() {
         addChannelFab = (FloatingActionButton) findViewById(R.id.add_channel_fab);
+        fabForwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_forwards);
+        fabBackwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_backwards);
+        fadeInAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+        fadeInAnimation.setDuration(100);
+        fadeOutAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+        fadeOutAnimation.setDuration(100);
 
         modeSwitch = (Switch) findViewById(R.id.mode_switch);
         modeSwitch.setChecked(playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM);
@@ -394,14 +408,18 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             @Override
             public void onClick(View view) {
                 if (playerBound) {
-                    if (playerService.saveCurrentFmStation()) {
-                        showStationList(playerService.getRadioMode());
+                    if (stationListAdapter != null && !stationListAdapter.isDeleteMode()) {
+                        if (playerService.saveCurrentFmStation()) {
+                            showStationList(playerService.getRadioMode());
+                        } else {
+                            Snackbar.make(
+                                    stationListRecyclerView,
+                                    R.string.channel_already_exists_message,
+                                    Snackbar.LENGTH_SHORT
+                            ).show();
+                        }
                     } else {
-                        Snackbar.make(
-                                stationListRecyclerView,
-                                R.string.channel_already_exists_message,
-                                Snackbar.LENGTH_SHORT
-                        ).show();
+                        stationListAdapter.closeDeleteMode();
                     }
                 }
             }
@@ -411,6 +429,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (stationListAdapter != null) {
+                    stationListAdapter.closeDeleteMode();
+                }
                 if (!playerBound) {
                     bindPlayerService();
                     sendActionToService(RadioPlayerService.ACTION_NEXT);
@@ -424,6 +445,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (stationListAdapter != null) {
+                    stationListAdapter.closeDeleteMode();
+                }
                 if (!playerBound) {
                     bindPlayerService();
                     sendActionToService(RadioPlayerService.ACTION_NEXT);
@@ -437,6 +461,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         searchForwardsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (stationListAdapter != null) {
+                    stationListAdapter.closeDeleteMode();
+                }
                 if (!playerBound) {
                     bindPlayerService();
                     sendActionToService(RadioPlayerService.ACTION_SEARCH_FORWARDS);
@@ -450,6 +477,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         searchBackwardsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (stationListAdapter != null) {
+                    stationListAdapter.closeDeleteMode();
+                }
                 if (!playerBound) {
                     bindPlayerService();
                     sendActionToService(RadioPlayerService.ACTION_SEARCH_BACKWARDS);
@@ -463,6 +493,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (stationListAdapter != null) {
+                    stationListAdapter.closeDeleteMode();
+                }
                 if (!playerBound) {
                     bindPlayerService();
                 } else {
@@ -490,6 +523,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         volumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (stationListAdapter != null) {
+                    stationListAdapter.closeDeleteMode();
+                }
                 if (volumeSeekBar.getVisibility() == View.VISIBLE) {
                     onCloseVolumeSeekBar();
 
@@ -534,14 +570,53 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void onRadioModeChanged(int mode) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
-            fmSeekBar.setVisibility(View.INVISIBLE);
-            searchBackwardsButton.setVisibility(View.INVISIBLE);
-            searchForwardsButton.setVisibility(View.INVISIBLE);
+
+            fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    fmSeekBar.setVisibility(View.INVISIBLE);
+                    searchBackwardsButton.setVisibility(View.INVISIBLE);
+                    searchForwardsButton.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            fmSeekBar.startAnimation(fadeOutAnimation);
+            searchBackwardsButton.startAnimation(fadeOutAnimation);
+            searchForwardsButton.startAnimation(fadeOutAnimation);
             addChannelFab.hide();
         } else {
-            fmSeekBar.setVisibility(View.VISIBLE);
-            searchBackwardsButton.setVisibility(View.VISIBLE);
-            searchForwardsButton.setVisibility(View.VISIBLE);
+            fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    fmSeekBar.setVisibility(View.VISIBLE);
+                    searchBackwardsButton.setVisibility(View.VISIBLE);
+                    searchForwardsButton.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            fmSeekBar.startAnimation(fadeInAnimation);
+            searchBackwardsButton.startAnimation(fadeInAnimation);
+            searchForwardsButton.startAnimation(fadeInAnimation);
+
             if (selectChannelScrollRunnable != null) {
                 stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
             }
@@ -592,6 +667,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (stationListAdapter != null) {
+                    stationListAdapter.closeDeleteMode();
+                }
                 startActivity(
                         new Intent(getApplicationContext(), SettingsActivity.class)
                 );
@@ -728,6 +806,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
             stationListAdapter.updateStationList(playerService.getFmRadioStations(), radioMode);
             stationListAdapter.setCurrentStationIndex(playerService.getCurrentSavedFmStationIndex());
+            if (stationListAdapter.getCurrentStationIndex() > -1) {
+                stationListRecyclerView.scrollToPosition(playerService.getCurrentSavedFmStationIndex());
+            }
             stationListAdapter.notifyCurrentStationChanged();
 
             if (playerService.getFmRadioStations().length < 1) {
@@ -738,6 +819,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         } else {
             stationListAdapter.updateStationList(playerService.getDabRadioStations(), radioMode);
             stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
+            if (stationListAdapter.getCurrentStationIndex() > -1) {
+                stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
+            }
             stationListAdapter.notifyCurrentStationChanged();
 
             if (playerService.getDabRadioStations().length < 1) {
@@ -865,6 +949,14 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         };
 
         stationListRecyclerView.post(cursorScrollRunnable);
+    }
+
+    public void onChannelListDeleteModeChanged(boolean deleteMode) {
+        if (deleteMode) {
+            addChannelFab.startAnimation(fabForwardsAnimation);
+        } else {
+            addChannelFab.startAnimation(fabBackwardsAnimation);
+        }
     }
 
     public void handleChannelClicked(int channelIndex) {
