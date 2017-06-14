@@ -1296,6 +1296,18 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
         @Override
+        public void onFastForward() {
+            super.onFastForward();
+            handleSearchForwards();
+        }
+
+        @Override
+        public void onRewind() {
+            super.onRewind();
+            handleSearchBackwards();
+        }
+
+        @Override
         public void onPlay() {
             handlePlayRequest();
         }
@@ -1311,12 +1323,22 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         @Override
         public void onSkipToNext() {
-            handleNextChannelRequest();
+            if (sharedPreferences.getBoolean(getString(R.string.pref_skip_buttons_control_key),
+                    true)) {
+                handleNextChannelRequest();
+            } else {
+                handleSearchForwards();
+            }
         }
 
         @Override
         public void onSkipToPrevious() {
-            handlePreviousChannelRequest();
+            if (sharedPreferences.getBoolean(getString(R.string.pref_skip_buttons_control_key),
+                    true)) {
+                handlePreviousChannelRequest();
+            } else {
+                handleSearchBackwards();
+            }
         }
 
         @Override
@@ -1339,19 +1361,27 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                         return true;
 
                     case KeyEvent.KEYCODE_MEDIA_PLAY:
-                        handlePlayRequest();
+                        onPlay();
                         return true;
 
                     case KeyEvent.KEYCODE_MEDIA_NEXT:
-                        handleNextChannelRequest();
+                        onSkipToNext();
+                        return true;
+
+                    case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                        onFastForward();
+                        return true;
+
+                    case KeyEvent.KEYCODE_MEDIA_REWIND:
+                        onRewind();
                         return true;
 
                     case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                        handlePreviousChannelRequest();
+                        onSkipToPrevious();
                         return true;
 
                     case KeyEvent.KEYCODE_MEDIA_STOP:
-                        handlePauseRequest();
+                        onPause();
                         return true;
 
                     default:

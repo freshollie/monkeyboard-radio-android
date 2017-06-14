@@ -13,6 +13,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity;
 import com.freshollie.monkeyboard.keystoneradio.R;
 
@@ -24,6 +25,9 @@ public class RadioPlayerNotification {
     private RadioPlayerService playerService;
     private NotificationCompat.Builder mediaNotificationBuilder;
     private NotificationManager notificationManager;
+
+    private boolean wasPlaying = false;
+    private int lastFrequency;
 
     private int NOTIFICATION_ID = 1;
 
@@ -56,69 +60,145 @@ public class RadioPlayerNotification {
             playDescription = "play";
         }
 
-        return builder.setShowWhen(false)
-                .setLargeIcon(
-                        ((BitmapDrawable) ResourcesCompat.getDrawableForDensity(
-                                playerService.getResources(),
-                                R.mipmap.ic_launcher,
-                                480,
-                                null
-                        )
-                        ).getBitmap()
-                )
-                .setSmallIcon(R.drawable.ic_notification_radio)
-                .setColor(ContextCompat.getColor(playerService, R.color.colorPrimaryDark))
-                .setContentIntent(
-                        PendingIntent.getActivity(
-                                playerService,
-                                0,
-                                new Intent(playerService, PlayerActivity.class),
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                        )
-                )
-                .setStyle(
-                        new NotificationCompat.MediaStyle()
-                                .setMediaSession(
-                                        playerService.getMediaSession()
-                                                .getSessionToken()
-                                )
-                                .setShowCancelButton(true)
-                                .setShowActionsInCompactView(0, 1, 2)
-                                .setCancelButtonIntent(
-                                        getPendingIntentForAction(
-                                                RadioPlayerService.ACTION_STOP
-                                        )
-                                )
-                )
-                .setContentTitle(playerService.getMetadata()
-                        .getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-                )
-                .setContentText(
-                        playerService.getMetadata().getString(
-                                MediaMetadataCompat.METADATA_KEY_GENRE
-                        )
-                )
-                .addAction(
-                        R.drawable.ic_notification_skip_prev,
-                        "prev",
-                        getPendingIntentForAction(RadioPlayerService.ACTION_PREVIOUS)
-                )
-                .addAction(
-                        playIcon,
-                        playDescription,
-                        getPendingIntentForAction(playAction)
-                )
-                .addAction(
-                        R.drawable.ic_notification_skip_next,
-                        "next",
-                        getPendingIntentForAction(RadioPlayerService.ACTION_NEXT)
-                )
-                .setDeleteIntent(
-                        getPendingIntentForAction(
-                                RadioPlayerService.ACTION_STOP
-                        )
-                )
-                .build();
+        if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
+            return builder.setShowWhen(false)
+                    .setLargeIcon(
+                            ((BitmapDrawable) ResourcesCompat.getDrawableForDensity(
+                                    playerService.getResources(),
+                                    R.mipmap.ic_launcher,
+                                    480,
+                                    null
+                            )
+                            ).getBitmap()
+                    )
+                    .setSmallIcon(R.drawable.ic_notification_radio)
+                    .setColor(ContextCompat.getColor(playerService, R.color.colorPrimaryDark))
+                    .setContentIntent(
+                            PendingIntent.getActivity(
+                                    playerService,
+                                    0,
+                                    new Intent(playerService, PlayerActivity.class),
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            )
+                    )
+                    .setStyle(
+                            new NotificationCompat.MediaStyle()
+                                    .setMediaSession(
+                                            playerService.getMediaSession()
+                                                    .getSessionToken()
+                                    )
+                                    .setShowCancelButton(true)
+                                    .setShowActionsInCompactView(0, 2, 4)
+                                    .setCancelButtonIntent(
+                                            getPendingIntentForAction(
+                                                    RadioPlayerService.ACTION_STOP
+                                            )
+                                    )
+                    )
+                    .setContentTitle(playerService.getMetadata()
+                            .getString(MediaMetadataCompat.METADATA_KEY_TITLE)
+                    )
+                    .setContentText(
+                            playerService.getMetadata().getString(
+                                    MediaMetadataCompat.METADATA_KEY_GENRE
+                            )
+                    )
+                    .addAction(
+                            R.drawable.ic_notification_skip_prev,
+                            "prev",
+                            getPendingIntentForAction(RadioPlayerService.ACTION_PREVIOUS)
+                    )
+                    .addAction(
+                            R.drawable.ic_fast_rewind_white_24dp,
+                            "search_backwards",
+                            getPendingIntentForAction(RadioPlayerService.ACTION_SEARCH_BACKWARDS)
+                    )
+                    .addAction(
+                            playIcon,
+                            playDescription,
+                            getPendingIntentForAction(playAction)
+                    )
+                    .addAction(
+                            R.drawable.ic_fast_forward_white_24dp,
+                            "search_forwards",
+                            getPendingIntentForAction(RadioPlayerService.ACTION_SEARCH_FORWARDS)
+                    )
+                    .addAction(
+                            R.drawable.ic_notification_skip_next,
+                            "next",
+                            getPendingIntentForAction(RadioPlayerService.ACTION_NEXT)
+                    )
+                    .setDeleteIntent(
+                            getPendingIntentForAction(
+                                    RadioPlayerService.ACTION_STOP
+                            )
+                    )
+                    .build();
+        } else {
+            return builder.setShowWhen(false)
+                    .setLargeIcon(
+                            ((BitmapDrawable) ResourcesCompat.getDrawableForDensity(
+                                    playerService.getResources(),
+                                    R.mipmap.ic_launcher,
+                                    480,
+                                    null
+                            )
+                            ).getBitmap()
+                    )
+                    .setSmallIcon(R.drawable.ic_notification_radio)
+                    .setColor(ContextCompat.getColor(playerService, R.color.colorPrimaryDark))
+                    .setContentIntent(
+                            PendingIntent.getActivity(
+                                    playerService,
+                                    0,
+                                    new Intent(playerService, PlayerActivity.class),
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            )
+                    )
+                    .setStyle(
+                            new NotificationCompat.MediaStyle()
+                                    .setMediaSession(
+                                            playerService.getMediaSession()
+                                                    .getSessionToken()
+                                    )
+                                    .setShowCancelButton(true)
+                                    .setShowActionsInCompactView(0, 1, 2)
+                                    .setCancelButtonIntent(
+                                            getPendingIntentForAction(
+                                                    RadioPlayerService.ACTION_STOP
+                                            )
+                                    )
+                    )
+                    .setContentTitle(playerService.getMetadata()
+                            .getString(MediaMetadataCompat.METADATA_KEY_TITLE)
+                    )
+                    .setContentText(
+                            playerService.getMetadata().getString(
+                                    MediaMetadataCompat.METADATA_KEY_GENRE
+                            )
+                    )
+                    .addAction(
+                            R.drawable.ic_notification_skip_prev,
+                            "prev",
+                            getPendingIntentForAction(RadioPlayerService.ACTION_PREVIOUS)
+                    )
+                    .addAction(
+                            playIcon,
+                            playDescription,
+                            getPendingIntentForAction(playAction)
+                    )
+                    .addAction(
+                            R.drawable.ic_notification_skip_next,
+                            "next",
+                            getPendingIntentForAction(RadioPlayerService.ACTION_NEXT)
+                    )
+                    .setDeleteIntent(
+                            getPendingIntentForAction(
+                                    RadioPlayerService.ACTION_STOP
+                            )
+                    )
+                    .build();
+        }
     }
 
     private PendingIntent getPendingIntentForAction(String action) {
