@@ -176,8 +176,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             stationCard.stationSelectionLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    playerActivity.handleChannelClicked(radioStation.getChannelFrequency()
-                    );
+                    playerActivity.handleChannelClicked(stationCard.getAdapterPosition());
                 }
             });
             stationCard.stationRemoveButton.setVisibility(View.INVISIBLE);
