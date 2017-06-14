@@ -845,7 +845,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 @Override
                 public void run() {
                     // Only execute final thread
-                    if (channelFrequency == currentDabChannelIndex) {
+                    if (channelFrequency == dabRadioStations[currentDabChannelIndex]
+                            .getChannelFrequency()) {
                         updateBoardDabChannelAction();
                     }
                 }
