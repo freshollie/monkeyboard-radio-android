@@ -13,9 +13,7 @@ import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 /**
  * Created by Freshollie on 08/02/2017.
@@ -170,7 +168,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             stationCard.stationRemoveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    playerActivity.handleRemoveChannel(radioStation);
+                    playerActivity.handleRemoveFmChannel(radioStation);
                     onStationRemoved(stationCard.getAdapterPosition());
                 }
             });
@@ -178,7 +176,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             stationCard.stationSelectionLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    playerActivity.handleSetChannel(radioStation.getChannelFrequency()
+                    playerActivity.handleChannelClicked(radioStation.getChannelFrequency()
                     );
                 }
             });
