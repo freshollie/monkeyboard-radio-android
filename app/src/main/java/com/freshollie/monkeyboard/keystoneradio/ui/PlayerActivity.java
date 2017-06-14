@@ -668,7 +668,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 updateGenreName(RadioDevice.StringValues.getGenreFromId(currentStation.getGenreId()));
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                    updateStationListSelection(playerService.getCurrentDabChannelFrequency());
+                    updateStationListSelection(playerService.getCurrentDabChannelIndex());
                 }
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
@@ -723,7 +723,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         stationListRecyclerView.stopScroll();
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
             stationListAdapter.updateStationList(playerService.getFmRadioStations(), radioMode);
-            stationListAdapter.setCurrentStationIndex(-1);
+            stationListAdapter.setCurrentStationIndex(playerService.getCurrentSavedFmStationIndex());
             stationListAdapter.notifyCurrentStationChanged();
 
             if (playerService.getFmRadioStations().length < 1) {
@@ -733,7 +733,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             }
         } else {
             stationListAdapter.updateStationList(playerService.getDabRadioStations(), radioMode);
-            stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelFrequency());
+            stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
             stationListAdapter.notifyCurrentStationChanged();
 
             if (playerService.getDabRadioStations().length < 1) {
@@ -859,18 +859,20 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         stationListRecyclerView.post(cursorScrollRunnable);
     }
 
-    public void handleSetChannel(int channelFrequency) {
+    public void handleChannelClicked(int channelIndex) {
         if (playerBound) {
-            if (channelFrequency >= RadioDevice.Values.MIN_FM_FREQUENCY) {
-                playerService.handleSetFmFrequencyRequest(channelFrequency);
+            if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
+                playerService.handleSetFmFrequencyRequest(
+                        playerService.getFmRadioStations()[channelIndex].getChannelFrequency()
+                );
             } else {
-                playerService.handleSetDabChannelRequest(channelFrequency);
+                playerService.handleSetDabChannelRequest(channelIndex);
             }
             playerService.handlePlayRequest();
         }
     }
 
-    public void handleRemoveChannel(RadioStation radioStation) {
+    public void handleRemoveFmChannel(RadioStation radioStation) {
         playerService.removeFmRadioStation(radioStation);
         if (playerService.getFmRadioStations().length < 1) {
             refreshStationList(playerService.getRadioMode());
@@ -1148,7 +1150,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             case KeyEvent.KEYCODE_ENTER:
                 if (stationListAdapter != null) {
                     if (playerBound) {
-                        int lastChannel = playerService.getCurrentDabChannelFrequency();
+                        int lastChannel = playerService.getCurrentDabChannelIndex();
                         playerService.handleSetDabChannelRequest(stationListAdapter.getCursorIndex());
 
                         // Pause the channel if we have not switched channels
