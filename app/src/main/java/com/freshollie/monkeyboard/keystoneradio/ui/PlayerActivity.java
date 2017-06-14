@@ -358,9 +358,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         fabForwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_forwards);
         fabBackwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_backwards);
         fadeInAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-        fadeInAnimation.setDuration(100);
+        fadeInAnimation.setDuration(200);
         fadeOutAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
-        fadeOutAnimation.setDuration(100);
+        fadeOutAnimation.setDuration(200);
 
         modeSwitch = (Switch) findViewById(R.id.mode_switch);
         modeSwitch.setChecked(playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM);

@@ -84,6 +84,10 @@
     <string name="pref_fm_mode_enabled_key">pref_fm_mode_enabled</string>
     <string name="pref_fm_mode_enabled_title">FM mode</string>
     <string name="mode_alert_message">At least one mode must be enabled</string>
+    <string name="pref_skip_buttons_control_summary">If checked then skip media buttons will skip to the next saved FM station,
+        otherwise they will control FM search</string>
+    <string name="pref_skip_buttons_control_key">pref_skip_buttons_control</string>
+    <string name="pref_skip_buttons_control_title">FM Skip buttons</string>
 
 
     <string-array name="STATION_GENRES">
