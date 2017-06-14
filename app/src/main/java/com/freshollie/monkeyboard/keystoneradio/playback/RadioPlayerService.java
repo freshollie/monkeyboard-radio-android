@@ -739,12 +739,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public int getCurrentSavedFmStationIndex() {
         if (getCurrentStation() != null) {
-            RadioStation[] fmRadioStations = getFmRadioStations();
             DecimalFormat df = new DecimalFormat("#.00");
 
-            for (int i = 0; i < fmRadioStations.length; i++) {
-                if (df.format(fmRadioStations[i].getChannelFrequency() / 1000.0).equals(
-                        df.format(getCurrentStation().getChannelFrequency() / 1000.0))) {
+            for (int i = 0; i < fmRadioStations.size(); i++) {
+                if (fmRadioStations.get(i).getName().equals(getCurrentStation().getName())) {
                     return i;
                 }
             }
@@ -839,16 +837,15 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return false;
     }
 
-    public void handleSetDabChannelRequest(final int channelFrequency) {
+    public void handleSetDabChannelRequest(final int channelIndex) {
         // Saves the new current channel
-        setCurrentDabChannelIndex(channelFrequency);
+        setCurrentDabChannelIndex(channelIndex);
 
         handleAction(new Runnable() {
                 @Override
                 public void run() {
                     // Only execute final thread
-                    if (channelFrequency == dabRadioStations[currentDabChannelIndex]
-                            .getChannelFrequency()) {
+                    if (channelIndex == currentDabChannelIndex) {
                         updateBoardDabChannelAction();
                     }
                 }
