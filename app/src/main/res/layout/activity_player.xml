@@ -216,6 +216,17 @@
 
                 <ImageButton
                     android:clickable="true"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/search_forward_button"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_fast_forward_white_24dp"
+                    android:scaleType="fitXY"
+                    android:layout_toLeftOf="@+id/skip_next_button"
+                    android:layout_centerVertical="true"/>
+
+                <ImageButton
+                    android:clickable="true"
                     android:background="?selectableItemBackgroundBorderless"
                     app:srcCompat="@drawable/ic_play_arrow_white_24dp"
                     android:scaleType="fitXY"
@@ -223,6 +234,17 @@
                     android:layout_height="100dp"
                     android:id="@+id/play_pause_button"
                     android:layout_centerInParent="true" />
+
+                <ImageButton
+                    android:clickable="true"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/search_backwards_button"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_fast_rewind_white_24dp"
+                    android:scaleType="fitXY"
+                    android:layout_toRightOf="@+id/skip_previous_button"
+                    android:layout_centerVertical="true"/>
 
                 <ImageButton
                     android:clickable="true"

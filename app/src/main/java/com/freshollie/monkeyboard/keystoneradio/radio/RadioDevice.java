@@ -752,6 +752,7 @@ public class RadioDevice {
             Log.v(TAG, "getTotalPrograms()");
         }
 
+
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,

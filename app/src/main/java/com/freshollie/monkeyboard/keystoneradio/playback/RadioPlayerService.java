@@ -47,6 +47,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     static int ATTACH_TIMEOUT = 10000; // Radio will stop trying to connect after 10 seconds
 
     // Actions
+    public final static String ACTION_SEARCH_FORWARDS =
+            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.SEARCH_FORWARDS";
+    public final static String ACTION_SEARCH_BACKWARDS =
+            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.SEARCH_BACKWARDS";
     public final static String ACTION_NEXT =
             "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.NEXT";
     public final static String ACTION_PREVIOUS =
@@ -327,6 +331,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     closeConnection();
                     stopSelf();
                     break;
+                case ACTION_SEARCH_FORWARDS:
+                    handleSearchForwards();
+                    break;
                 case ACTION_NEXT:
                     handleNextChannelRequest();
                     break;
@@ -335,6 +342,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     break;
                 case ACTION_PREVIOUS:
                     handlePreviousChannelRequest();
+                    break;
+                case ACTION_SEARCH_BACKWARDS:
+                    handleSearchBackwards();
                     break;
                 case ACTION_PLAY:
                     handlePlayRequest();
@@ -719,12 +729,34 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return fmRadioStations.toArray(new RadioStation[fmRadioStations.size()]);
     }
 
+    private int getCurrentDabChannelIndex() {
+        for (int i = 0; i < dabRadioStations.length; i++) {
+            if (dabRadioStations[i].getChannelFrequency() == currentDabChannelFrequency) {
+                return i;
+            }
+        }
+    }
+
     public int getCurrentDabChannelFrequency() {
         return currentDabChannelFrequency;
     }
 
     public int getCurrentFmFrequency() {
         return currentFmFrequency;
+    }
+
+    public int getCurrentSavedFmStationIndex() {
+        RadioStation[] fmRadioStations = getFmRadioStations();
+        DecimalFormat df = new DecimalFormat("#.00");
+
+        for (int i = 0; i < fmRadioStations.length; i++) {
+            if (df.format(fmRadioStations[i].getChannelFrequency() / 1000.0).equals(
+                    df.format(getCurrentStation().getChannelFrequency() / 1000.0))) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private void setCurrentDabChannelFrequency(int channelFrequency) {
@@ -960,7 +992,34 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 handleSetDabChannelRequest(0);
                             }
                         } else {
-                            handleSearchForwards();
+                            int currentFmChannelIndex = getCurrentSavedFmStationIndex();
+                            RadioStation[] radioStations = getFmRadioStations();
+
+                            // We have saved stations
+                            if (radioStations.length > 0) {
+                                int nextChannelIndex = -1;
+
+                                // We are not currently on a station
+                                if (currentFmChannelIndex < 0) {
+                                    for (int i = 0; i < radioStations.length; i++) {
+                                        if (radioStations[i].getChannelFrequency() >
+                                                getCurrentStation().getChannelFrequency()) {
+                                            nextChannelIndex = i;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (currentFmChannelIndex < radioStations.length - 1) {
+                                        nextChannelIndex = currentFmChannelIndex + 1;
+                                    }
+                                }
+
+                                if (nextChannelIndex != -1) {
+                                    handleSetFmFrequencyRequest(
+                                            radioStations[nextChannelIndex].getChannelFrequency()
+                                    );
+                                }
+                            }
                         }
                     }
                 }
@@ -979,7 +1038,37 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 handleSetDabChannelRequest(getDabRadioStations().length - 1);
                             }
                         } else {
-                            handleSearchBackwards();
+                            int currentFmChannelIndex = getCurrentSavedFmStationIndex();
+                            RadioStation[] radioStations = getFmRadioStations();
+
+                            // We have saved stations
+                            if (radioStations.length > 0) {
+                                int nextChannelIndex = -1;
+
+                                // We are not currently on a station
+                                if (currentFmChannelIndex < 0) {
+                                    // Go through the stations backwards until we find the next lowest station
+                                    for (int i = radioStations.length - 1; i > -1; i--) {
+                                        if (radioStations[i].getChannelFrequency() <
+                                                getCurrentStation().getChannelFrequency()) {
+                                            nextChannelIndex = i;
+                                            break;
+                                        }
+                                    }
+
+                                } else {
+                                    if (currentFmChannelIndex > 0) {
+                                        nextChannelIndex = currentFmChannelIndex - 1;
+                                    }
+                                }
+
+                                // If we dont get a next channel index then we don't change channel
+                                if (nextChannelIndex != -1) {
+                                    handleSetFmFrequencyRequest(
+                                            radioStations[nextChannelIndex].getChannelFrequency()
+                                    );
+                                }
+                            }
                         }
                     }
                 }

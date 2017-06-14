@@ -56,6 +56,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     private ImageButton nextButton;
     private ImageButton previousButton;
+    private ImageButton searchForwardsButton;
+    private ImageButton searchBackwardsButton;
     private ImageButton pauseButton;
     private ImageButton playButton;
     private ImageButton volumeButton;
@@ -152,7 +154,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to Player, cast the IBinder and get RadioPlayerService instance
-            RadioPlayerService.RadioPlayerBinder binder = (RadioPlayerService.RadioPlayerBinder) service;
+            RadioPlayerService.RadioPlayerBinder binder =
+                    (RadioPlayerService.RadioPlayerBinder) service;
             playerService = binder.getService();
             radio = playerService.getRadio();
             playerBound = true;
@@ -430,6 +433,31 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             }
         });
 
+        searchForwardsButton = (ImageButton) findViewById(R.id.search_forward_button);
+        searchForwardsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!playerBound) {
+                    bindPlayerService();
+                    sendActionToService(RadioPlayerService.ACTION_SEARCH_FORWARDS);
+                } else {
+                    playerService.handleSearchForwards();
+                }
+            }
+        });
+
+        searchBackwardsButton = (ImageButton) findViewById(R.id.search_backwards_button);
+        searchBackwardsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!playerBound) {
+                    bindPlayerService();
+                    sendActionToService(RadioPlayerService.ACTION_SEARCH_BACKWARDS);
+                } else {
+                    playerService.handleSearchBackwards();
+                }
+            }
+        });
 
         playButton = (ImageButton) findViewById(R.id.play_pause_button);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -505,9 +533,13 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onRadioModeChanged(int mode) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
             fmSeekBar.setVisibility(View.INVISIBLE);
+            searchBackwardsButton.setVisibility(View.INVISIBLE);
+            searchForwardsButton.setVisibility(View.INVISIBLE);
             addChannelFab.hide();
         } else {
             fmSeekBar.setVisibility(View.VISIBLE);
+            searchBackwardsButton.setVisibility(View.VISIBLE);
+            searchForwardsButton.setVisibility(View.VISIBLE);
             if (selectChannelScrollRunnable != null) {
                 stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
             }
@@ -643,6 +675,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                     if (!userChangingFmFrequency) {
                         fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
                     }
+
+                    updateStationListSelection(playerService.getCurrentSavedFmStationIndex());
                 }
             }
         } else {
