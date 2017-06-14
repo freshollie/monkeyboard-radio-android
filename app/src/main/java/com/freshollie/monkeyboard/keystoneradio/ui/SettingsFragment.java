@@ -126,6 +126,23 @@ public class SettingsFragment extends PreferenceFragment {
                     }
                 });
 
+        findPreference(getString(R.string.pref_clear_fm_stations_key))
+                .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        confirm(
+                                "Are you sure you want to clear all the saved FM stations?",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (playerService != null) {
+                                            playerService.clearFmRadioStations();
+                                        }
+                                    }
+                                });
+                        return true;
+                    }
+                });
         final CheckBoxPreference dabEnabledPreference =
                 (CheckBoxPreference) findPreference(getString(R.string.pref_dab_mode_enabled_key));
         final CheckBoxPreference fmEnabledPreference =

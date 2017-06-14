@@ -250,10 +250,14 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             // Update the volume
             updateVolume(playerService.getPlayerVolume());
 
-            // Update the player with the new attributes from the station list
+            // Update the station list if it has been changed
             if (!Arrays.equals(playerService.getDabRadioStations(),
-                    stationListAdapter.getDabStationList()) &&
+                    stationListAdapter.getStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+                showStationList(playerService.getRadioMode());
+            } else if (!Arrays.equals(playerService.getFmRadioStations(),
+                    stationListAdapter.getStationList()) &&
+                    playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
                 showStationList(playerService.getRadioMode());
             }
 

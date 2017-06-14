@@ -6,6 +6,10 @@
             android:key="@string/setting_perform_dab_search_button_key"
             android:title="@string/setting_perform_dab_search_text"
             android:summary="@string/setting_perform_dab_search_summary" />
+        <Preference
+            android:key="@string/pref_clear_fm_stations_key"
+            android:title="@string/pref_clear_fm_stations_title"
+            android:summary="@string/pref_clear_fm_stations_summary" />
         <CheckBoxPreference
             android:key="@string/pref_dab_mode_enabled_key"
             android:title="@string/pref_dab_mode_enabled_title"
