@@ -88,6 +88,9 @@
         otherwise they will control FM search</string>
     <string name="pref_skip_buttons_control_key">pref_skip_buttons_control</string>
     <string name="pref_skip_buttons_control_title">FM Skip buttons</string>
+    <string name="pref_clear_fm_stations_key">pref_clear_fm_stations_key</string>
+    <string name="pref_clear_fm_stations_title">Clear FM stations</string>
+    <string name="pref_clear_fm_stations_summary">Clear all saved FM stations</string>
 
 
     <string-array name="STATION_GENRES">

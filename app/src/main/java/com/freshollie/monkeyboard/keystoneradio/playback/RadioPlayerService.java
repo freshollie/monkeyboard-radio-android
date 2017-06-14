@@ -537,6 +537,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return false;
     }
 
+    public void clearFmRadioStations() {
+        fmRadioStations.clear();
+        saveFmStationList();
+    }
     public void removeFmRadioStation(RadioStation radioStation) {
         fmRadioStations.remove(radioStation);
         saveFmStationList();
