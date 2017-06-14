@@ -247,7 +247,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             if (!Arrays.equals(playerService.getDabRadioStations(),
                     stationListAdapter.getDabStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                refreshStationList(playerService.getRadioMode());
+                showStationList(playerService.getRadioMode());
             }
 
             // Re-Register the callback
@@ -395,7 +395,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             public void onClick(View view) {
                 if (playerBound) {
                     if (playerService.saveCurrentFmStation()) {
-                        refreshStationList(playerService.getRadioMode());
+                        showStationList(playerService.getRadioMode());
                     } else {
                         Snackbar.make(
                                 stationListRecyclerView,
@@ -509,7 +509,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (playerBound) {
                     volumeText.setText(String.valueOf(progress));
-                    playerService.setPlayerVolume(progress);
+                    if (fromUser) {
+                        playerService.setPlayerVolume(progress);
+                    }
                     updateVolumeIcon(progress);
                 }
             }
@@ -547,7 +549,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
         }
         modeSwitch.setChecked(mode == RadioDevice.Values.STREAM_MODE_FM);
-        refreshStationList(mode);
+        showStationList(mode);
         clearPlayerAttributes();
     }
 
@@ -667,13 +669,15 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 updateEnsembleName(currentStation.getEnsemble());
                 updateGenreName(RadioDevice.StringValues.getGenreFromId(currentStation.getGenreId()));
 
+
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
                     updateStationListSelection(playerService.getCurrentDabChannelIndex());
                 }
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
                     if (!userChangingFmFrequency) {
-                        fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+                        fmSeekBar.setProgress(playerService.getCurrentFmFrequency() -
+                                RadioDevice.Values.MIN_FM_FREQUENCY);
                     }
 
                     updateStationListSelection(playerService.getCurrentSavedFmStationIndex());
@@ -719,7 +723,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         genreTextView.setText(genre);
     }
 
-    public void refreshStationList(int radioMode) {
+    public void showStationList(int radioMode) {
         stationListRecyclerView.stopScroll();
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
             stationListAdapter.updateStationList(playerService.getFmRadioStations(), radioMode);
@@ -781,7 +785,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                                     @Override
                                     public void run() {
                                         stationListAdapter.notifyCurrentStationChanged();
-                                        }
+                                    }
                                 });
                             }
                             stationListRecyclerView.removeOnScrollListener(this);
@@ -790,12 +794,16 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 });
 
                 if (playerBound &&
-                        playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB &&
-                        stationListAdapter.getCurrentStationIndex() < stationListAdapter.getItemCount()
-                        ) {
-                    stationListRecyclerView.smoothScrollToPosition(
-                            stationListAdapter.getCurrentStationIndex()
-                    );
+                        stationListAdapter.getCurrentStationIndex() <
+                                stationListAdapter.getItemCount()) {
+                    if (stationListAdapter.getCurrentStationIndex() != -1) {
+
+                        stationListRecyclerView.smoothScrollToPosition(
+                                stationListAdapter.getCurrentStationIndex()
+                        );
+                    } else {
+                        stationListAdapter.notifyCurrentStationChanged();
+                    }
                 }
             }
         };
@@ -875,7 +883,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void handleRemoveFmChannel(RadioStation radioStation) {
         playerService.removeFmRadioStation(radioStation);
         if (playerService.getFmRadioStations().length < 1) {
-            refreshStationList(playerService.getRadioMode());
+            showStationList(playerService.getRadioMode());
         }
     }
 
@@ -1067,7 +1075,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onStationListCopyComplete() {
         if (playerBound) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                refreshStationList(playerService.getRadioMode());
+                showStationList(playerService.getRadioMode());
             }
             playerService.handlePlayRequest();
         }

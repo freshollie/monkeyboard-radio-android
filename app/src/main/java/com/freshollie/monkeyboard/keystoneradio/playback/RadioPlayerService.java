@@ -738,13 +738,15 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public int getCurrentSavedFmStationIndex() {
-        RadioStation[] fmRadioStations = getFmRadioStations();
-        DecimalFormat df = new DecimalFormat("#.00");
+        if (getCurrentStation() != null) {
+            RadioStation[] fmRadioStations = getFmRadioStations();
+            DecimalFormat df = new DecimalFormat("#.00");
 
-        for (int i = 0; i < fmRadioStations.length; i++) {
-            if (df.format(fmRadioStations[i].getChannelFrequency() / 1000.0).equals(
-                    df.format(getCurrentStation().getChannelFrequency() / 1000.0))) {
-                return i;
+            for (int i = 0; i < fmRadioStations.length; i++) {
+                if (df.format(fmRadioStations[i].getChannelFrequency() / 1000.0).equals(
+                        df.format(getCurrentStation().getChannelFrequency() / 1000.0))) {
+                    return i;
+                }
             }
         }
 
@@ -1011,6 +1013,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                     handleSetFmFrequencyRequest(
                                             radioStations[nextChannelIndex].getChannelFrequency()
                                     );
+                                } else {
+                                    handlePlayRequest();
                                 }
                             }
                         }
@@ -1056,10 +1060,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 }
 
                                 // If we dont get a next channel index then we don't change channel
+
                                 if (nextChannelIndex != -1) {
                                     handleSetFmFrequencyRequest(
                                             radioStations[nextChannelIndex].getChannelFrequency()
                                     );
+                                } else {
+                                    handlePlayRequest();
                                 }
                             }
                         }
