@@ -1011,7 +1011,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                             radioStations[nextChannelIndex].getChannelFrequency()
                                     );
                                 } else {
-                                    handlePlayRequest();
+                                    if (fmRadioStations.size() > 0) {
+                                        handleSetFmFrequencyRequest(
+                                                fmRadioStations.get(0)
+                                                        .getChannelFrequency()
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -1056,14 +1061,17 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                     }
                                 }
 
-                                // If we dont get a next channel index then we don't change channel
-
                                 if (nextChannelIndex != -1) {
                                     handleSetFmFrequencyRequest(
                                             radioStations[nextChannelIndex].getChannelFrequency()
                                     );
                                 } else {
-                                    handlePlayRequest();
+                                    if (fmRadioStations.size() > 0) {
+                                        handleSetFmFrequencyRequest(
+                                                fmRadioStations.get(fmRadioStations.size() - 1)
+                                                        .getChannelFrequency()
+                                        );
+                                    }
                                 }
                             }
                         }
