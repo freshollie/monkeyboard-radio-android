@@ -302,6 +302,16 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         onRadioModeChanged(playerService.getRadioMode());
 
+        // Stop the animation from happening when the activity is first created
+        if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+            fmSeekBar.clearAnimation();
+            fmSeekBar.setVisibility(View.INVISIBLE);
+            searchBackwardsButton.clearAnimation();
+            searchBackwardsButton.setVisibility(View.INVISIBLE);
+            searchForwardsButton.clearAnimation();
+            searchForwardsButton.setVisibility(View.INVISIBLE);
+        }
+
         // then sets the animations back to normal
         stationListLayoutManager.setSnapDuration(SNAP_SPEED);
         stationListRecyclerView.getItemAnimator().setChangeDuration(0);
@@ -398,6 +408,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 userChangingFmFrequency = true;
+                if (stationListAdapter.isDeleteMode()) {
+                    stationListAdapter.closeDeleteMode();
+                }
             }
 
             @Override
@@ -492,6 +505,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 }
             }
         });
+
 
         playButton = (ImageButton) findViewById(R.id.play_pause_button);
         playButton.setOnClickListener(new View.OnClickListener() {
