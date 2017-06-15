@@ -298,7 +298,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         // Update info of the current session
         updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
-        updateMetadata(new RadioStation("", -1, -1, ""));
+        updateMetadata(new RadioStation());
 
         // Connect to the radio API
         radio = new RadioDevice(getApplicationContext());
