@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 08/02/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 14/06/17 23:42
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.support.v4.content.ContextCompat;
@@ -16,7 +23,9 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 import java.text.DecimalFormat;
 
 /**
- * Created by Freshollie on 08/02/2017.
+ * Station list adapter is used to display the radio stations in a recycler view. It features
+ * functionality for the user to delete FM stations, scrolling through stations and highlighting
+ * the currently playing station
  */
 
 public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.StationCard> {

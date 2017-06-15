@@ -1,10 +1,16 @@
+/*
+ * Created by Oliver Bell on 12/01/17 23:10
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 25/05/17 02:05
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by Freshollie on 12/01/2017.
  * Used to store information about a radio station
  */
 

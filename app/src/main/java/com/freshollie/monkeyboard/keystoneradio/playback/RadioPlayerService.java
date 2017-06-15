@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 14/01/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 15/06/17 21:50
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.playback;
 
 import android.app.Service;
@@ -37,8 +44,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Created by Freshollie on 14/01/2017.
- *
  * Radio Player Service manages the control of the radio.
  *
  */

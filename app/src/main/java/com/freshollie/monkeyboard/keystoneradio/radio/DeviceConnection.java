@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 12/01/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 28/05/17 01:07
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
 import android.app.PendingIntent;
@@ -19,10 +26,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Created by Freshollie on 12/01/2017.
- *
  * Handles all connection interaction with the monkeyboard over the usb serial connection
- *
  */
 
 public class DeviceConnection {

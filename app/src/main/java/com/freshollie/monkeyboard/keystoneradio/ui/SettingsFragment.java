@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 13/02/17
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 14/06/17 23:47
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 
@@ -23,6 +30,10 @@ import android.view.View;
 import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
 
+/**
+ * Settings fragment displays all of the settings for the player and allows the user to edit those
+ * preferences.
+ */
 public class SettingsFragment extends PreferenceFragment {
     private String TAG = this.getClass().getSimpleName();
     private SharedPreferences sharedPreferences;

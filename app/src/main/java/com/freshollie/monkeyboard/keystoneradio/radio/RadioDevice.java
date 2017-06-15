@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 12/01/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 13/06/17 16:10
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
 import android.content.Context;
@@ -13,7 +20,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
- * Created by Freshollie on 12/01/2017.
  * Used as an API to interact with the monkeyboard
  */
 
