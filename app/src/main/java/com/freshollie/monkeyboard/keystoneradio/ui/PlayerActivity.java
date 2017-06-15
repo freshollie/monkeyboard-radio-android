@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 15/01/17
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 15/06/17 23:07
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.content.BroadcastReceiver;
@@ -43,6 +50,10 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 import java.util.Arrays;
 
+/**
+ * Player activity is the main activity of the app. It binds the the Playback service and displays
+ * details about the radio. It also allows the user to control of the player service.
+ */
 public class PlayerActivity extends AppCompatActivity implements RadioDeviceListenerManager.DataListener,
         RadioPlayerService.PlayerCallback {
     private String TAG = this.getClass().getSimpleName();

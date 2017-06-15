@@ -1,8 +1,11 @@
-package com.freshollie.monkeyboard.keystoneradio.playback;
-
-/**
- * Created by freshollie on 08/05/17.
+/*
+ * Created by Oliver Bell on 18/05/17
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 17/05/17 13:19
  */
+
+package com.freshollie.monkeyboard.keystoneradio.playback;
 
 import android.content.Context;
 import android.database.ContentObserver;
@@ -10,7 +13,7 @@ import android.media.AudioManager;
 import android.os.Handler;
 
 /**
- * Created by freshollie on 08/05/17.
+ * Handles listening for android system volume changes on devices before 5.0
  */
 
 public class SettingsVolumeObserver extends ContentObserver {

@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 15/01/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 14/06/17 23:15
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.playback;
 
 import android.app.Notification;
@@ -18,9 +25,9 @@ import com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity;
 import com.freshollie.monkeyboard.keystoneradio.R;
 
 /**
- * Created by Freshollie on 15/01/2017.
+ * Handles the player service notification, will update using the players metadata when
+ * requested
  */
-
 public class RadioPlayerNotification {
     private RadioPlayerService playerService;
     private NotificationCompat.Builder mediaNotificationBuilder;

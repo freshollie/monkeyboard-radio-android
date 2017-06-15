@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 13/02/17
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 02/05/17 13:11
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.os.Build;
@@ -7,6 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
+
+/**
+ * Settings activity contains and displays the settings fragment and sets the status bar
+ * colours if android version is high enough
+ */
 
 public class SettingsActivity extends AppCompatActivity {
 

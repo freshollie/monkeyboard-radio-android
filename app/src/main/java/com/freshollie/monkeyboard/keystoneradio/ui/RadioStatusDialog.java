@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 11/02/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 02/06/17 01:34
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.app.Dialog;
@@ -19,7 +26,6 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 /**
- * Created by Freshollie on 11/02/2017.
  * Dialog used to show progress of a DAB search or channel copy
  */
 

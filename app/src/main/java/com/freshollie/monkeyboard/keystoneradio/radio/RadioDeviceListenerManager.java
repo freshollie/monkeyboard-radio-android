@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 12/01/17
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 25/05/17 02:01
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
 import android.os.Handler;
@@ -5,8 +12,7 @@ import android.os.Handler;
 import java.util.ArrayList;
 
 /**
- * Created by Freshollie on 12/01/2017.
- *
+ * Used to handle all callbacks to other classes from API
  */
 
 public class RadioDeviceListenerManager {
