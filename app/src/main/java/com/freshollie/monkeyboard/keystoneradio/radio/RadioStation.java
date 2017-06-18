@@ -56,11 +56,11 @@ public class RadioStation {
         this.name = name;
     }
 
-    public int getChannelFrequency() {
+    public int getFrequency() {
         return channelFrequency;
     }
 
-    public void setChannelFrequency(int channelFrequency) {
+    public void setFrequency(int channelFrequency) {
         this.channelFrequency = channelFrequency;
     }
 
@@ -80,7 +80,7 @@ public class RadioStation {
         try {
             return new JSONObject()
                     .put(JsonKeys.name, getName())
-                    .put(JsonKeys.channelFrequency, getChannelFrequency())
+                    .put(JsonKeys.channelFrequency, getFrequency())
                     .put(JsonKeys.genreId, getGenreId())
                     .put(JsonKeys.ensemble, getEnsemble())
                     .toString();

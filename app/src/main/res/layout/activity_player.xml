@@ -153,8 +153,7 @@
                     android:layout_height="40dp"
                     android:layout_margin="10dp"
                     android:layout_above="@+id/volume_button"
-                    android:id="@+id/fm_seek_bar"
-                    android:visibility="invisible"/>
+                    android:id="@+id/fm_seek_bar"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -174,6 +173,13 @@
                     android:textSize="60sp"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/channel_name"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/channel_name"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/fm_frequency_text"
+                    android:textSize="40sp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -264,7 +270,6 @@
             app:srcCompat="@drawable/ic_add_white_24dp"
             android:layout_margin="16dp"
             android:clickable="true"
-            android:visibility="gone"
             android:id="@+id/add_channel_fab"
             app:layout_anchor="@id/player_attributes_panel"
             app:layout_anchorGravity="bottom|right|end"/>

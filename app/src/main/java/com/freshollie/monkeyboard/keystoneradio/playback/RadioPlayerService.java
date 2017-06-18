@@ -447,8 +447,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 Arrays.sort(dabRadioStations, new Comparator<RadioStation>() {
                     @Override
                     public int compare(RadioStation radioStation, RadioStation t1) {
-                        return Integer.valueOf(radioStation.getChannelFrequency())
-                                .compareTo(t1.getChannelFrequency());
+                        return Integer.valueOf(radioStation.getFrequency())
+                                .compareTo(t1.getFrequency());
                     }
                 });
 
@@ -527,14 +527,19 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public boolean saveCurrentFmStation() {
+        RadioStation radioStationCopy = new RadioStation();
+        radioStationCopy.setName(currentFmRadioStation.getName());
+        radioStationCopy.setGenreId(currentFmRadioStation.getGenreId());
+        radioStationCopy.setFrequency(currentFmRadioStation.getFrequency());
+
         if (currentFmRadioStation != null) {
             for (RadioStation station: fmRadioStations) {
-                if (((station.getChannelFrequency()) / 100) * 100
-                        == ((currentFmRadioStation.getChannelFrequency()) / 100) * 100) {
+                if (((station.getFrequency()) / 100) * 100
+                        == ((radioStationCopy.getFrequency()) / 100) * 100) {
                     return false;
                 }
             }
-            fmRadioStations.add(currentFmRadioStation);
+            fmRadioStations.add(radioStationCopy);
             sortFmRadioStations();
             saveFmStationList();
             return true;
@@ -558,8 +563,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         Arrays.sort(radioStationsArray, new Comparator<RadioStation>() {
             @Override
             public int compare(RadioStation radioStation, RadioStation t1) {
-                return Integer.valueOf(radioStation.getChannelFrequency())
-                        .compareTo(t1.getChannelFrequency());
+                return Integer.valueOf(radioStation.getFrequency())
+                        .compareTo(t1.getFrequency());
             }
         });
 
@@ -600,7 +605,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         // If the our internal database is dramatically different to that on the board, we will try
         // and sync our copies
 
-        radio.setStereoMode(1);
+        handleAction(new Runnable() {
+            @Override
+            public void run() {
+                radio.setStereoMode(1);
+            }
+        });
 
         if (queuedAction != null) {
             new Thread(queuedAction).start();
@@ -719,7 +729,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public RadioStation getStationFromId(int channelId) {
         for (RadioStation station: dabRadioStations) {
-            if (station.getChannelFrequency() == channelId) {
+            if (station.getFrequency() == channelId) {
                 return station;
             }
         }
@@ -746,12 +756,17 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return currentFmFrequency;
     }
 
+    /**
+     * Returns the first saved station that contains the same name or is the same frequency.
+     */
     public int getCurrentSavedFmStationIndex() {
         if (getCurrentStation() != null) {
-            DecimalFormat df = new DecimalFormat("#.00");
 
             for (int i = 0; i < fmRadioStations.size(); i++) {
-                if (fmRadioStations.get(i).getName().equals(getCurrentStation().getName())) {
+                if ((fmRadioStations.get(i).getName().equals(getCurrentStation().getName()) &&
+                        !getCurrentStation().getName().isEmpty()) ||
+                        currentFmFrequency / 100 == fmRadioStations.get(i).getFrequency() / 100
+                        ) {
                     return i;
                 }
             }
@@ -807,10 +822,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
     }
 
-    private boolean isActionComplete() {
-        return actionComplete;
-    }
-
     private boolean updateBoardFmFrequencyAction() {
         Log.v(TAG, "Requesting board to play: " + currentFmFrequency);
         if (radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
@@ -837,7 +848,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         } else if (getDabRadioStations().length > 0) {
             Log.v(TAG, "Requesting board to play: " + getCurrentStation().getName());
-            if (radio.play(getRadioMode(), currentDabChannelIndex)) {
+            if (radio.play(getRadioMode(), dabRadioStations[currentDabChannelIndex].getFrequency())) {
                 Log.v(TAG, "Approved, updating meta");
                 updateMetadata(getCurrentStation());
                 return true;
@@ -1003,8 +1014,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 // We are not currently on a station
                                 if (currentFmChannelIndex < 0) {
                                     for (int i = 0; i < radioStations.length; i++) {
-                                        if (radioStations[i].getChannelFrequency() >
-                                                getCurrentStation().getChannelFrequency()) {
+                                        if (radioStations[i].getFrequency() >
+                                                getCurrentStation().getFrequency()) {
                                             nextChannelIndex = i;
                                             break;
                                         }
@@ -1017,13 +1028,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
                                 if (nextChannelIndex != -1) {
                                     handleSetFmFrequencyRequest(
-                                            radioStations[nextChannelIndex].getChannelFrequency()
+                                            radioStations[nextChannelIndex].getFrequency()
                                     );
                                 } else {
                                     if (fmRadioStations.size() > 0) {
                                         handleSetFmFrequencyRequest(
                                                 fmRadioStations.get(0)
-                                                        .getChannelFrequency()
+                                                        .getFrequency()
                                         );
                                     }
                                 }
@@ -1057,8 +1068,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 if (currentFmChannelIndex < 0) {
                                     // Go through the stations backwards until we find the next lowest station
                                     for (int i = radioStations.length - 1; i > -1; i--) {
-                                        if (radioStations[i].getChannelFrequency() <
-                                                getCurrentStation().getChannelFrequency()) {
+                                        if (radioStations[i].getFrequency() <
+                                                getCurrentStation().getFrequency()) {
                                             nextChannelIndex = i;
                                             break;
                                         }
@@ -1072,13 +1083,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
                                 if (nextChannelIndex != -1) {
                                     handleSetFmFrequencyRequest(
-                                            radioStations[nextChannelIndex].getChannelFrequency()
+                                            radioStations[nextChannelIndex].getFrequency()
                                     );
                                 } else {
                                     if (fmRadioStations.size() > 0) {
                                         handleSetFmFrequencyRequest(
                                                 fmRadioStations.get(fmRadioStations.size() - 1)
-                                                        .getChannelFrequency()
+                                                        .getFrequency()
                                         );
                                     }
                                 }
@@ -1156,10 +1167,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         currentFmRadioStation = new RadioStation();
         DecimalFormat df = new DecimalFormat("#.00");
 
-        currentFmRadioStation.setName(
-                getString(R.string.fm_frequency_placeholder, df.format(frequency / 1000.0))
-        );
-        currentFmRadioStation.setChannelFrequency(frequency);
+        currentFmRadioStation.setFrequency(frequency);
+
+        // We are already on a saved station so take our saved name
+        if (getCurrentSavedFmStationIndex() > -1) {
+            currentFmRadioStation.setName(fmRadioStations.get(getCurrentSavedFmStationIndex()).getName());
+        }
 
         updateMetadata(currentFmRadioStation);
     }
@@ -1170,6 +1183,14 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         currentFmRadioStation.setName(name);
+
+        if (getCurrentSavedFmStationIndex() > -1) {
+            if (!fmRadioStations.get(getCurrentSavedFmStationIndex()).getName().equals(name)) {
+                fmRadioStations.get(getCurrentSavedFmStationIndex()).setName(name);
+                saveFmStationList();
+            }
+        }
+
         updateMetadata(currentFmRadioStation);
     }
 
@@ -1188,7 +1209,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 if (getMediaController()
                         .getMetadata()
                         .getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER)
-                        == station.getChannelFrequency()) {
+                        == station.getFrequency()) {
                     return;
                 }
             }
@@ -1205,7 +1226,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                     )
                             )
                             .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,
-                                    station.getChannelFrequency())
+                                    station.getFrequency())
                             .build()
             );
 
