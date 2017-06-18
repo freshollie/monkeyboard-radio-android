@@ -116,12 +116,7 @@ public class RadioStatusDialog extends DialogFragment {
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        playerService.getRadio().stopSearch();
-                    }
-                });
+                playerService.handleStopSearch();
                 dismiss();
             }
         });
@@ -153,21 +148,8 @@ public class RadioStatusDialog extends DialogFragment {
         playerService.unregisterCallback(playerCallback);
         radio.getListenerManager()
                 .unregisterConnectionStateChangedListener(connectionStateChangeListener);
-        if (radio.isConnected() &&
-                radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        if (radio.stopSearch() ||
-                                !radio.isConnected() ||
-                                radio.getPlayStatus() != RadioDevice.Values.PLAY_STATUS_SEARCHING) {
-                            break;
-                        }
-                    }
-                }
-            }).start();
-
+        if (radio.isConnected()) {
+            playerService.handleStopSearch();
         }
     }
 
