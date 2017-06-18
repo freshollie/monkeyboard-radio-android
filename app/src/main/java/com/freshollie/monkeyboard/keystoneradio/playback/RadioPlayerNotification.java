@@ -13,6 +13,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import java.text.DecimalFormat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -68,6 +69,18 @@ public class RadioPlayerNotification {
         }
 
         if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
+
+            String trackName = playerService.getMetadata()
+                    .getString(MediaMetadataCompat.METADATA_KEY_TITLE);
+
+            if (trackName == null || trackName.isEmpty()) {
+                trackName = new DecimalFormat("#.0").format(
+                                    playerService.getMetadata().getLong(
+                                            MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER
+                                    ) / 1000.0
+                );
+            }
+
             return builder.setShowWhen(false)
                     .setLargeIcon(
                             ((BitmapDrawable) ResourcesCompat.getDrawableForDensity(
@@ -102,9 +115,7 @@ public class RadioPlayerNotification {
                                             )
                                     )
                     )
-                    .setContentTitle(playerService.getMetadata()
-                            .getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-                    )
+                    .setContentTitle(trackName)
                     .setContentText(
                             playerService.getMetadata().getString(
                                     MediaMetadataCompat.METADATA_KEY_GENRE
@@ -140,6 +151,7 @@ public class RadioPlayerNotification {
                                     RadioPlayerService.ACTION_STOP
                             )
                     )
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .build();
         } else {
             return builder.setShowWhen(false)
@@ -204,6 +216,7 @@ public class RadioPlayerNotification {
                                     RadioPlayerService.ACTION_STOP
                             )
                     )
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .build();
         }
     }
