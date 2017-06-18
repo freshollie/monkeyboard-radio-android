@@ -310,8 +310,8 @@ public class RadioDevice {
 
         buffer[lastByteNum] = ByteValues.END_BYTE;
 
-        long startTime = SystemClock.currentThreadTimeMillis();
-        while ((SystemClock.currentThreadTimeMillis() - startTime) < COMMAND_ATTEMPTS_TIMEOUT &&
+        long startTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startTime) < COMMAND_ATTEMPTS_TIMEOUT &&
                 connection.isRunning()) {
 
             byte[] response;

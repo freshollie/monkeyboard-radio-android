@@ -315,14 +315,14 @@ public class DeviceConnection {
         * verify it is the correct command
          */
 
-        long startTime = SystemClock.elapsedRealtime();
+        long startTime = System.currentTimeMillis();
 
         // This holds a command while it is being received
         byte[] commandBytes = new byte[MAX_PACKET_LENGTH];
         int commandByteNumber = 0;
 
         // Keep trying to read for a response byte until we time out
-        while ((SystemClock.elapsedRealtime() - startTime) < RESPONSE_TIMEOUT_LENGTH && isRunning()) {
+        while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && isRunning()) {
             byte[] readBytes = new byte[MAX_PACKET_LENGTH];
             int numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
 
@@ -335,7 +335,6 @@ public class DeviceConnection {
                     commandByteNumber ++;
                     if (GET_RESPONSE_DEBUG) {
                         Log.d(TAG, "Readbyte: " + String.valueOf(readByte));
-                        Log.d(TAG, "EndByte: " + String.valueOf(RadioDevice.ByteValues.END_BYTE));
                     }
                     if (readByte == RadioDevice.ByteValues.END_BYTE) {
                         if (GET_RESPONSE_DEBUG) {

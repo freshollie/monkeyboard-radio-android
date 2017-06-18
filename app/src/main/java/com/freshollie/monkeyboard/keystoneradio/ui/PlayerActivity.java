@@ -48,6 +48,7 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 /**
@@ -91,6 +92,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     private boolean userChangingFmFrequency = false;
 
+    private TextView fmFrequencyTextView;
     private TextView currentChannelView;
     private TextView programTextTextView;
     private TextView signalStrengthView;
@@ -405,14 +407,19 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         refreshSwitchControls();
 
         fmSeekBar = (SeekBar) findViewById(R.id.fm_seek_bar);
-        fmSeekBar.setMax(RadioDevice.Values.MAX_FM_FREQUENCY - RadioDevice.Values.MIN_FM_FREQUENCY);
-        fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
+        fmSeekBar.setMax(
+                (RadioDevice.Values.MAX_FM_FREQUENCY - RadioDevice.Values.MIN_FM_FREQUENCY) / 100
+        );
+
+        fmSeekBar.setProgress(
+                (playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY) / 100
+        );
 
         fmSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
                 if (playerBound && fromUser) {
-                    playerService.handleSetFmFrequencyRequest(i + RadioDevice.Values.MIN_FM_FREQUENCY);
+                    playerService.handleSetFmFrequencyRequest(i * 100 + RadioDevice.Values.MIN_FM_FREQUENCY);
                 }
             }
 
@@ -707,6 +714,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void setupPlayerAttributes(Bundle savedInstanceState) {
+        fmFrequencyTextView = (TextView) findViewById(R.id.fm_frequency_text);
         currentChannelView = (TextView) findViewById(R.id.channel_name);
         dataRateTextView = (TextView) findViewById(R.id.data_rate);
         ensembleTextView = (TextView) findViewById(R.id.station_ensemble_name);
@@ -722,6 +730,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         if (savedInstanceState != null) {
             Log.v(TAG, "Loading previous states");
+            fmFrequencyTextView.setText(
+                    savedInstanceState.getString(String.valueOf(R.id.fm_frequency_text))
+            );
             currentChannelView.setText(
                     savedInstanceState.getString(String.valueOf(R.id.channel_name))
             );
@@ -756,6 +767,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void clearPlayerAttributes() {
+        fmFrequencyTextView.setText("");
         signalStrengthView.setText("");
         programTextTextView.setText("");
         stereoStateTextView.setText("");
@@ -782,9 +794,14 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 }
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
+                    fmFrequencyTextView.setText(
+                            new DecimalFormat("#.0")
+                                    .format(currentStation.getFrequency() / 1000.0)
+                    );
+
                     if (!userChangingFmFrequency) {
-                        fmSeekBar.setProgress(playerService.getCurrentFmFrequency() -
-                                RadioDevice.Values.MIN_FM_FREQUENCY);
+                        fmSeekBar.setProgress((playerService.getCurrentFmFrequency() -
+                                RadioDevice.Values.MIN_FM_FREQUENCY) / 100);
                     }
 
                     updateStationListSelection(playerService.getCurrentSavedFmStationIndex());
@@ -992,7 +1009,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         if (playerBound) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
                 playerService.handleSetFmFrequencyRequest(
-                        playerService.getFmRadioStations()[channelIndex].getChannelFrequency()
+                        playerService.getFmRadioStations()[channelIndex].getFrequency()
                 );
             } else {
                 playerService.handleSetDabChannelRequest(channelIndex);
@@ -1228,6 +1245,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.v(TAG, "Saving state");
+        outState.putString(String.valueOf(R.id.fm_frequency_text),
+                fmFrequencyTextView.getText().toString());
+
         outState.putString(String.valueOf(R.id.channel_name),
                 currentChannelView.getText().toString());
 

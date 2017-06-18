@@ -93,18 +93,14 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         final RadioStation radioStation = stationList[position];
 
         stationCard.stationName.setText(radioStation.getName());
-        DecimalFormat df = new DecimalFormat("#.00");
 
-        String frequencyStationName = playerActivity.getString(
-                R.string.fm_frequency_placeholder,
-                df.format(radioStation.getChannelFrequency() / 1000.0)
-        );
-
-        if (radioStation.getChannelFrequency() >= RadioDevice.Values.MIN_FM_FREQUENCY &&
-                !frequencyStationName.equals(radioStation.getName())) {
+        if (radioStation.getFrequency() >= RadioDevice.Values.MIN_FM_FREQUENCY) {
             // We are an FM station but we have a name so set the ensemble text to the frequency
             // text
-            stationCard.stationEnsemble.setText(frequencyStationName);
+            stationCard.stationEnsemble.setText(
+                    new DecimalFormat("#.0")
+                            .format(radioStation.getFrequency() / 1000.0)
+            );
         } else {
             stationCard.stationEnsemble.setText(radioStation.getEnsemble());
         }
