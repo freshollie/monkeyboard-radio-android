@@ -30,6 +30,7 @@ import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
+import com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1164,10 +1165,16 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void updateFmFrequencyMetadata(int frequency) {
-        currentFmRadioStation = new RadioStation();
-        DecimalFormat df = new DecimalFormat("#.00");
+        int actualFrequency = frequency / 100 * 100;
 
-        currentFmRadioStation.setFrequency(frequency);
+        if (currentFmRadioStation != null) {
+            if (actualFrequency == currentFmRadioStation.getFrequency()) {
+                return;
+            }
+        }
+
+        currentFmRadioStation = new RadioStation();
+        currentFmRadioStation.setFrequency(actualFrequency);
 
         // We are already on a saved station so take our saved name
         if (getCurrentSavedFmStationIndex() > -1) {
