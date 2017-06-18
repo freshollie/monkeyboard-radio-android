@@ -41,6 +41,10 @@ public class RadioDevice {
     private String lastFmProgramName;
     private int lastFmProgramType;
 
+    private int lastStreamMode;
+
+    private DABSearchTask dabSearchTask;
+
     private int pollNumber = 0;
 
     private int COMMAND_ATTEMPTS_TIMEOUT = 300;
@@ -878,7 +882,7 @@ public class RadioDevice {
             dabSearchListener.onStarted();
 
             if (getTotalPrograms() > 0) {
-                reset(Values.RESET_TYPE_CLEAR);
+                //reset(Values.RESET_TYPE_CLEAR); // todo
             }
 
             // After a reset we need to wait for the board to respond to this command;
@@ -891,7 +895,7 @@ public class RadioDevice {
             }
 
 
-            int lastProgess = -1;
+            int lastProgress = -1;
             int lastNumChannels = -1;
             int progress;
             int numChannels = 0;
@@ -899,7 +903,7 @@ public class RadioDevice {
                 while (getFrequency(0) != -1 && getPlayStatus() == Values.PLAY_STATUS_SEARCHING) {
                     progress = getFrequency(0); // Gets the current frequency of the search
                     numChannels = getSearchProgram();
-                    if (lastNumChannels != numChannels || lastProgess != progress) {
+                    if (lastNumChannels != numChannels || lastProgress != progress) {
                         publishProgress(numChannels, progress);
                     }
                 }
@@ -929,7 +933,19 @@ public class RadioDevice {
     public boolean startDABSearch(DABSearchListener searchListener) {
         Log.v(TAG, "startDABSearch()");
         if (getPlayStatus() != Values.PLAY_STATUS_SEARCHING) {
-            new DABSearchTask().execute(searchListener);
+            dabSearchTask = new DABSearchTask();
+            dabSearchTask.execute(searchListener);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean stopDabSearch() {
+        Log.v(TAG, "stopDabSearch()");
+        if (getPlayStatus() == Values.PLAY_STATUS_SEARCHING ||
+                (dabSearchTask != null && !dabSearchTask.isCancelled())) {
+            dabSearchTask.cancel(true);
+            stopSearch();
             return true;
         }
         return false;
@@ -960,12 +976,26 @@ public class RadioDevice {
 
     /**
      * Runs all of the commands needed to poll information from a DAB/FM radio.
-     *
-     * @return
      */
     private boolean poll() {
         try {
             int currentStreamMode = getPlayMode();
+
+            // If we change mode we might as well reset the previous data so we send new data
+            if (currentStreamMode != lastStreamMode) {
+                lastPlayStatus = -1;
+                lastStereoState = -1;
+                lastProgramDataRate = -1;
+                lastFmProgramName = "";
+                lastFmProgramType = -1;
+                lastFmSignalStrength = -1;
+                lastFmFrequency = -1;
+                lastProgramDataRate = -1;
+                lastProgramText = "";
+                lastSignalQuality = -1;
+            }
+
+            lastStreamMode = currentStreamMode;
 
             int newVolume = getVolume();
             if (newVolume != lastVolume && newVolume != -1) {

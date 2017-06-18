@@ -1119,6 +1119,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     public void handleSetRadioMode(int newRadioMode) {
         setRadioMode(newRadioMode);
         if (newRadioMode == RadioDevice.Values.STREAM_MODE_DAB) {
+            currentFmRadioStation = null;
             handleSetDabChannelRequest(currentDabChannelIndex);
         } else {
             handleSetFmFrequencyRequest(currentFmFrequency);
@@ -1139,6 +1140,16 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             public void run() {
                 radio.stopSearch();
                 radio.search(direction);
+            }
+        });
+    }
+
+    public void handleStopSearch() {
+        handleAction(new Runnable() {
+            @Override
+            public void run() {
+                radio.stopDabSearch();
+
             }
         });
     }
