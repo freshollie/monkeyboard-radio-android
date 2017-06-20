@@ -268,6 +268,14 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                     stationListAdapter.getStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
                 showStationList(playerService.getRadioMode());
+                if (playerService.getDabRadioStations().length < 1) {
+                    if (sharedPreferences.getBoolean(
+                            getString(R.string.pref_fm_mode_enabled_key),
+                            true)
+                            ) {
+                        playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
+                    }
+                }
             } else if (!Arrays.equals(playerService.getFmRadioStations(),
                     stationListAdapter.getStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
@@ -350,14 +358,12 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         if (!fmModeEnabled) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
                 playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_DAB);
-                onRadioModeChanged(playerService.getRadioMode());
             }
             modeSwitchLabel.setVisibility(View.GONE);
             modeSwitch.setVisibility(View.GONE);
         } else if (!dabModeEnabled) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
                 playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
-                onRadioModeChanged(playerService.getRadioMode());
             }
             modeSwitchLabel.setVisibility(View.GONE);
             modeSwitch.setVisibility(View.GONE);
@@ -400,7 +406,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                                     RadioDevice.Values.STREAM_MODE_DAB:
                                     RadioDevice.Values.STREAM_MODE_FM
                     );
-                    onRadioModeChanged(playerService.getRadioMode());
                 }
             }
         });

@@ -882,7 +882,7 @@ public class RadioDevice {
             dabSearchListener.onStarted();
 
             if (getTotalPrograms() > 0) {
-                //reset(Values.RESET_TYPE_CLEAR); // todo
+                reset(Values.RESET_TYPE_CLEAR);
             }
 
             // After a reset we need to wait for the board to respond to this command;

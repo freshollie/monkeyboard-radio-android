@@ -117,6 +117,27 @@ public class RadioStatusDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 playerService.handleStopSearch();
+
+                // Check if this dialog is being run in the player activity
+                if (getActivity() != null &&
+                        getActivity().getClass().getSimpleName()
+                                .equals(PlayerActivity.class.getSimpleName())) {
+
+                    // Switch back to FM mode if possible
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager
+                                    .getDefaultSharedPreferences(getActivity());
+                    if (sharedPreferences
+                            .getBoolean(
+                                    getString(R.string.pref_fm_mode_enabled_key),
+                                    true
+                            )) {
+                        playerService
+                                .handleSetRadioMode(
+                                        RadioDevice.Values.STREAM_MODE_FM
+                                );
+                    }
+                }
                 dismiss();
             }
         });
@@ -189,10 +210,6 @@ public class RadioStatusDialog extends DialogFragment {
                                                 .handleSetRadioMode(
                                                         RadioDevice.Values.STREAM_MODE_FM
                                                 );
-                                        ((PlayerActivity) getActivity())
-                                                .onRadioModeChanged(
-                                                        RadioDevice.Values.STREAM_MODE_FM
-                                                );
                                     }
                                     dismiss();
                                 }
@@ -245,6 +262,7 @@ public class RadioStatusDialog extends DialogFragment {
                     getString(R.string.dialog_dab_search_found_channels_progress,
                             numChannels)
             );
+
             if (progressIcon.isIndeterminate()) {
                 progressIcon.setIndeterminate(false);
             }
@@ -292,6 +310,11 @@ public class RadioStatusDialog extends DialogFragment {
 
         @Override
         public void onPlayerVolumeChanged(int newVolume) {
+
+        }
+
+        @Override
+        public void onRadioModeChanged(int radioMode) {
 
         }
     };
