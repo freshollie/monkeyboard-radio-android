@@ -119,6 +119,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     public interface PlayerCallback {
         void onPlayerVolumeChanged(int volume);
 
+        void onRadioModeChanged(int radioMode);
+
         void onNoStoredStations();
         void onDeviceAttachTimeout();
 
@@ -548,7 +550,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return false;
     }
 
-    public void clearFmRadioStations() {
+    public void handleClearFmRadioStations() {
         fmRadioStations.clear();
         saveFmStationList();
     }
@@ -1118,6 +1120,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void handleSetRadioMode(int newRadioMode) {
         setRadioMode(newRadioMode);
+        notifyRadioModeChanged(newRadioMode);
         if (newRadioMode == RadioDevice.Values.STREAM_MODE_DAB) {
             currentFmRadioStation = null;
             handleSetDabChannelRequest(currentDabChannelIndex);
@@ -1155,6 +1158,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void startDabChannelSearchTask() {
+        dabRadioStations = new RadioStation[0];
         radio.startDABSearch(dabSearchListener);
     }
 
@@ -1525,6 +1529,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void unregisterCallback(PlayerCallback callback) {
         playerCallbacks.remove(callback);
+    }
+
+    private void notifyRadioModeChanged(int radioMode) {
+        for (PlayerCallback playerCallback: playerCallbacks) {
+            playerCallback.onRadioModeChanged(radioMode);
+        }
     }
 
     private void notifyPlayerVolumeChanged(int newVolume) {

@@ -147,7 +147,7 @@ public class SettingsFragment extends PreferenceFragment {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         if (playerService != null) {
-                                            playerService.clearFmRadioStations();
+                                            playerService.handleClearFmRadioStations();
                                         }
                                     }
                                 });
