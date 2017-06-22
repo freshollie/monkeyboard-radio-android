@@ -23,8 +23,7 @@
         </activity>
 
         <activity
-            android:name="com.freshollie.monkeyboard.keystoneradio.ui.SettingsActivity"
-            android:launchMode="singleTop">
+            android:name="com.freshollie.monkeyboard.keystoneradio.ui.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity" />

@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">Monkeyboard Dab Radio</string>
+    <string name="app_name">Monkeyboard Keystone Radio</string>
 
     <string name="no_saved_stations">Radio has no stored stations, perform scan?</string>
-    <string name="yes">yes</string>
-    <string name="no">no</string>
-    <string name="cancel">cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
 
     <string name="device_connection_timed_out_try_again">Waited too long for device to connect. \nTry again?</string>
     <string name="dialog_dab_search_try_again_message">No stations found. Make sure the arial is plugged in.\nTry again?</string>
@@ -57,18 +57,40 @@
 
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
-    <string name="SHARED_PREFERENCES_KEY">98asfa98as8ffd</string>
-    <string name="CURRENT_CHANNEL_KEY">current_channel</string>
-    <string name="STATION_LIST_KEY">station_list</string>
+    <string name="DAB_CURRENT_CHANNEL_INDEX_KEY">dab_current_channel_index</string>
+    <string name="FM_CURRENT_FREQUENCY_KEY">fm_current_frequency</string>
+
+    <string name="DAB_STATION_LIST_KEY">dab_station_list</string>
+    <string name="FM_STATION_LIST_KEY">fm_station_list</string>
     <string name="VOLUME_KEY">volume</string>
     <string name="DUCK_VOLUME_KEY">duck_volume</string>
     <string name="PLAY_ON_OPEN_KEY">play_on_open</string>
     <string name="HEADUNIT_MAIN_INPUT_KEY">headunit_main_input</string>
     <string name="SCROLL_WRAP_KEY">scroll_wrap</string>
     <string name="SYNC_VOLUME_KEY">sync_volume</string>
+
     <string name="pref_sync_volume_title">Sync radio and tablet volumes</string>
     <string name="pref_sync_volume_summary_on">Radio volume and tablet music volume are synced</string>
     <string name="pref_sync_volume_summary_off">Radio volume will be stored separately to tablet music volume</string>
+
+    <string name="RADIO_MODE_KEY">radio_mode</string>
+    <string name="fm_frequency_placeholder">%s MHz</string>
+    <string name="remove_station_description">Remove this channel</string>
+    <string name="channel_already_exists_message">Channel already saved</string>
+    <string name="pref_dab_mode_enabled_key">dab_mode_enabled</string>
+    <string name="pref_dab_mode_enabled_title">DAB mode</string>
+    <string name="pref_dab_mode_enabled_summary_on">Enabled</string>
+    <string name="pref_dab_mode_enabled_summary_off">Disabled</string>
+    <string name="pref_fm_mode_enabled_key">pref_fm_mode_enabled</string>
+    <string name="pref_fm_mode_enabled_title">FM mode</string>
+    <string name="mode_alert_message">At least one mode must be enabled</string>
+    <string name="pref_skip_buttons_control_summary">If checked then skip media buttons will skip to the next saved FM station,
+        otherwise they will control FM search</string>
+    <string name="pref_skip_buttons_control_key">pref_skip_buttons_control</string>
+    <string name="pref_skip_buttons_control_title">FM Skip buttons</string>
+    <string name="pref_clear_fm_stations_key">pref_clear_fm_stations_key</string>
+    <string name="pref_clear_fm_stations_title">Clear FM stations</string>
+    <string name="pref_clear_fm_stations_summary">Clear all saved FM stations</string>
 
 
     <string-array name="STATION_GENRES">
