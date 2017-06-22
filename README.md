@@ -1,14 +1,20 @@
-# Monkeyboard DAB radio for android
+# Monkeyboard - DAB & FM radio for android
+
+<img align="right" src="screenshots/demo.gif">
 
 [Latest Build](/app/build/outputs/apk) (Minimum version 4.2)
 
-Build has only been tested on 6.0. If the app crashes on your system submit an issue with a full log file (Look this up if you dont know how to do this)
+Build has only been tested on 6.0 & 5.1. 
+
+If the app crashes on your system submit an issue with a full log file (Look this up if you dont know how to do this)
+
+
 
 ## About
 
-This app will interface with a [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-fm-digital-radio-development-board) and provides a control and feedback interface for the user for DAB only.
+This app will interface with a [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-fm-digital-radio-development-board) and provides a control and feedback interface for the user.
 
-The Monkeyboard communicates via USB serial and so I used the specifcation from the manufacturer to write a simple API interface for the board (com.freshollie.monkeyboarddab.radio). 
+The Monkeyboard communicates via USB serial and so I used the specifcation from the manufacturer to write a simple API interface for the board (com.freshollie.monkeyboard.keystoneradio.radio). 
 
 The app is designed to act as if it is a normal music player as so will act accordingly, for example audio focus will be follow a mediaplayer notification is provided. 
 
@@ -35,15 +41,15 @@ If you wish to report a bug, create an issue and I will look into it.
 
 ## Screenshots
 <p align="center">
-    <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/main_interface.png" alt="Main interface" width="800"/>
+    <img src="screenshots/main_interface.png" alt="Main interface" width="800"/>
 </p>
 
 <p align="center">
-    <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/searching_interface.png" alt="Searching interface" width="800"/>
+    <img src="screenshots/searching_interface.png" alt="Searching interface" width="800"/>
 </p>
 
 <p align="center">>
-    <img src="https://github.com/freshollie/MonkeyboardAndroidRadioApp/raw/master/screenshots/settings_interface.png" align="center" alt="Settings interface" width="800"/>
+    <img src="screenshots/settings_interface.png" align="center" alt="Settings interface" width="800"/>
 </p>
 
 ## Licence
