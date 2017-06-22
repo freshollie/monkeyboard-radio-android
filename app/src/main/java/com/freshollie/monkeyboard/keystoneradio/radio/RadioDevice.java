@@ -762,13 +762,15 @@ public class RadioDevice {
             Log.v(TAG, "getTotalPrograms()");
         }
 
+        byte[] response = null;
 
-        byte[] response =
-                call(
-                        ByteValues.CLASS_STREAM,
-                        ByteValues.STREAM_GetTotalProgram,
-                        new byte[]{}
-                );
+        while (response == null && isConnected()) {
+            response = call(
+                    ByteValues.CLASS_STREAM,
+                    ByteValues.STREAM_GetTotalProgram,
+                    new byte[]{}
+            );
+        }
 
         if (response != null) {
             return getIntFromBytes(Arrays.copyOfRange(response, 6, 10));

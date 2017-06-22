@@ -856,18 +856,22 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
      * Updates the radio board to play the currently selected DAB station.
      *
      * If there is a large difference between the number of programs and the number of stored
-     * programs, a search will be performed.
+     * programs, the stations will be copied from the board, if there are no stations on the board
+     * a search will be performed
      */
     private boolean updateBoardDabChannelAction() {
+
+        int totalPrograms = radio.getTotalPrograms();
+
         if (getDabRadioStations().length < 1 ||
-                totalCollectedDabStations != radio.getTotalPrograms()) {
+                totalCollectedDabStations != totalPrograms) {
 
             if (radio.getTotalPrograms() > 0) {
                 if (getDabRadioStations().length < 1) {
                     Log.v(TAG, "No stations stored on device");
                 } else {
                     Log.v(TAG, "" + totalCollectedDabStations);
-                    Log.v(TAG, "" + radio.getTotalPrograms());
+                    Log.v(TAG, "" + totalPrograms);
                 }
                 startDabStationListCopyTask();
             } else {
