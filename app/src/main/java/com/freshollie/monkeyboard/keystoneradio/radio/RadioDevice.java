@@ -825,6 +825,22 @@ public class RadioDevice {
         return stationList;
     }
 
+    public void waitForReady() {
+        // After a reset we need to wait for the board to respond to this command;
+        long startTime = SystemClock.currentThreadTimeMillis();
+        while ((SystemClock.currentThreadTimeMillis() - startTime) < 5000 &&
+                connection.isRunning()) {
+            if (getSysReady()) {
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+    }
+
     private class CopyStationsTask extends AsyncTask<CopyProgramsListener, Integer, RadioStation[]> {
         private CopyProgramsListener copyProgramsListener;
 
@@ -885,14 +901,7 @@ public class RadioDevice {
                 reset(Values.RESET_TYPE_CLEAR);
             }
 
-            // After a reset we need to wait for the board to respond to this command;
-            long startTime = SystemClock.currentThreadTimeMillis();
-            while ((SystemClock.currentThreadTimeMillis() - startTime) < 5000 &&
-                    connection.isRunning()) {
-                if (getSysReady()) {
-                    break;
-                }
-            }
+            waitForReady();
 
 
             int lastProgress = -1;
@@ -945,6 +954,7 @@ public class RadioDevice {
         if (getPlayStatus() == Values.PLAY_STATUS_SEARCHING ||
                 (dabSearchTask != null && !dabSearchTask.isCancelled())) {
             dabSearchTask.cancel(true);
+            dabSearchTask = null;
             stopSearch();
             return true;
         }

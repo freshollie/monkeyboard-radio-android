@@ -102,7 +102,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public static int MAX_PLAYER_VOLUME = 15;
     private boolean actionComplete;
-
+    private boolean copyTaskRunning = false;
 
     private enum AudioFocus {
         NoFocusNoDuck,    // we don't have audio focus, and can't duck
@@ -596,6 +596,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void saveCurrentDabChannelIndex() {
+        Log.v(TAG, "Saving DAB index " + currentDabChannelIndex);
         sharedPreferences.edit()
                 .putInt(getString(R.string.DAB_CURRENT_CHANNEL_INDEX_KEY), currentDabChannelIndex)
                 .apply();
@@ -608,9 +609,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void startDabStationListCopyTask() {
-        radio.copyDabStationList(copyProgramsListener);
-        setCurrentDabChannelIndex(0);
-        notifyDabStationListCopyStart();
+        if (!copyTaskRunning) {
+            copyTaskRunning = true;
+            radio.copyDabStationList(copyProgramsListener);
+            setCurrentDabChannelIndex(0);
+            notifyDabStationListCopyStart();
+        }
     }
 
     private void onConnectedSequence() {
@@ -821,6 +825,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         Runnable newRunnable = new Runnable() {
             @Override
             public void run() {
+                radio.waitForReady();
                 action.run();
             }
         };
@@ -856,7 +861,14 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private boolean updateBoardDabChannelAction() {
         if (getDabRadioStations().length < 1 ||
                 totalCollectedDabStations != radio.getTotalPrograms()) {
+
             if (radio.getTotalPrograms() > 0) {
+                if (getDabRadioStations().length < 1) {
+                    Log.v(TAG, "No stations stored on device");
+                } else {
+                    Log.v(TAG, "" + totalCollectedDabStations);
+                    Log.v(TAG, "" + radio.getTotalPrograms());
+                }
                 startDabStationListCopyTask();
             } else {
                 Log.v(TAG, "No stations stored, need to perform channel search");
@@ -1611,6 +1623,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void notifyStationListCopyComplete() {
+        copyTaskRunning = false;
         for (PlayerCallback callback: playerCallbacks) {
             callback.onStationListCopyComplete();
         }
