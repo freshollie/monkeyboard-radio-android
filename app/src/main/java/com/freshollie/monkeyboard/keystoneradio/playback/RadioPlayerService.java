@@ -30,12 +30,10 @@ import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
-import com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -586,7 +584,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 .apply();
     }
 
-    private void saveCurrentDabChannelFrequency() {
+    private void saveCurrentDabChannelIndex() {
         sharedPreferences.edit()
                 .putInt(getString(R.string.DAB_CURRENT_CHANNEL_INDEX_KEY), currentDabChannelIndex)
                 .apply();
@@ -780,7 +778,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private void setCurrentDabChannelIndex(int channelIndex) {
         currentDabChannelIndex = channelIndex;
-        saveCurrentDabChannelFrequency();
+        saveCurrentDabChannelIndex();
     }
 
     private void setCurrentFmChannelFrequency(int frequency) {
