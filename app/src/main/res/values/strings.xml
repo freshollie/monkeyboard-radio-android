@@ -57,7 +57,7 @@
 
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
-    <string name="DAB_CURRENT_CHANNEL_INDEX_KEY">dab_current_channel_frequency</string>
+    <string name="DAB_CURRENT_CHANNEL_INDEX_KEY">dab_current_channel_index</string>
     <string name="FM_CURRENT_FREQUENCY_KEY">fm_current_frequency</string>
 
     <string name="DAB_STATION_LIST_KEY">dab_station_list</string>
