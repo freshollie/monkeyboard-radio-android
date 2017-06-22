@@ -1,9 +1,18 @@
+/*
+ * Created by Oliver Bell on 11/02/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 02/06/17 01:34
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,16 +21,15 @@ import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
-import com.freshollie.monkeyboard.keystoneradio.radio.ListenerManager;
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 /**
- * Created by Freshollie on 11/02/2017.
  * Dialog used to show progress of a DAB search or channel copy
  */
 
-public class RadioStatusDialog extends DialogFragment{
+public class RadioStatusDialog extends DialogFragment {
     private final String TAG = getClass().getSimpleName();
     private RadioPlayerService playerService;
     private RadioDevice radio;
@@ -75,7 +83,7 @@ public class RadioStatusDialog extends DialogFragment{
             progressIcon.setMaxProgress(RadioDevice.Values.MAX_CHANNEL_BAND);
             progressText.setText(getString(R.string.dialog_dab_search_found_channels_progress, 0));
             if (radio.isConnected()) {
-                playerService.startChannelSearchTask();
+                playerService.startDabChannelSearchTask();
             }
 
         } else if (currentState == State.Copying) {
@@ -108,6 +116,28 @@ public class RadioStatusDialog extends DialogFragment{
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                playerService.handleStopSearch();
+
+                // Check if this dialog is being run in the player activity
+                if (getActivity() != null &&
+                        getActivity().getClass().getSimpleName()
+                                .equals(PlayerActivity.class.getSimpleName())) {
+
+                    // Switch back to FM mode if possible
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager
+                                    .getDefaultSharedPreferences(getActivity());
+                    if (sharedPreferences
+                            .getBoolean(
+                                    getString(R.string.pref_fm_mode_enabled_key),
+                                    true
+                            )) {
+                        playerService
+                                .handleSetRadioMode(
+                                        RadioDevice.Values.STREAM_MODE_FM
+                                );
+                    }
+                }
                 dismiss();
             }
         });
@@ -139,21 +169,8 @@ public class RadioStatusDialog extends DialogFragment{
         playerService.unregisterCallback(playerCallback);
         radio.getListenerManager()
                 .unregisterConnectionStateChangedListener(connectionStateChangeListener);
-        if (radio.isConnected() &&
-                radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        if (radio.stopSearch() ||
-                                !radio.isConnected() ||
-                                radio.getPlayStatus() != RadioDevice.Values.PLAY_STATUS_SEARCHING) {
-                            break;
-                        }
-                    }
-                }
-            }).start();
-
+        if (radio.isConnected()) {
+            playerService.handleStopSearch();
         }
     }
 
@@ -175,12 +192,28 @@ public class RadioStatusDialog extends DialogFragment{
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if (getActivity().getClass().getSimpleName()
-                                        .equals("PlayerActivity")) {
-                                    playerService.closeConnection();
+                                // Check if this dialog is being run in the player activity
+                                if (getActivity() != null &&
+                                        getActivity().getClass().getSimpleName()
+                                                .equals("PlayerActivity")) {
+
+                                    // Switch back to FM mode if possible
+                                    SharedPreferences sharedPreferences =
+                                            PreferenceManager
+                                                    .getDefaultSharedPreferences(getActivity());
+                                    if (sharedPreferences
+                                            .getBoolean(
+                                                    getString(R.string.pref_fm_mode_enabled_key),
+                                                    true
+                                            )) {
+                                        playerService
+                                                .handleSetRadioMode(
+                                                        RadioDevice.Values.STREAM_MODE_FM
+                                                );
+                                    }
                                     dismiss();
-                                    getActivity().finish();
                                 }
+
                             }
                         })
                         .show();
@@ -190,7 +223,7 @@ public class RadioStatusDialog extends DialogFragment{
         }
 
         @Override
-        public void onAttachTimeout() {
+        public void onDeviceAttachTimeout() {
             statusText.setText(getString(R.string.dialog_dab_search_status_failed));
             progressIcon.setVisibility(View.INVISIBLE);
             progressText.setText(getString(R.string.dialog_dab_search_failed_timed_out));
@@ -229,6 +262,7 @@ public class RadioStatusDialog extends DialogFragment{
                     getString(R.string.dialog_dab_search_found_channels_progress,
                             numChannels)
             );
+
             if (progressIcon.isIndeterminate()) {
                 progressIcon.setIndeterminate(false);
             }
@@ -237,7 +271,7 @@ public class RadioStatusDialog extends DialogFragment{
 
         @Override
         public void onSearchComplete(int numChannels) {
-            playerService.startStationListCopyTask();
+            playerService.startDabStationListCopyTask();
         }
 
         @Override
@@ -278,10 +312,15 @@ public class RadioStatusDialog extends DialogFragment{
         public void onPlayerVolumeChanged(int newVolume) {
 
         }
+
+        @Override
+        public void onRadioModeChanged(int radioMode) {
+
+        }
     };
 
-    private ListenerManager.ConnectionStateChangeListener connectionStateChangeListener =
-            new ListenerManager.ConnectionStateChangeListener() {
+    private RadioDeviceListenerManager.ConnectionStateChangeListener connectionStateChangeListener =
+            new RadioDeviceListenerManager.ConnectionStateChangeListener() {
         @Override
         public void onStart() {
             setState(State.Searching);

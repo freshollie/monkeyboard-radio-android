@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 13/02/17
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 14/06/17 23:47
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 
@@ -14,6 +21,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -22,6 +30,10 @@ import android.view.View;
 import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
 
+/**
+ * Settings fragment displays all of the settings for the player and allows the user to edit those
+ * preferences.
+ */
 public class SettingsFragment extends PreferenceFragment {
     private String TAG = this.getClass().getSimpleName();
     private SharedPreferences sharedPreferences;
@@ -55,11 +67,7 @@ public class SettingsFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getActivity()
-                .getSharedPreferences(
-                        getActivity().getString(R.string.SHARED_PREFERENCES_KEY),
-                        Context.MODE_PRIVATE
-                );
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
@@ -88,6 +96,13 @@ public class SettingsFragment extends PreferenceFragment {
                 .setCancelable(true)
                 .setPositiveButton(getString(R.string.no), null)
                 .setNegativeButton(getString(R.string.yes), yesButton)
+                .show();
+    }
+
+    public void showModeAlert() {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.mode_alert_message)
+                .setPositiveButton(android.R.string.ok, null)
                 .show();
     }
 
@@ -121,6 +136,52 @@ public class SettingsFragment extends PreferenceFragment {
                         return true;
                     }
                 });
+
+        findPreference(getString(R.string.pref_clear_fm_stations_key))
+                .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        confirm(
+                                "Are you sure you want to clear all the saved FM stations?",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (playerService != null) {
+                                            playerService.handleClearFmRadioStations();
+                                        }
+                                    }
+                                });
+                        return true;
+                    }
+                });
+        final CheckBoxPreference dabEnabledPreference =
+                (CheckBoxPreference) findPreference(getString(R.string.pref_dab_mode_enabled_key));
+        final CheckBoxPreference fmEnabledPreference =
+                (CheckBoxPreference) findPreference(getString(R.string.pref_fm_mode_enabled_key));
+
+        dabEnabledPreference.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                if (!fmEnabledPreference.isChecked() && !((boolean) o)) {
+                    showModeAlert();
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        fmEnabledPreference.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                if (!dabEnabledPreference.isChecked() && !((boolean) o)) {
+                    showModeAlert();
+                    return false;
+                }
+                return true;
+            }
+        });
 
         // Play on open checkbox
         CheckBoxPreference playInputPreference =

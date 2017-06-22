@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 09/02/17
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 02/05/17 13:11
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.content.Context;
@@ -9,7 +16,7 @@ import com.nshmura.snappysmoothscroller.SnapType;
 import com.nshmura.snappysmoothscroller.SnappySmoothScroller;
 
 /**
- * Created by Freshollie on 09/02/2017.
+ * Layoutmanager used to control the animation of the recyclerview stationlist
  */
 
 public class StationListLayoutManager extends LinearLayoutManager {
