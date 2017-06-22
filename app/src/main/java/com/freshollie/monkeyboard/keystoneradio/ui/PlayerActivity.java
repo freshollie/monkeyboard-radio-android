@@ -326,7 +326,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         updateVolume(playerService.getPlayerVolume());
 
-        onRadioModeChanged(playerService.getRadioMode());
+
+        onRadioModeChanged(playerService.getRadioMode(), false);
 
         // Stop the animation from happening when the activity is first created
         if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
@@ -615,6 +616,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void onRadioModeChanged(int mode) {
+        onRadioModeChanged(mode, true);
+    }
+
+    public void onRadioModeChanged(int mode, boolean clearAttributes) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
 
             fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -671,7 +676,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
         modeSwitch.setChecked(mode == RadioDevice.Values.STREAM_MODE_FM);
         showStationList(mode);
-        clearPlayerAttributes();
+
+        if (clearAttributes) {
+            clearPlayerAttributes();
+        }
     }
 
     public void onOpenVolumeSeekBar() {
@@ -777,6 +785,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void clearPlayerAttributes() {
+        Log.d(TAG, "Clearing player attributes");
         fmFrequencyTextView.setText("");
         signalStrengthView.setText("");
         programTextTextView.setText("");
