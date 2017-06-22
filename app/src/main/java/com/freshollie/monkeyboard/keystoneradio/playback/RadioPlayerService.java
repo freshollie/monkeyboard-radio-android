@@ -76,6 +76,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     private RadioDevice radio;
     private RadioStation[] dabRadioStations = new RadioStation[0];
+    private int totalCollectedDabStations = 0;
     private ArrayList<RadioStation> fmRadioStations = new ArrayList<>();
 
     private RadioStation currentFmRadioStation;
@@ -164,6 +165,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
     };
 
+
     private RadioDevice.CopyProgramsListener copyProgramsListener =
             new RadioDevice.CopyProgramsListener() {
         @Override
@@ -173,12 +175,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         @Override
-        public void onComplete(RadioStation[] stationList) {
+        public void onComplete(RadioStation[] collectedRadioStations) {
             Log.v(TAG, "Collected all stations");
             ArrayList<RadioStation> newStationList = new ArrayList<>();
 
 
-            for (RadioStation radioStation: stationList) {
+            for (RadioStation radioStation: collectedRadioStations) {
                 if (radioStation.getGenreId() != -1) {
                     newStationList.add(radioStation);
                 }
@@ -187,7 +189,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             setDabStationList(
                     newStationList.toArray(
                             new RadioStation[newStationList.size()]
-                    )
+                    ),
+                    collectedRadioStations.length
             );
 
             if (dabRadioStations.length > 0) {
@@ -436,6 +439,11 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         if (dabStationsJsonList != null) {
             dabRadioStations = new RadioStation[dabStationsJsonList.size()];
+            totalCollectedDabStations = sharedPreferences.getInt(
+                    getString(R.string.TOTAL_COLLECTED_DAB_STATIONS_KEY),
+                    0
+            );
+
             try {
                 int i = 0;
                 for (String stationJsonString: dabStationsJsonList) {
@@ -511,6 +519,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         editor.putStringSet(getString(R.string.DAB_STATION_LIST_KEY), stringSet);
 
+        editor.putInt(getString(R.string.TOTAL_COLLECTED_DAB_STATIONS_KEY), totalCollectedDabStations);
+
         editor.apply();
     }
 
@@ -572,8 +582,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         fmRadioStations = new ArrayList<>(Arrays.asList(radioStationsArray));
     }
 
-    private void setDabStationList(RadioStation[] stationList) {
+    private void setDabStationList(RadioStation[] stationList, int totalCollectedPrograms) {
         dabRadioStations = stationList;
+        totalCollectedDabStations = totalCollectedPrograms;
         saveDabStationList();
     }
 
@@ -836,17 +847,21 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         return false;
     }
 
+    /**
+     * Updates the radio board to play the currently selected DAB station.
+     *
+     * If there is a large difference between the number of programs and the number of stored
+     * programs, a search will be performed.
+     */
     private boolean updateBoardDabChannelAction() {
-        if (Math.abs(getDabRadioStations().length - radio.getTotalPrograms()) > 8 ||
-                getDabRadioStations().length < 1) {
+        if (getDabRadioStations().length < 1 ||
+                totalCollectedDabStations != radio.getTotalPrograms()) {
             if (radio.getTotalPrograms() > 0) {
                 startDabStationListCopyTask();
-
             } else {
                 Log.v(TAG, "No stations stored, need to perform channel search");
                 notifyNoStoredStations();
             }
-
         } else if (getDabRadioStations().length > 0) {
             Log.v(TAG, "Requesting board to play: " + getCurrentStation().getName());
             if (radio.play(getRadioMode(), dabRadioStations[currentDabChannelIndex].getFrequency())) {
