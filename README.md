@@ -45,7 +45,7 @@ If you wish to report a bug, create an issue and I will look into it.
 </p>
 
 <p align="center">
-    <img src="screenshots/searching_interface.png" alt="Searching interface" width="800"/>
+    <img src="screenshots/dab_searc.gif" alt="Searching interface" width="800"/>
 </p>
 
 <p align="center">>
