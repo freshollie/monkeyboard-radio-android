@@ -1,3 +1,10 @@
+/*
+ * Created by Oliver Bell on 12/01/2017
+ * Copyright (c) 2017. by Oliver bell <freshollie@gmail.com>
+ *
+ * Last modified 28/05/17 01:07
+ */
+
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
 import android.app.PendingIntent;
@@ -19,10 +26,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Created by Freshollie on 12/01/2017.
- *
  * Handles all connection interaction with the monkeyboard over the usb serial connection
- *
  */
 
 public class DeviceConnection {
@@ -37,7 +41,7 @@ public class DeviceConnection {
     public final int RESPONSE_TIMEOUT_LENGTH = 200;
 
     private final String ACTION_USB_PERMISSION =
-            "com.freshollie.monkeyboarddabradio.radio.deviceconnection.action.USB_PERMISSION";
+            "com.freshollie.monkeyboard.keystoneradio.radio.deviceconnection.action.USB_PERMISSION";
 
     private int commandSerialNumber = 0;
     private UsbManager usbManager;
@@ -45,7 +49,7 @@ public class DeviceConnection {
     private UsbDeviceConnection usbDeviceConnection;
     private UsbSerialPort deviceSerialInterface;
 
-    private ListenerManager.ConnectionStateChangeListener connectionStateListener;
+    private RadioDeviceListenerManager.ConnectionStateChangeListener connectionStateListener;
 
     private Context context;
 
@@ -311,14 +315,14 @@ public class DeviceConnection {
         * verify it is the correct command
          */
 
-        long startTime = SystemClock.elapsedRealtime();
+        long startTime = System.currentTimeMillis();
 
         // This holds a command while it is being received
         byte[] commandBytes = new byte[MAX_PACKET_LENGTH];
         int commandByteNumber = 0;
 
         // Keep trying to read for a response byte until we time out
-        while ((SystemClock.elapsedRealtime() - startTime) < RESPONSE_TIMEOUT_LENGTH && isRunning()) {
+        while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && isRunning()) {
             byte[] readBytes = new byte[MAX_PACKET_LENGTH];
             int numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
 
@@ -331,7 +335,6 @@ public class DeviceConnection {
                     commandByteNumber ++;
                     if (GET_RESPONSE_DEBUG) {
                         Log.d(TAG, "Readbyte: " + String.valueOf(readByte));
-                        Log.d(TAG, "EndByte: " + String.valueOf(RadioDevice.ByteValues.END_BYTE));
                     }
                     if (readByte == RadioDevice.ByteValues.END_BYTE) {
                         if (GET_RESPONSE_DEBUG) {
@@ -413,7 +416,7 @@ public class DeviceConnection {
         return responseBytes;
     }
 
-    public void setConnectionStateListener(ListenerManager.ConnectionStateChangeListener listener) {
+    public void setConnectionStateListener(RadioDeviceListenerManager.ConnectionStateChangeListener listener) {
         connectionStateListener = listener;
     }
 
