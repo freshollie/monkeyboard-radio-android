@@ -792,7 +792,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         stereoStateTextView.setText("");
         onDabProgramDataRateChanged(0);
         onDabSignalQualityChanged(0);
-        onPlayStatusChanged(RadioDevice.Values.PLAY_STATUS_STREAM_STOP);
         genreTextView.setText("");
         ensembleTextView.setText("");
         currentChannelView.setText("");
