@@ -1122,6 +1122,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (newRadioMode == RadioDevice.Values.STREAM_MODE_DAB) {
             currentFmRadioStation = null;
             handleSetDabChannelRequest(currentDabChannelIndex);
+
         } else {
             handleSetFmFrequencyRequest(currentFmFrequency);
         }
@@ -1475,6 +1476,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                         updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
                     }
                 }
+            } else if (searchPauseState) {
+                searchPauseState = false;
+                updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
             }
         }
 
@@ -1505,9 +1509,11 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         @Override
         public void onFmSearchFrequencyChanged(int frequency) {
-            Log.v(TAG, "Search frequency changed");
-            setCurrentFmChannelFrequency(frequency);
-            updateFmFrequencyMetadata(frequency);
+            if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
+                Log.v(TAG, "Search frequency changed");
+                setCurrentFmChannelFrequency(frequency);
+                updateFmFrequencyMetadata(frequency);
+            }
         }
 
         @Override
