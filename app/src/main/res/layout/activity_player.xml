@@ -1,216 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
     android:orientation="vertical"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     tools:context="com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity">
-    <LinearLayout
+
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:orientation="vertical"
-        android:id="@+id/playing_panel"
-        android:clipToPadding="false">
-
-        <RelativeLayout
+        android:layout_weight="2">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:clipToPadding="false"
+            android:id="@+id/playing_panel">
 
-            <ImageButton
-                android:contentDescription="@string/settings_icon_description"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/settings_button"
-                android:background="?selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/ic_settings_white_24dp"
-                android:scaleType="fitXY"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="@dimen/activity_vertical_margin" />
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/signal_strength_icon"
-                android:layout_alignLeft="@+id/signal_strength_icon"
-                android:id="@+id/play_status"
-                android:text="@string/radio_status_connecting"
-                android:textSize="15sp" />
-
-            <TextView
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:gravity="right"
-                android:textAlignment="gravity"
-                android:id="@+id/signal_strength"
-                android:text="100%"
-                android:textSize="20sp"
-                android:layout_toLeftOf="@id/settings_button"
-                android:paddingRight="20dp" />
-
-            <ImageView
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp"
-                android:id="@+id/signal_strength_icon"
-                android:layout_toLeftOf="@id/signal_strength" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/data_rate"
-                android:textSize="15sp"
-                android:text="128 Kbps"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/program_stereo_mode"
-                android:textSize="15sp"
-                android:text="Stereo"
-                android:layout_below="@id/data_rate"
-                android:layout_centerHorizontal="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:id="@+id/station_ensemble_name"
-                android:textSize="20sp"
-                android:text="BBC National DAB"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:layout_alignParentLeft="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/station_ensemble_name"
-                android:layout_margin="5dp"
-                android:id="@+id/station_genre"
-                android:textSize="20sp"
-                android:text="Pop"
-                android:textAppearance="?android:textAppearanceSmall" />
-
-            <ImageButton
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_volume_mute_white_24dp"
-                android:scaleType="fitXY"
-                android:id="@+id/volume_button"
-                android:background="?selectableItemBackgroundBorderless"
-                android:layout_alignParentLeft="true" />
-
-            <SeekBar
-                android:layout_width="400dp"
-                android:layout_height="40dp"
-                android:layout_above="@+id/volume_button"
-                android:id="@+id/volume_seek_bar"
-                android:visibility="invisible"
-                android:max="16"
-                android:layout_alignParentLeft="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:layout_above="@+id/volume_seek_bar"
-                android:id="@+id/volume_text"
-                android:visibility="invisible"
-                android:paddingLeft="@dimen/activity_vertical_margin" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/status_panel_middle_point"
-                android:layout_centerHorizontal="true"
-                android:text="BBC Radio 1"
-                android:textSize="60sp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/channel_name"/>
-
-            <View
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_centerInParent="true"
-                android:id="@+id/status_panel_middle_point"/>
+                android:layout_weight="2"
+                android:id="@+id/player_attributes_panel">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/status_panel_middle_point"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
-                android:layout_centerHorizontal="true"
-                android:gravity="center"
-                android:textSize="30sp"
-                android:text="Test program text, this will display text about the program"
-                android:id="@+id/program_text"
-                android:textAppearance="?android:attr/textAppearance" />
-        </RelativeLayout>
+                <ImageButton
+                    android:contentDescription="@string/settings_icon_description"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/settings_button"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_settings_white_24dp"
+                    android:scaleType="fitXY"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="@dimen/activity_vertical_margin" />
 
-        <RelativeLayout
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            android:id="@+id/player_control_panel">
-            <ImageButton
-                android:clickable="true"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:id="@+id/skip_next_button"
-                android:background="?selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/ic_skip_next_white_24dp"
-                android:scaleType="fitXY"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"/>
+                <TextView
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/signal_strength_icon"
+                    android:layout_alignLeft="@+id/signal_strength_icon"
+                    android:id="@+id/play_status"
+                    android:text="@string/radio_status_connecting"
+                    android:textSize="15sp" />
 
-            <ImageButton
-                android:clickable="true"
-                android:background="?selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/ic_play_arrow_white_24dp"
-                android:scaleType="fitXY"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:id="@+id/play_pause_button"
-                android:layout_centerInParent="true" />
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:gravity="right"
+                    android:textAlignment="gravity"
+                    android:id="@+id/signal_strength"
+                    android:text="100%"
+                    android:textSize="20sp"
+                    android:layout_toLeftOf="@id/settings_button"
+                    android:paddingRight="20dp" />
 
-            <ImageButton
-                android:clickable="true"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:background="?selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/ic_skip_previous_white_24dp"
-                android:scaleType="fitXY"
-                android:id="@+id/skip_previous_button"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"/>
-        </RelativeLayout>
+                <ImageView
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp"
+                    android:id="@+id/signal_strength_icon"
+                    android:layout_toLeftOf="@id/signal_strength" />
 
-    </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/data_rate"
+                    android:textSize="15sp"
+                    android:text="128 Kbps"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/program_stereo_mode"
+                    android:textSize="15sp"
+                    android:text="Stereo"
+                    android:layout_below="@id/data_rate"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:id="@+id/station_ensemble_name"
+                    android:textSize="20sp"
+                    android:text="BBC National DAB"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_alignParentLeft="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/station_ensemble_name"
+                    android:layout_margin="5dp"
+                    android:id="@+id/station_genre"
+                    android:textSize="20sp"
+                    android:text="Pop"
+                    android:textAppearance="?android:textAppearanceSmall" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/station_genre"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_alignParentLeft="true"
+                    android:text="Mode"
+                    android:id="@+id/mode_switch_label"/>
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/mode_switch_label"
+                    android:layout_alignParentLeft="true"
+                    android:id="@+id/mode_switch"
+                    android:layout_marginLeft="5dp"
+                    android:showText="true"
+                    android:textOn="FM"
+                    android:textOff="DAB" />
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentBottom="true"
+                    app:srcCompat="@drawable/ic_volume_mute_white_24dp"
+                    android:scaleType="fitXY"
+                    android:id="@+id/volume_button"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:layout_alignParentLeft="true" />
+
+                <SeekBar
+                    android:layout_width="400dp"
+                    android:layout_height="40dp"
+                    android:layout_above="@+id/volume_button"
+                    android:id="@+id/volume_seek_bar"
+                    android:visibility="invisible"
+                    android:max="16"
+                    android:layout_alignParentLeft="true" />
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:layout_above="@+id/volume_button"
+                    android:id="@+id/fm_seek_bar"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_above="@+id/volume_seek_bar"
+                    android:id="@+id/volume_text"
+                    android:visibility="invisible"
+                    android:paddingLeft="@dimen/activity_vertical_margin" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/status_panel_middle_point"
+                    android:layout_centerHorizontal="true"
+                    android:text="BBC Radio 1"
+                    android:textSize="60sp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/channel_name"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/channel_name"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/fm_frequency_text"
+                    android:textSize="40sp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/status_panel_middle_point"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/status_panel_middle_point"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="1dp"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:textSize="30sp"
+                    android:text="Test program text, this will display text about the program"
+                    android:id="@+id/program_text"
+                    android:textAppearance="?android:attr/textAppearance" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:id="@+id/player_control_panel">
+
+                <ImageButton
+                    android:clickable="true"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/skip_next_button"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_skip_next_white_24dp"
+                    android:scaleType="fitXY"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"/>
+
+                <ImageButton
+                    android:clickable="true"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/search_forward_button"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_fast_forward_white_24dp"
+                    android:scaleType="fitXY"
+                    android:layout_toLeftOf="@+id/skip_next_button"
+                    android:layout_centerVertical="true"/>
+
+                <ImageButton
+                    android:clickable="true"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_play_arrow_white_24dp"
+                    android:scaleType="fitXY"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/play_pause_button"
+                    android:layout_centerInParent="true" />
+
+                <ImageButton
+                    android:clickable="true"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/search_backwards_button"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_fast_rewind_white_24dp"
+                    android:scaleType="fitXY"
+                    android:layout_toRightOf="@+id/skip_previous_button"
+                    android:layout_centerVertical="true"/>
+
+                <ImageButton
+                    android:clickable="true"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_skip_previous_white_24dp"
+                    android:scaleType="fitXY"
+                    android:id="@+id/skip_previous_button"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+        </LinearLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_add_white_24dp"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:id="@+id/add_channel_fab"
+            app:layout_anchor="@id/player_attributes_panel"
+            app:layout_anchorGravity="bottom|right|end"/>
+    </android.support.design.widget.CoordinatorLayout>
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
         android:background="@color/backgroundDarkAccent"
         android:id="@+id/station_list_container">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No saved stations"
+            android:gravity="center"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:id="@+id/no_saved_stations_text"
+            android:visibility="gone"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/station_list"
             android:scrollbars="vertical"
@@ -218,8 +297,8 @@
             android:layout_height="match_parent"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:fadeScrollbars="false"
+            android:clickable="true"
             android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
-            android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
-            android:background="@color/stationListBackgroundColor"/>
+            android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"/>
     </LinearLayout>
 </LinearLayout>

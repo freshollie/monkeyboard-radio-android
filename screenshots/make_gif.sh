@@ -1,0 +1,1 @@
+ffmpeg -y -i device-2017-06-22-163430.mp4 -vf fps=25,scale=640:-1:flags=lanczos,palettegen palette.png && ffmpeg -i device-2017-06-22-163430.mp4 -i palette.png -filter_complex "fps=25,scale=640:-1:flags=lanczos[x];[x][1:v]paletteuse" output.gif

@@ -1,3 +1,21 @@
+# BETA 1.2
+- Added FM mode to the app
+- Fixed station copy loop bug
+- Fixed search dialog bugs
+- Added more options to settings
+- More fixes with performance
+- Changed package name
+
+# BETA 1.1.1
+
+## Fixes
+- PlayerService refector
+- Comments
+
+## Changes
+- Volume will now mimic system volume, so volume buttons will affect radio volume
+
+
 # BETA 1.1
 
 ## Fixes
