@@ -870,6 +870,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
      * a search will be performed
      */
     private boolean updateBoardDabChannelAction() {
+        // Make sure we are up to date
+        if (totalCollectedDabStations != radioTotalStoredPrograms) {
+            radio.waitForReady();
+            radioTotalStoredPrograms = radio.getTotalPrograms();
+        }
+
         if (getDabRadioStations().length < 1 ||
                 totalCollectedDabStations != radioTotalStoredPrograms) {
 
