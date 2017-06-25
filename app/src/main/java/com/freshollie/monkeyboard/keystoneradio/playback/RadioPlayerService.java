@@ -77,6 +77,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private RadioDevice radio;
     private RadioStation[] dabRadioStations = new RadioStation[0];
     private int totalCollectedDabStations = 0;
+    private int radioTotalStoredPrograms;
+
     private ArrayList<RadioStation> fmRadioStations = new ArrayList<>();
 
     private RadioStation currentFmRadioStation;
@@ -193,6 +195,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     collectedRadioStations.length
             );
 
+            copyTaskRunning = false;
+
             if (dabRadioStations.length > 0) {
                 notifyStationListCopyComplete();
             } else {
@@ -209,6 +213,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         @Override
         public void onComplete(int numPrograms) {
+            startDabStationListCopyTask();
             notifyChannelSearchComplete(numPrograms);
         }
 
@@ -621,9 +626,13 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         // If the our internal database is dramatically different to that on the board, we will try
         // and sync our copies
 
+
+
         handleAction(new Runnable() {
             @Override
             public void run() {
+                radio.waitForReady();
+                radioTotalStoredPrograms = radio.getTotalPrograms();
                 radio.setStereoMode(1);
             }
         });
@@ -822,17 +831,17 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
      * @param action the request the needs to be fulfilled.
      */
     private void handleAction(final Runnable action) {
+
         Runnable newRunnable = new Runnable() {
             @Override
             public void run() {
-                radio.waitForReady();
                 action.run();
             }
         };
 
 
         if (radio.isConnected()) {
-            requestExecutor.submit(newRunnable);
+            requestExecutor.submit(action);
         } else {
             queuedAction = action;
             openConnection();
@@ -844,6 +853,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
             radio.stopSearch();
         }
+
         if (radio.play(getRadioMode(), currentFmFrequency)) {
             Log.v(TAG, "Approved, updating meta");
             updateFmFrequencyMetadata(currentFmFrequency);
@@ -860,18 +870,15 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
      * a search will be performed
      */
     private boolean updateBoardDabChannelAction() {
-
-        int totalPrograms = radio.getTotalPrograms();
-
         if (getDabRadioStations().length < 1 ||
-                totalCollectedDabStations != totalPrograms) {
+                totalCollectedDabStations != radioTotalStoredPrograms) {
 
-            if (radio.getTotalPrograms() > 0) {
+            if (radioTotalStoredPrograms > 0) {
                 if (getDabRadioStations().length < 1) {
                     Log.v(TAG, "No stations stored on device");
                 } else {
                     Log.v(TAG, "" + totalCollectedDabStations);
-                    Log.v(TAG, "" + totalPrograms);
+                    Log.v(TAG, "" + radioTotalStoredPrograms);
                 }
                 startDabStationListCopyTask();
             } else {
@@ -1627,7 +1634,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void notifyStationListCopyComplete() {
-        copyTaskRunning = false;
         for (PlayerCallback callback: playerCallbacks) {
             callback.onStationListCopyComplete();
         }
