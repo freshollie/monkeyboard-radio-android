@@ -17,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
@@ -43,7 +44,7 @@ public class RadioStatusDialog extends DialogFragment {
 
     private State currentState = State.Connecting;
 
-    private CircularProgressView progressIcon;
+    private ProgressBar progressBar;
     private TextView statusText;
     private TextView progressText;
 
@@ -64,8 +65,8 @@ public class RadioStatusDialog extends DialogFragment {
     private void onStateUpdated() {
         if (currentState == State.Connecting) {
             statusText.setText(getString(R.string.dialog_dab_search_status_connecting));
-            progressIcon.setIndeterminate(true);
-            progressIcon.setVisibility(View.VISIBLE);
+            progressBar.setProgress(0);
+            progressBar.setVisibility(View.VISIBLE);
             progressText.setText("");
             if (radio.isConnected()) {
                 setState(State.Searching);
@@ -75,12 +76,9 @@ public class RadioStatusDialog extends DialogFragment {
 
         } else if (currentState == State.Searching) {
             statusText.setText(getString(R.string.dialog_dab_search_status_searching));
-            if (!progressIcon.isIndeterminate()) {
-                progressIcon.setIndeterminate(true);
-            }
-            progressIcon.setVisibility(View.VISIBLE);
-            progressIcon.setProgress(0);
-            progressIcon.setMaxProgress(RadioDevice.Values.MAX_CHANNEL_BAND);
+            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setProgress(0);
+            progressBar.setMax(RadioDevice.Values.MAX_CHANNEL_BAND);
             progressText.setText(getString(R.string.dialog_dab_search_found_channels_progress, 0));
             if (radio.isConnected()) {
                 playerService.startDabChannelSearchTask();
@@ -88,9 +86,8 @@ public class RadioStatusDialog extends DialogFragment {
 
         } else if (currentState == State.Copying) {
             statusText.setText(getString(R.string.dialog_dab_search_status_copying));
-            progressIcon.setVisibility(View.VISIBLE);
-            progressIcon.setIndeterminate(false);
-            progressIcon.setProgress(0);
+            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setProgress(0);
             progressText.setText(getString(R.string.dialog_dab_search_copying_channels_progress, 0));
         }
     }
@@ -106,7 +103,7 @@ public class RadioStatusDialog extends DialogFragment {
         // Pass null as the parent view because its going in the dialog layout
         View view = inflater.inflate(R.layout.search_dialog_content, null);
 
-        progressIcon = (CircularProgressView) view.findViewById(R.id.search_dialog_progress_icon);
+        progressBar = (ProgressBar) view.findViewById(R.id.search_dialog_progress_bar);
         progressText = (TextView) view.findViewById(R.id.search_dialog_progress_text);
         statusText = (TextView) view.findViewById(R.id.search_dialog_status_text);
 
@@ -179,7 +176,7 @@ public class RadioStatusDialog extends DialogFragment {
         public void onNoStoredStations() {
             if (currentState != State.Connecting) {
                 statusText.setText(getString(R.string.dialog_dab_search_status_failed));
-                progressIcon.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
                 progressText.setText(getString(R.string.dialog_dab_search_failed_no_channels_found));
                 new AlertDialog.Builder(getActivity())
                         .setMessage(getString(R.string.dialog_dab_search_try_again_message))
@@ -211,8 +208,8 @@ public class RadioStatusDialog extends DialogFragment {
                                                         RadioDevice.Values.STREAM_MODE_FM
                                                 );
                                     }
-                                    dismiss();
                                 }
+                                dismiss();
 
                             }
                         })
@@ -225,7 +222,7 @@ public class RadioStatusDialog extends DialogFragment {
         @Override
         public void onDeviceAttachTimeout() {
             statusText.setText(getString(R.string.dialog_dab_search_status_failed));
-            progressIcon.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
             progressText.setText(getString(R.string.dialog_dab_search_failed_timed_out));
 
             new AlertDialog.Builder(getActivity())
@@ -263,15 +260,12 @@ public class RadioStatusDialog extends DialogFragment {
                             numChannels)
             );
 
-            if (progressIcon.isIndeterminate()) {
-                progressIcon.setIndeterminate(false);
-            }
-            progressIcon.setProgress(progress);
+            progressBar.setProgress(progress);
         }
 
         @Override
         public void onSearchComplete(int numChannels) {
-            playerService.startDabStationListCopyTask();
+
         }
 
         @Override
@@ -287,15 +281,17 @@ public class RadioStatusDialog extends DialogFragment {
             if (currentState != State.Copying) {
                 setState(State.Copying);
             }
+
             progressText.setText(
                     getString(R.string.dialog_dab_search_copying_channels_progress,
                             progress)
             );
-            if (progressIcon.getMaxProgress() != max) {
-                progressIcon.setMaxProgress(max);
+
+            if (progressBar.getMax() != max) {
+                progressBar.setMax(max);
             }
 
-            progressIcon.setProgress(max);
+            progressBar.setProgress(progress);
         }
 
         @Override

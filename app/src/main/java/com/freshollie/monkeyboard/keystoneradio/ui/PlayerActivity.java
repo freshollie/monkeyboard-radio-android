@@ -430,7 +430,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
                 if (playerBound && fromUser) {
-                    playerService.handleSetFmFrequencyRequest(i * 100 + RadioDevice.Values.MIN_FM_FREQUENCY);
+                    playerService.handleSetFmFrequencyRequest(
+                            i * 100 + RadioDevice.Values.MIN_FM_FREQUENCY
+                    );
                 }
             }
 
