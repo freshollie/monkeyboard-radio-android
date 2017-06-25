@@ -904,6 +904,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void handleSetDabChannelRequest(final int channelIndex) {
         // Saves the new current channel
+        if (channelIndex < 0 || channelIndex >= dabRadioStations.length) {
+            return;
+        }
+
         setCurrentDabChannelIndex(channelIndex);
 
         handleAction(new Runnable() {

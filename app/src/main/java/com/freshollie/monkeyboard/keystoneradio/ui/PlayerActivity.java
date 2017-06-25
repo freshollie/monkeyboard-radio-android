@@ -1321,7 +1321,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         switch (keyCode) {
             case KeyEvent.KEYCODE_ENTER:
                 if (stationListAdapter != null) {
-                    if (playerBound) {
+                    if (playerBound &&
+                            playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
                         int lastChannel = playerService.getCurrentDabChannelIndex();
                         playerService.handleSetDabChannelRequest(stationListAdapter.getCursorIndex());
 
