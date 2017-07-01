@@ -1356,7 +1356,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         return false;
     }
-
+ 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
