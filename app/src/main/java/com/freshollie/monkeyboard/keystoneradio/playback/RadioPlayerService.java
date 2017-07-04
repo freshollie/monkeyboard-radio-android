@@ -626,8 +626,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         // If the our internal database is dramatically different to that on the board, we will try
         // and sync our copies
 
-
-
         handleAction(new Runnable() {
             @Override
             public void run() {
@@ -638,7 +636,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         });
 
         if (queuedAction != null) {
-            new Thread(queuedAction).start();
+            handleAction(queuedAction);
             queuedAction = null;
         }
 

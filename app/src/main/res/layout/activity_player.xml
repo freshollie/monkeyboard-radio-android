@@ -170,7 +170,7 @@
                     android:layout_above="@+id/status_panel_middle_point"
                     android:layout_centerHorizontal="true"
                     android:text="BBC Radio 1"
-                    android:textSize="60sp"
+                    android:textSize="60dp"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/channel_name"/>
                 <TextView
