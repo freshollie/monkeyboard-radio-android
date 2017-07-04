@@ -1,10 +1,23 @@
+# BETA 1.2.2
+
+## Fixes
+
+- Fixed minor bug which caused the queued action from connecting 
+  (For example when you send the service a request to play) not 
+  being executed on the board executor thread, caused weird issues
+
 # BETA 1.2
-- Added FM mode to the app
+
+# Fixes
 - Fixed station copy loop bug
 - Fixed search dialog bugs
-- Added more options to settings
-- More fixes with performance
+- Fixed performance fixes
+
+# Changes
 - Changed package name
+
+# New
+- Added FM mode
 
 # BETA 1.1.1
 
