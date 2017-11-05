@@ -1048,9 +1048,11 @@ public class RadioDevice {
                 }
 
                 int newStereoState = getStereo();
-                if (newStereoState != lastStereoState && newStereoState != -1) {
-                    listenerManager.notifyStereoStateChanged(newStereoState);
+                if (newStereoState != lastStereoState) {
                     lastStereoState = newStereoState;
+                    if (newStereoState != -1) {
+                        listenerManager.notifyStereoStateChanged(newStereoState);
+                    }
                 }
             }
 
@@ -1098,9 +1100,8 @@ public class RadioDevice {
 
             String newProgramText = getProgramText();
             if (newProgramText != null) {
-                if (!newProgramText.equals(lastProgramText) && !newProgramText.isEmpty()) {
+                if (!newProgramText.isEmpty()) {
                     listenerManager.notifyProgramTextChanged(newProgramText);
-                    lastProgramText = newProgramText;
                 }
             }
 

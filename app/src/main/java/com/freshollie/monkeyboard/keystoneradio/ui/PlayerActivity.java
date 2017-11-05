@@ -351,6 +351,18 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         if (preferencePlayOnOpen) {
             playerService.handlePlayRequest();
         }
+
+        // Make sure these attributes are up to date also
+        if (radio.isConnected()) {
+            onPlayStatusChanged(radio.getPlayStatus());
+            onStereoStateChanged(radio.getStereo());
+            if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+                onDabProgramDataRateChanged(radio.getProgramDataRate());
+                onDabSignalQualityChanged(radio.getSignalQuality());
+            } else {
+                onFmSignalStrengthChanged(radio.getSignalStrength());
+            }
+        }
     }
 
     public void refreshSwitchControls() {
@@ -1117,6 +1129,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     @Override
     public void onStereoStateChanged(int stereoState) {
+        Log.v(TAG, "STEROEREOEOE STATE CHANGE " + String.valueOf(stereoState));
         stereoStateTextView.setText(RadioDevice.StringValues.getStereoModeFromId(stereoState));
     }
 
