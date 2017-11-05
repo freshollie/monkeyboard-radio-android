@@ -8,6 +8,7 @@
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,9 +45,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         public TextView stationGenre;
         public TextView stationEnsemble;
         public View stationItemBackground;
-        public RelativeLayout stationSelectionLayout;
-        public View stationTopDivide;
-        public View stationBottomDivide;
+        public CardView stationSelectionLayout;
         public View stationRemoveButton;
 
         public StationCard(View v) {
@@ -55,9 +54,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             stationGenre = (TextView) v.findViewById(R.id.station_genre_card_text);
             stationEnsemble = (TextView) v.findViewById(R.id.station_ensemble_name_card_text);
             stationItemBackground = v.findViewById(R.id.station_item_background);
-            stationSelectionLayout = (RelativeLayout) v.findViewById(R.id.station_item_layout);
-            stationTopDivide = v.findViewById(R.id.top_divide);
-            stationBottomDivide = v.findViewById(R.id.bottom_divide);
+            stationSelectionLayout = (CardView) v.findViewById(R.id.station_item_layout);
             stationRemoveButton = v.findViewById(R.id.station_remove_button);
         }
     }
@@ -71,7 +68,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     public StationListAdapter.StationCard onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         // create a new view
-        RelativeLayout stationCardView = (RelativeLayout) LayoutInflater.from(parent.getContext())
+        CardView stationCardView = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.station_card_layout, parent, false);
         return new StationCard(stationCardView);
     }
@@ -118,13 +115,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
 
         if (position == cursorIndex && !deleteMode) {
-            stationCard.stationBottomDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.colorPrimaryDark)
-            );
-
-            stationCard.stationTopDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.colorPrimaryDark)
-            );
 
             if (position != currentStationIndex) {
                 stationCard.stationItemBackground.setBackgroundColor(ContextCompat
@@ -133,13 +123,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 stationCard.stationItemBackground.setAlpha(0.3f);
             }
 
-        } else {
-            stationCard.stationBottomDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.backgroundDarker)
-            );
-            stationCard.stationTopDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.backgroundDarker)
-            );
         }
 
         if (position != currentStationIndex && position != cursorIndex) {

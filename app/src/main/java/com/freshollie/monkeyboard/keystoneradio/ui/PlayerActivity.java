@@ -332,7 +332,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         // Stop the animation from happening when the activity is first created
         if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
             fmSeekBar.clearAnimation();
-            fmSeekBar.setVisibility(View.INVISIBLE);
+            fmSeekBar.setVisibility(View.GONE);
             searchBackwardsButton.clearAnimation();
             searchBackwardsButton.setVisibility(View.INVISIBLE);
             searchForwardsButton.clearAnimation();
@@ -359,25 +359,20 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         boolean dabModeEnabled =
                 sharedPreferences.getBoolean(getString(R.string.pref_dab_mode_enabled_key), true);
 
-        TextView modeSwitchLabel = (TextView) findViewById(R.id.mode_switch_label);
-
         if (!fmModeEnabled) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
                 playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_DAB);
             }
-            modeSwitchLabel.setVisibility(View.GONE);
             modeSwitch.setVisibility(View.GONE);
         } else if (!dabModeEnabled) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
                 playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
             }
-            modeSwitchLabel.setVisibility(View.GONE);
             modeSwitch.setVisibility(View.GONE);
         } else {
             modeSwitch.setChecked(playerService.getRadioMode() ==
                     RadioDevice.Values.STREAM_MODE_FM);
             modeSwitch.setVisibility(View.VISIBLE);
-            modeSwitchLabel.setVisibility(View.VISIBLE);
         }
     }
 
@@ -450,7 +445,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             }
         });
 
-        fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.INVISIBLE);
+        fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
         addChannelFab.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
         addChannelFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -632,7 +627,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    fmSeekBar.setVisibility(View.INVISIBLE);
+                    fmSeekBar.setVisibility(View.GONE);
                     searchBackwardsButton.setVisibility(View.INVISIBLE);
                     searchForwardsButton.setVisibility(View.INVISIBLE);
                 }
@@ -666,6 +661,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
                 }
             });
+            fmSeekBar.setVisibility(View.INVISIBLE);
             fmSeekBar.startAnimation(fadeInAnimation);
             searchBackwardsButton.startAnimation(fadeInAnimation);
             searchForwardsButton.startAnimation(fadeInAnimation);
@@ -753,6 +749,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             fmFrequencyTextView.setText(
                     savedInstanceState.getString(String.valueOf(R.id.fm_frequency_text))
             );
+            if (!fmFrequencyTextView.getText().toString().isEmpty()) {
+                fmFrequencyTextView.setVisibility(View.VISIBLE);
+            }
+
             currentChannelView.setText(
                     savedInstanceState.getString(String.valueOf(R.id.channel_name))
             );
@@ -789,6 +789,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void clearPlayerAttributes() {
         Log.d(TAG, "Clearing player attributes");
         fmFrequencyTextView.setText("");
+        fmFrequencyTextView.setVisibility(View.GONE);
         signalStrengthView.setText("");
         programTextTextView.setText("");
         stereoStateTextView.setText("");
@@ -818,6 +819,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                             new DecimalFormat("#.0")
                                     .format(currentStation.getFrequency() / 1000.0)
                     );
+                    fmFrequencyTextView.setVisibility(View.VISIBLE);
 
                     if (!userChangingFmFrequency) {
                         fmSeekBar.setProgress((playerService.getCurrentFmFrequency() -

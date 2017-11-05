@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Monkeyboard Keystone Radio</string>
 
-    <string name="no_saved_stations">Radio has no stored stations, perform scan?</string>
+    <string name="no_saved_stations_question">Radio has no stored stations, perform scan?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
@@ -92,6 +92,9 @@
     <string name="pref_clear_fm_stations_title">Clear FM stations</string>
     <string name="pref_clear_fm_stations_summary">Clear all saved FM stations</string>
     <string name="TOTAL_COLLECTED_DAB_STATIONS_KEY">total_collected_dab_stations</string>
+    <string name="no_saved_stations_message">No saved stations</string>
+    <string name="dab">DAB</string>
+    <string name="fm">FM</string>
 
 
     <string-array name="STATION_GENRES">

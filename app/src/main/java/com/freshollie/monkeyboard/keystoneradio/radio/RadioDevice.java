@@ -86,6 +86,9 @@ public class RadioDevice {
         static byte STREAM_GetEnsembleName = 0x15; // Name of the DAB collection
         static byte STREAM_GetTotalProgram = 0x16;
         static byte STREAM_GetSearchProgram = 0x1B;
+
+        static byte CLASS_MOT = 0x03;
+        static byte MOT_GetMOTData = 0x00;
     }
 
     public static class Values {
@@ -805,6 +808,18 @@ public class RadioDevice {
         ) != null;
     }
 
+    private byte[] queryMotData() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "queryMotData()");
+        }
+
+        Log.v(TAG, "queryMotData()");
+        Log.v(
+                TAG,
+                Arrays.toString(call(ByteValues.CLASS_MOT, ByteValues.MOT_GetMOTData, new byte[]{0x01})));
+        return new byte[0];
+    }
+
     private RadioStation getRadioStation(int channelId) {
         String name = getProgramName(channelId, false);
         int genre = getProgramType(channelId);
@@ -1011,7 +1026,6 @@ public class RadioDevice {
 
             int newVolume = getVolume();
             if (newVolume != lastVolume && newVolume != -1) {
-                Log.v(TAG, "new Volume: " + newVolume);
                 listenerManager.notifyVolumeChanged(newVolume);
                 lastVolume = newVolume;
             }
@@ -1021,7 +1035,6 @@ public class RadioDevice {
                 if (getPlayMode() == Values.STREAM_MODE_DAB) {
                     int newProgramDataRate = getProgramDataRate();
                     if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
-                        Log.v(TAG, "new DataRate: " + newProgramDataRate);
                         listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
                         lastProgramDataRate = newProgramDataRate;
                     }
@@ -1029,7 +1042,6 @@ public class RadioDevice {
 
                 int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
                 if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
-                    Log.v(TAG, "new Program Type: " + newFmProgramType);
                     listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
                     lastFmProgramType = newFmProgramType;
 
@@ -1037,7 +1049,6 @@ public class RadioDevice {
 
                 int newStereoState = getStereo();
                 if (newStereoState != lastStereoState && newStereoState != -1) {
-                    Log.v(TAG, "new NewStereoState: " + newStereoState);
                     listenerManager.notifyStereoStateChanged(newStereoState);
                     lastStereoState = newStereoState;
                 }
@@ -1046,17 +1057,17 @@ public class RadioDevice {
             if (currentStreamMode == Values.STREAM_MODE_DAB) {
                 int newSignalQuality = getSignalQuality();
                 if (newSignalQuality != lastSignalQuality && newSignalQuality != -1) {
-                    Log.v(TAG, "new Signal Quality: " + newSignalQuality);
                     listenerManager.notifyDabSignalQualityChanged(newSignalQuality);
                     lastSignalQuality = newSignalQuality;
                 }
+
+                queryMotData();
 
             } else {
                 // We only need to search this stuff for FM
 
                 int newSignalStrength = getSignalStrength();
                 if (newSignalStrength != lastFmSignalStrength && newSignalStrength != -1) {
-                    Log.v(TAG, "new Signal strength: " + newSignalStrength);
                     listenerManager.notifyFmSignalStrengthChanged(newSignalStrength);
                     lastFmSignalStrength = newSignalStrength;
                 }
@@ -1065,7 +1076,6 @@ public class RadioDevice {
                 if (newFmProgramName != null &&
                         !newFmProgramName.equals(lastFmProgramName) &&
                         !newFmProgramName.isEmpty()) {
-                    Log.v(TAG, "new Program Name: " + newFmProgramName);
                     listenerManager.notifyFmProgramNameUpdated(newFmProgramName);
                     lastFmProgramName = newFmProgramName;
                 }
@@ -1075,7 +1085,6 @@ public class RadioDevice {
                 if (lastPlayStatus == Values.PLAY_STATUS_SEARCHING) {
                     int newSearchFrequency = getPlayIndex();
                     if (newSearchFrequency != lastFmFrequency && newSearchFrequency != -1) {
-                        Log.v(TAG, "new Frequency: " + newSearchFrequency);
                         listenerManager.notifyFmSearchFrequencyChanged(newSearchFrequency);
                         lastFmFrequency = newSearchFrequency;
                     }
@@ -1090,7 +1099,6 @@ public class RadioDevice {
             String newProgramText = getProgramText();
             if (newProgramText != null) {
                 if (!newProgramText.equals(lastProgramText) && !newProgramText.isEmpty()) {
-                    Log.v(TAG, "new ProgramText: " + newProgramText);
                     listenerManager.notifyProgramTextChanged(newProgramText);
                     lastProgramText = newProgramText;
                 }
@@ -1099,7 +1107,6 @@ public class RadioDevice {
             int newPlayStatus = getPlayStatus();
 
             if (newPlayStatus != lastPlayStatus && newPlayStatus != -1) {
-                Log.v(TAG, "new PlayStatus: " + newPlayStatus);
                 listenerManager.notifyPlayStatusChanged(newPlayStatus);
                 lastPlayStatus = newPlayStatus;
             }
