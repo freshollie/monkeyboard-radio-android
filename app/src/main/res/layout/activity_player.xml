@@ -35,6 +35,7 @@
                     app:cardElevation="5dp"
                     android:id="@+id/channel_status_bar">
                     <RelativeLayout
+                        android:padding="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -182,8 +183,8 @@
                     android:id="@+id/program_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/volume_text"
-                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/channel_name"
+                    android:layout_alignParentLeft="true"
                     android:padding="7dp"
                     android:text="Test program text, this will display text about the program"
                     android:textAppearance="?android:attr/textAppearance"
