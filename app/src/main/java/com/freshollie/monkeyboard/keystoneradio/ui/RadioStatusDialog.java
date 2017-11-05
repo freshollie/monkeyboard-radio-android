@@ -24,7 +24,6 @@ import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 /**
  * Dialog used to show progress of a DAB search or channel copy
