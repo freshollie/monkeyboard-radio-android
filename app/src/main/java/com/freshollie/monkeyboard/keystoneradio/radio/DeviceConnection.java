@@ -37,8 +37,8 @@ public class DeviceConnection {
     static boolean GET_RESPONSE_DEBUG = false;
 
     public static final int MAX_PACKET_LENGTH = 255;
-    public final int COMMUNICATION_TIMEOUT_LENGTH = 20;
-    public final int RESPONSE_TIMEOUT_LENGTH = 200;
+    public final int COMMUNICATION_TIMEOUT_LENGTH = 100;
+    public final int RESPONSE_TIMEOUT_LENGTH = 300;
 
     private final String ACTION_USB_PERMISSION =
             "com.freshollie.monkeyboard.keystoneradio.radio.deviceconnection.action.USB_PERMISSION";
@@ -320,11 +320,19 @@ public class DeviceConnection {
         // This holds a command while it is being received
         byte[] commandBytes = new byte[MAX_PACKET_LENGTH];
         int commandByteNumber = 0;
+        int payloadLength = 0;
 
         // Keep trying to read for a response byte until we time out
         while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && isRunning()) {
             byte[] readBytes = new byte[MAX_PACKET_LENGTH];
             int numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
+
+            if (numBytesRead == 0) {
+                Log.d(TAG, "Payload length: " + payloadLength + ", Actual length: " + (commandByteNumber - 6));
+                if (commandBytes[commandByteNumber - 1] == RadioDevice.ByteValues.END_BYTE) {
+                    return Arrays.copyOfRange(commandBytes, 0, commandByteNumber + 1);
+                }
+            }
 
             for (int i = 0; i < numBytesRead; i++) {
                 byte readByte = readBytes[i];
@@ -332,41 +340,61 @@ public class DeviceConnection {
                     // We are currently reading a command
 
                     commandBytes[commandByteNumber] = readByte; // Add the next byte
-                    commandByteNumber ++;
                     if (GET_RESPONSE_DEBUG) {
                         Log.d(TAG, "Readbyte: " + String.valueOf(readByte));
                     }
-                    if (readByte == RadioDevice.ByteValues.END_BYTE) {
-                        if (GET_RESPONSE_DEBUG) {
-                            Log.d(TAG, "End of command found");
-                            Log.d(TAG, Arrays.toString(commandBytes));
-                        }
 
-                        // Checked if command is signed with our serial number
-                        if (commandBytes[3] == serialNumber) {
+                    // We are at what should be the payload byte, so read the payload
+                    if (commandByteNumber == 5) {
+                        payloadLength = readByte & 0xFF;
+                    }
+
+                    if (commandByteNumber > 5 && (commandByteNumber - 6) >= payloadLength) {
+                        // We are larger than the payload length
+                        if (readByte == RadioDevice.ByteValues.END_BYTE) {
                             if (GET_RESPONSE_DEBUG) {
-                                Log.v(TAG, "Command is ours");
+                                Log.d(TAG, "End of command found");
+                                Log.d(TAG, Arrays.toString(commandBytes));
                             }
-                            // The command has finished being read and the command
-                            // is the command we are looking for so return it
-                            return Arrays.copyOfRange(commandBytes, 0, commandByteNumber);
 
+                            // Checked if command is signed with our serial number
+                            if (commandBytes[3] == serialNumber) {
+                                if (GET_RESPONSE_DEBUG) {
+                                    Log.v(TAG, "Command is ours");
+                                }
+                                // The command has finished being read and the command
+                                // is the command we are looking for so return it
+                                return Arrays.copyOfRange(commandBytes, 0, commandByteNumber + 1);
+
+                            } else {
+                                // This was not our command response, ignore it and restart
+                                commandByteNumber = 0;
+                                commandBytes = new byte[MAX_PACKET_LENGTH];
+                            }
                         } else {
-                            // This was not our command response, ignore it and restart
-                            commandByteNumber = 0;
-                            commandBytes = new byte[MAX_PACKET_LENGTH];
+                            Log.v(TAG,String.valueOf(readByte));
+                            Log.v(TAG, "BAD PACKET " + Arrays.toString(commandBytes));
+
+                            // Seeing as we are larger than the buffer size and we didn't get an end byte,
+                            // Something is wrong, so return nothing
+                            return new byte[MAX_PACKET_LENGTH];
                         }
                     }
+
+                    commandByteNumber++;
                 } else if (readByte == RadioDevice.ByteValues.START_BYTE) {
                     // A new command has started
                     commandByteNumber = 0;
+                    payloadLength = -1;
+
                     commandBytes = new byte[MAX_PACKET_LENGTH];
                     if (GET_RESPONSE_DEBUG) {
                         Log.v(TAG, "Read: New command starting to be read");
                     }
 
                     commandBytes[0] = readByte;
-                    commandByteNumber ++;
+
+                    commandByteNumber++;
                 }
             }
         }

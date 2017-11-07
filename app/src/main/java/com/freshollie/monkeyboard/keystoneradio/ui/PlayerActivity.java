@@ -1129,7 +1129,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     @Override
     public void onStereoStateChanged(int stereoState) {
-        Log.v(TAG, "STEROEREOEOE STATE CHANGE " + String.valueOf(stereoState));
         stereoStateTextView.setText(RadioDevice.StringValues.getStereoModeFromId(stereoState));
     }
 
