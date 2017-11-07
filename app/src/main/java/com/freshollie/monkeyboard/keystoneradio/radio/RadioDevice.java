@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
 
@@ -111,6 +112,8 @@ public class RadioDevice {
 
         public static final int SEARCH_BACKWARDS = 0;
         public static final int SEARCH_FORWARDS = 1;
+
+        public static final byte WITH_APPLICATION_TYPE = 0x01;
     }
 
 
@@ -162,6 +165,8 @@ public class RadioDevice {
     private Context context;
 
     private RadioDeviceListenerManager listenerManager;
+
+    private MOTDataParser motDataParser = new MOTDataParser();
 
     private Runnable pollLoop = new Runnable() {
         @Override
@@ -248,14 +253,14 @@ public class RadioDevice {
         pollThread.interrupt();
     }
 
-    private byte[] getBytesFromInt(int integer, int numBytes) {
+    public static byte[] getBytesFromInt(int integer, int numBytes) {
         byte[] bytes = new byte[numBytes];
         ByteBuffer wrapped = ByteBuffer.wrap(bytes);
         wrapped.putInt(integer);
         return bytes;
     }
 
-    private int getIntFromBytes(byte[] bytes){
+    public static int getIntFromBytes(byte[] bytes){
         ByteBuffer wrapped = ByteBuffer.wrap(bytes);
         int value;
         if (bytes.length < 4) {
@@ -266,7 +271,7 @@ public class RadioDevice {
         return value;
     }
 
-    private String getStringFromBytes(byte[] bytes) {
+    public static String getStringFromBytes(byte[] bytes) {
         return new String(bytes, Charset.forName("UTF-16")).trim();
     }
 
@@ -808,16 +813,18 @@ public class RadioDevice {
         ) != null;
     }
 
-    private byte[] queryMotData() {
+    private byte[] getMOTData() {
         if (DEBUG_OUT_COMMANDS) {
-            Log.v(TAG, "queryMotData()");
+            Log.v(TAG, "getMotData()");
         }
 
-        Log.v(TAG, "queryMotData()");
-        Log.v(
-                TAG,
-                Arrays.toString(call(ByteValues.CLASS_MOT, ByteValues.MOT_GetMOTData, new byte[]{0x01})));
-        return new byte[0];
+        return call(
+                ByteValues.CLASS_MOT,
+                ByteValues.MOT_GetMOTData,
+                new byte[]{
+                        Values.WITH_APPLICATION_TYPE
+                }
+        );
     }
 
     private RadioStation getRadioStation(int channelId) {
@@ -1063,7 +1070,16 @@ public class RadioDevice {
                     lastSignalQuality = newSignalQuality;
                 }
 
-                queryMotData();
+                int channelId = getPlayIndex();
+
+                byte[] motData = getMOTData();
+                if (motData != null) {
+                    motDataParser.parseData(channelId, motData);
+                    if (motDataParser.getChannelObject(channelId) != null && motDataParser.getChannelObject(channelId).isComplete()) {
+                        Log.v(TAG, Arrays.toString(motDataParser.getChannelObject(channelId).getBody()));
+                        motDataParser.reset();
+                    }
+                }
 
             } else {
                 // We only need to search this stuff for FM
@@ -1091,10 +1107,6 @@ public class RadioDevice {
                         lastFmFrequency = newSearchFrequency;
                     }
                 }
-
-
-
-
             }
 
 
