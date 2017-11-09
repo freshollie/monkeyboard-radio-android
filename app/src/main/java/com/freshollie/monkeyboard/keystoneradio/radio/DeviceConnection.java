@@ -18,6 +18,9 @@ import android.hardware.usb.UsbManager;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.felhr.usbserial.CDCSerialDevice;
+import com.felhr.usbserial.UsbSerialDevice;
+import com.felhr.usbserial.UsbSerialInterface;
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
@@ -245,10 +248,10 @@ public class DeviceConnection {
         Log.v(TAG, "Opening connection to device");
 
         usbDeviceConnection = usbManager.openDevice(usbDevice);
-
         UsbSerialDriver driver = new CdcAcmSerialDriver(usbDevice);
-        deviceSerialInterface = driver.getPorts().get(0);
+
         Log.v(TAG, "Device has " + String.valueOf(driver.getPorts().size()) + " ports");
+        deviceSerialInterface = driver.getPorts().get(0);
 
         try {
             deviceSerialInterface.open(usbDeviceConnection);
@@ -260,14 +263,13 @@ public class DeviceConnection {
             if (connectionStateListener != null) {
                 connectionStateListener.onStart();
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             closeConnection();
             if (connectionStateListener != null) {
                 connectionStateListener.onFail();
             }
         }
-
     }
 
 

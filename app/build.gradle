@@ -36,5 +36,6 @@ dependencies {
     compile project(':usbSerialForAndroid')
     compile 'com.nshmura:snappysmoothscroller:1.0.0'
     compile 'com.github.deano2390:FlowTextView:2.0.5'
+    compile 'com.github.felHR85:UsbSerial:4.5'
     testCompile 'junit:junit:4.12'
 }
