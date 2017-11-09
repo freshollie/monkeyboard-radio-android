@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
 
@@ -166,7 +165,7 @@ public class RadioDevice {
 
     private RadioDeviceListenerManager listenerManager;
 
-    private MOTDataParser motDataParser = new MOTDataParser();
+    private MOTDataHandler motDataHandler = new MOTDataHandler();
 
     private Runnable pollLoop = new Runnable() {
         @Override
@@ -1074,10 +1073,12 @@ public class RadioDevice {
 
                 byte[] motData = getMOTData();
                 if (motData != null) {
-                    motDataParser.parseData(channelId, motData);
-                    if (motDataParser.getChannelObject(channelId) != null && motDataParser.getChannelObject(channelId).isComplete()) {
-                        Log.v(TAG, Arrays.toString(motDataParser.getChannelObject(channelId).getBody()));
-                        motDataParser.reset();
+                    motDataHandler.parseSentence(channelId, motData);
+                    if (motDataHandler.getChannelObject(channelId) != null && motDataHandler.getChannelObject(channelId).isComplete()) {
+                        Log.i(TAG, Arrays.toString(motDataHandler.getChannelObject(channelId).getHeader()));
+                        Log.i(TAG, Arrays.toString(motDataHandler.getChannelObject(channelId).getBody()));
+                        Log.i(TAG, String.valueOf(motDataHandler.getChannelObject(channelId).getBody().length));
+                        motDataHandler.reset();
                     }
                 }
 
