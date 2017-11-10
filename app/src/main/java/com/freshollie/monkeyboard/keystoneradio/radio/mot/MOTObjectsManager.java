@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.radio;
+package com.freshollie.monkeyboard.keystoneradio.radio.mot;
 
 import android.util.Log;
 import android.util.SparseArray;
@@ -10,9 +10,9 @@ import java.util.Arrays;
  */
 
 
-public class MOTDataHandler {
+public class MOTObjectsManager {
 
-    private static final String TAG = MOTDataHandler.class.getSimpleName();
+    private static final String TAG = MOTObjectsManager.class.getSimpleName();
 
     public static int intFromBitsRange(byte b, int from, int count) {
         StringBuilder bitStringBuilder = new StringBuilder();
@@ -35,10 +35,38 @@ public class MOTDataHandler {
         return c;
     }
 
+    /**
+     * Get CRC checksum from the given bytes, algorithm by
+     * https://introcs.cs.princeton.edu/java/61data/CRC16CCITT.java
+     *
+     */
+    public static int computeCRC(byte[] bytes) {
+        int crc = 0xFFFF;          // initial value
+        int polynomial = 0x1021;   // 0001 0000 0010 0001  (0, 5, 12)
+
+
+        for (byte b : bytes) {
+            for (int i = 0; i < 8; i++) {
+                boolean bit = ((b   >> (7-i) & 1) == 1);
+                boolean c15 = ((crc >> 15    & 1) == 1);
+                crc <<= 1;
+                if (c15 ^ bit) crc ^= polynomial;
+            }
+        }
+
+        crc &= 0xffff;
+
+        // I don't know why but these are the values I get from the packets
+        crc = 0xFFFF - crc;
+        return crc;
+    }
+
     SparseArray<MOTObject> channelObjectMap = new SparseArray<>();
 
-    public MOTObject parseSentence(int channelId, byte[] data) {
-        MOTDataPacket packet = MOTDataPacket.fromSentence(data);
+    public MOTObject onNewData(int channelId, byte[] data) {
+        Packet packet = Packet.fromBytes(data);
+
+        Log.i(TAG, Arrays.toString(packet.data));
 
         MOTObject channelObject = channelObjectMap.get(channelId);
 
@@ -47,6 +75,7 @@ public class MOTDataHandler {
             channelObject = new MOTObject(packet.motObjectId, packet.applicationType);
             channelObjectMap.put(channelId, channelObject);
         }
+
         channelObject.addPacket(packet);
         return null;
     }
