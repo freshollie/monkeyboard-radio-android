@@ -14,6 +14,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
+import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObjectsManager;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -165,7 +166,7 @@ public class RadioDevice {
 
     private RadioDeviceListenerManager listenerManager;
 
-    private MOTDataHandler motDataHandler = new MOTDataHandler();
+    private MOTObjectsManager motObjectsManager = new MOTObjectsManager();
 
     private Runnable pollLoop = new Runnable() {
         @Override
@@ -817,13 +818,20 @@ public class RadioDevice {
             Log.v(TAG, "getMotData()");
         }
 
-        return call(
+        byte[] response = call(
                 ByteValues.CLASS_MOT,
                 ByteValues.MOT_GetMOTData,
                 new byte[]{
                         Values.WITH_APPLICATION_TYPE
                 }
         );
+
+        // Ensure that the response contains at least 1 piece of data
+        if (response != null && response.length > 8) {
+            return Arrays.copyOfRange(response, 6, response.length - 1);
+        } else {
+            return new byte[0];
+        }
     }
 
     private RadioStation getRadioStation(int channelId) {
@@ -1072,13 +1080,10 @@ public class RadioDevice {
                 int channelId = getPlayIndex();
 
                 byte[] motData = getMOTData();
-                if (motData != null) {
-                    motDataHandler.parseSentence(channelId, motData);
-                    if (motDataHandler.getChannelObject(channelId) != null && motDataHandler.getChannelObject(channelId).isComplete()) {
-                        Log.i(TAG, Arrays.toString(motDataHandler.getChannelObject(channelId).getHeader()));
-                        Log.i(TAG, Arrays.toString(motDataHandler.getChannelObject(channelId).getBody()));
-                        Log.i(TAG, String.valueOf(motDataHandler.getChannelObject(channelId).getBody().length));
-                        motDataHandler.reset();
+                if (motData.length > 0) {
+                    motObjectsManager.onNewData(channelId, motData);
+                    if (motObjectsManager.getChannelObject(channelId) != null && motObjectsManager.getChannelObject(channelId).isComplete()) {
+                        motObjectsManager.reset();
                     }
                 }
 

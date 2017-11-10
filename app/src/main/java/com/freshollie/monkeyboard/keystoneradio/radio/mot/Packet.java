@@ -1,6 +1,8 @@
-package com.freshollie.monkeyboard.keystoneradio.radio;
+package com.freshollie.monkeyboard.keystoneradio.radio.mot;
 
 import android.util.Log;
+
+import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 
 import java.util.Arrays;
 
@@ -8,8 +10,8 @@ import java.util.Arrays;
  * Created by freshollie on 08.11.17.
  */
 
-public class MOTDataPacket {
-    private static final String TAG = MOTDataPacket.class.getSimpleName();
+public class Packet {
+    private static final String TAG = Packet.class.getSimpleName();
     public final int motObjectId;
     public final int applicationType;
     public final int mscDataGroupType;
@@ -19,15 +21,14 @@ public class MOTDataPacket {
     public final boolean isFinalPacket;
     public final byte[] data;
 
-    public static MOTDataPacket fromSentence(byte[] sentence) {
-        Log.i(TAG, Arrays.toString(sentence));
+    public static Packet fromBytes(byte[] bytes) {
+        int applicationType = bytes[1];
+        int dataGroupType = bytes[2];
 
-        int applicationType = sentence[7];
-        int dataGroupType = sentence[8];
+        int preParsedSegmentId = RadioDevice.getIntFromBytes(new byte[] {bytes[3], bytes[4]});
 
-        int preParsedSegmentId = RadioDevice.getIntFromBytes(new byte[] {sentence[9], sentence[10]});
-        int objectId = RadioDevice.getIntFromBytes(new byte[] {sentence[11], sentence[12]});
-        int packetId = sentence[13];
+        int objectId = RadioDevice.getIntFromBytes(new byte[] {bytes[5], bytes[6]});
+        int packetId = bytes[7];
 
         boolean lastSegment = false;
         if (Integer.toBinaryString(preParsedSegmentId).length() > 15) {
@@ -40,14 +41,14 @@ public class MOTDataPacket {
         int segmentId = preParsedSegmentId;
 
         boolean lastPacket = false;
-        if (Integer.toBinaryString(sentence[13]).length() > 6) {
+        if (Integer.toBinaryString(bytes[7]).length() > 6) {
             lastPacket = true;
             packetId += 128;
         }
 
-        byte[] data = Arrays.copyOfRange(sentence, 14, sentence.length -1);
+        byte[] data = Arrays.copyOfRange(bytes, 8, bytes.length);
 
-        return new MOTDataPacket(
+        return new Packet(
                 objectId,
                 applicationType,
                 dataGroupType,
@@ -59,7 +60,7 @@ public class MOTDataPacket {
         );
     }
 
-    public MOTDataPacket(
+    public Packet(
             int motObjectId,
             int applicationType,
             int mscDataGroupType,
