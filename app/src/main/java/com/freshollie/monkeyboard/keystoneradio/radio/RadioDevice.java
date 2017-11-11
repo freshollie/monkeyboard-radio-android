@@ -8,12 +8,15 @@
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
+import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObject;
 import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObjectsManager;
 
 import java.nio.ByteBuffer;
@@ -173,7 +176,7 @@ public class RadioDevice {
         public void run() {
             Log.v(TAG, "Poll Loop started");
             while (true) {
-                if (!poll() || !connection.isRunning() || Thread.currentThread().isInterrupted()) {
+                if (!poll() || !connection.isConnectionOpen() || Thread.currentThread().isInterrupted()) {
                     Log.v(TAG, "Poll Loop stopped");
                     break;
                 }
@@ -223,7 +226,7 @@ public class RadioDevice {
             }
         });
 
-        if (!connection.isRunning()) {
+        if (!connection.isConnectionOpen()) {
             connection.start();
         }
     }
@@ -324,7 +327,7 @@ public class RadioDevice {
 
         long startTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - startTime) < COMMAND_ATTEMPTS_TIMEOUT &&
-                connection.isRunning()) {
+                connection.isConnectionOpen()) {
 
             byte[] response;
 
@@ -860,7 +863,7 @@ public class RadioDevice {
         // After a reset we need to wait for the board to respond to this command;
         long startTime = SystemClock.currentThreadTimeMillis();
         while ((SystemClock.currentThreadTimeMillis() - startTime) < 5000 &&
-                connection.isRunning()) {
+                connection.isConnectionOpen()) {
             if (getSysReady()) {
                 break;
             }
@@ -1082,8 +1085,24 @@ public class RadioDevice {
                 byte[] motData = getMOTData();
                 if (motData.length > 0) {
                     motObjectsManager.onNewData(channelId, motData);
-                    if (motObjectsManager.getChannelObject(channelId) != null && motObjectsManager.getChannelObject(channelId).isComplete()) {
-                        motObjectsManager.reset();
+                    MOTObject channelObject = motObjectsManager.getChannelObject(channelId);
+
+                    if (channelObject != null && channelObject.isComplete()) {
+                        if (MOTObjectsManager.DEBUG) Log.i(TAG, "MOT object completed");
+                        if (channelObject.getApplicationType() == MOTObject.APPLICATION_TYPE_SLIDESHOW) {
+                            byte[] body = motObjectsManager.getChannelObject(channelId).getBodyData();
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(body, 0, body.length, options);
+                            if (options.outWidth < 1000 && options.outHeight < 1000 && bitmap != null) {
+                                if (MOTObjectsManager.DEBUG) Log.i(TAG, "Notifying new slideshow image");
+                                listenerManager.notifyNewSlideshowImage(
+                                        bitmap
+                                );
+                            } else {
+                                if (MOTObjectsManager.DEBUG) Log.e(TAG, "Made bad image");
+                            }
+                        }
+                        motObjectsManager.removeChannelObject(channelId);
                     }
                 }
 
@@ -1130,7 +1149,7 @@ public class RadioDevice {
                 lastPlayStatus = newPlayStatus;
             }
         } catch (Exception e) {
-            if (connection.isDeviceAttached() && connection.isRunning()) {
+            if (connection.isDeviceAttached() && connection.isConnectionOpen()) {
                 e.printStackTrace();
             }
             return false;
@@ -1146,6 +1165,6 @@ public class RadioDevice {
     }
 
     public boolean isConnected() {
-        return connection.isRunning();
+        return connection.isConnectionOpen();
     }
 }

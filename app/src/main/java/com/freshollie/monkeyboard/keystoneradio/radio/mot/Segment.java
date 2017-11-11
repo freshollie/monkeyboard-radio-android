@@ -22,12 +22,12 @@ public class Segment {
         this.id = id;
         this.isFinal = isFinal;
 
+        // This seems to be correct
         repetitionCount = MOTObjectsManager.intFromBitsRange(data[0], 5, 3);
 
+        // This is the correct method, but this data appears to be useless
         size = RadioDevice.getIntFromBytes(new byte[] {data[0], data[1]}) & ~(1 << 13) & ~(1 << 14) & ~(1 << 15) & 0xFFFF;
 
-        this.data = Arrays.copyOfRange(data, 2, data.length);
-
-        Log.i("SEGMENT", "Built. Size found: " + String.valueOf(size) + " actual size " + String.valueOf(this.data.length));
+        this.data = Arrays.copyOfRange(data, 9, data.length);
     }
 }

@@ -14,12 +14,16 @@ import android.util.SparseArray;
  * extracted from MSC Objects created by the incoming packets from the slave
  */
 public class MOTObject {
+    private static final String TAG = MOTObject.class.getSimpleName();
+
+    public static final int APPLICATION_TYPE_SLIDESHOW = 0;
+
     private final int id;
     private final int applicationType;
 
     private SparseArray<MSCDataGroup> mscDataGroupObjectsPool = new SparseArray<>();
 
-    private MOTObjectBody body = new MOTObjectBody();
+    private SegmentedObject body = new SegmentedObject();
     private MOTObjectHeader header = new MOTObjectHeader();
 
     public MOTObject(int id, int applicationType) {
@@ -31,31 +35,12 @@ public class MOTObject {
         return header.isComplete() && body.isComplete();
     }
 
-    public byte[] getHeader() {
-        return null;
-
-        /*
-        byte[] data = new byte[]{};
-        for (int i = 0; i < headerSegments.size(); i++) {
-            data = MOTObjectsManager.concatBytes(data, headerSegments.get(i).getData());
-        }
-
-
-        return data;
-        */
+    public MOTObjectHeader getHeader() {
+        return header;
     }
 
-    public byte[] getBody() {
-        return null;
-        /*
-        byte[] data = new byte[]{};
-
-        for (int i = 0; i < bodySegments.size(); i++) {
-            data = MOTObjectsManager.concatBytes(data, bodySegments.get(i).getData());
-        }
-
-        return data;
-        */
+    public byte[] getBodyData() {
+        return body.getOrderedData();
     }
 
     public int getApplicationType() {
@@ -95,20 +80,22 @@ public class MOTObject {
                     Segment extractedSegment =
                             new Segment(
                                     mscDataGroupObject.segmentNumber,
-                                    mscDataGroupObject.lastSegment,
+                                    mscDataGroupObject.last,
                                     mscDataGroupObject.data
                             );
 
-                    if (mscDataGroupObject.dataGroupType == 3) {
+                    if (mscDataGroupObject.dataGroupType == MSCDataGroup.TYPE_HEADER) {
+                        if (MOTObjectsManager.DEBUG) Log.i(TAG, "Header segment " + String.valueOf(extractedSegment.id) + " completed");
                         header.addSegment(extractedSegment);
                     } else {
+                        if (MOTObjectsManager.DEBUG) Log.i(TAG, "Body segment " + String.valueOf(extractedSegment.id) + " completed");
                         body.addSegment(extractedSegment);
                     }
                 } else {
-                    Log.i("MOTOBJECT", "Wrong segment ID in header: " + String.valueOf(mscDataGroupObject.segmentNumber));
+                    if (MOTObjectsManager.DEBUG) Log.e(TAG, "Wrong segment ID in header: " + String.valueOf(mscDataGroupObject.segmentNumber));
                 }
             } else {
-                Log.i("MOTOBJECT", "COMPUTED CRC IS DIFFERENT " + String.valueOf(MOTObjectsManager.computeCRC(mscDataGroupObject.data)));
+                if (MOTObjectsManager.DEBUG) Log.e("MOTOBJECT", "COMPUTED CRC IS DIFFERENT " + String.valueOf(mscDataGroupObject.crc) + " : " + String.valueOf(MOTObjectsManager.computeCRC(mscDataGroupObject.data)));
             }
         }
     }

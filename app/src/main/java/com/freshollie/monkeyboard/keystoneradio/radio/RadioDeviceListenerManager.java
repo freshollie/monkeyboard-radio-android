@@ -7,6 +7,7 @@
 
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
+import android.graphics.Bitmap;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class RadioDeviceListenerManager {
      */
 
     public interface DataListener {
-        void onProgramTextChanged(String programText);
+        void onNewProgramText(String programText);
         void onPlayStatusChanged(int playStatus);
         void onDabSignalQualityChanged(int signalStrength);
         void onDabProgramDataRateChanged(int dataRate);
@@ -59,6 +60,8 @@ public class RadioDeviceListenerManager {
         void onFmSearchFrequencyChanged(int frequency);
         void onFmProgramNameUpdated(String newFmProgramName);
         void onFmProgramTypeUpdated(int newFmProgramType);
+
+        void onNewSlideshowImage(Bitmap bitmap);
     }
 
     public interface ConnectionStateChangeListener {
@@ -144,7 +147,7 @@ public class RadioDeviceListenerManager {
             public void run() {
                 synchronized (dataListeners) {
                     for (DataListener dataListener : new ArrayList<>(dataListeners)) {
-                        dataListener.onProgramTextChanged(programText);
+                        dataListener.onNewProgramText(programText);
                     }
                 }
             }
@@ -236,6 +239,19 @@ public class RadioDeviceListenerManager {
                 synchronized (dataListeners) {
                     for (DataListener dataListener : new ArrayList<>(dataListeners)) {
                         dataListener.onStereoStateChanged(stereoState);
+                    }
+                }
+            }
+        });
+    }
+
+    void notifyNewSlideshowImage(final Bitmap bitmap) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (dataListeners) {
+                    for (DataListener dataListener: new ArrayList<DataListener>(dataListeners)) {
+                        dataListener.onNewSlideshowImage(bitmap);
                     }
                 }
             }
