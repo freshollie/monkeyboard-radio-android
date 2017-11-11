@@ -11,6 +11,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Build;
@@ -52,19 +53,19 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     // Actions
     public final static String ACTION_SEARCH_FORWARDS =
-            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.SEARCH_FORWARDS";
+            "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.SEARCH_FORWARDS";
     public final static String ACTION_SEARCH_BACKWARDS =
-            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.SEARCH_BACKWARDS";
+            "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.SEARCH_BACKWARDS";
     public final static String ACTION_NEXT =
-            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.NEXT";
+            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.NEXT";
     public final static String ACTION_PREVIOUS =
-            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.PREVIOUS";
+            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.PREVIOUS";
     public final static String ACTION_STOP =
-            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.STOP";
+            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.STOP";
     public final static String ACTION_PLAY =
-            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.PLAY";
+            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.PLAY";
     public final static String ACTION_PAUSE =
-            "com.freshollie.monkeyboarddab.playback.radioplayerservice.action.PAUSE";
+            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.PAUSE";
 
     public final static String ACTION_SET_RADIO_MODE = "";
 
@@ -310,9 +311,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         // Build a playback state for the player
         playbackStateBuilder = new PlaybackStateCompat.Builder();
 
-        // Update info of the current session
+        // Update info of the current session to initial state
         updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
-        updateMetadata(new RadioStation());
+        createNewPlaybackMetadataForStation(new RadioStation());
 
         // Connect to the radio API
         radio = new RadioDevice(getApplicationContext());
@@ -334,7 +335,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(TAG, "Got start intent");
+        Log.v(TAG, "Got an intent");
         if (intent != null && intent.getAction() != null) {
             Log.v(TAG, "Received intent:" + intent.getAction());
 
@@ -623,13 +624,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     private void onConnectedSequence() {
-        // If the our internal database is dramatically different to that on the board, we will try
-        // and sync our copies
-
         handleAction(new Runnable() {
             @Override
             public void run() {
                 radio.waitForReady();
+                // When the radio first connects, try to get the number of programs stored,
+                // and set the stereo mode to stereo
                 radioTotalStoredPrograms = radio.getTotalPrograms();
                 radio.setStereoMode(1);
             }
@@ -646,8 +646,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             handleSetFmFrequencyRequest(getCurrentFmFrequency());
         }
 
+        if (getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
+            handlePlayRequest();
+        }
+
         if (playerNotification != null) {
-            playerNotification.update();
+            //playerNotification.update();
         }
     }
 
@@ -656,7 +660,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             Log.v(TAG, "Starting device connection");
 
             if (playerNotification != null) {
-                playerNotification.update();
+                //playerNotification.update();
             }
 
             openingConnection = true;
@@ -874,6 +878,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             radioTotalStoredPrograms = radio.getTotalPrograms();
         }
 
+        // If the our internal database is dramatically different to that on the board, we will try
+        // and sync our copies
         if (getDabRadioStations().length < 1 ||
                 totalCollectedDabStations != radioTotalStoredPrograms) {
 
@@ -893,7 +899,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             Log.v(TAG, "Requesting board to play: " + getCurrentStation().getName());
             if (radio.play(getRadioMode(), dabRadioStations[currentDabChannelIndex].getFrequency())) {
                 Log.v(TAG, "Approved, updating meta");
-                updateMetadata(getCurrentStation());
+                createNewPlaybackMetadataForStation(getCurrentStation());
                 return true;
             }
         }
@@ -908,7 +914,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         setCurrentDabChannelIndex(channelIndex);
 
-        handleAction(new Runnable() {
+        if (radio.isAttached()) {
+            // Board is attached so try and connect and perform
+            // and confirm channel change before updating metadata
+            handleAction(new Runnable() {
                 @Override
                 public void run() {
                     // Only execute final thread
@@ -916,7 +925,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                         updateBoardDabChannelAction();
                     }
                 }
-        });
+            });
+        } else {
+            createNewPlaybackMetadataForStation(getCurrentStation());
+        }
     }
 
     public void handleSetFmFrequencyRequest(final int frequency) {
@@ -953,35 +965,33 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         if (channel != -1) {
-            handleAction(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!hasFocus()) {
-                                requestAudioFocus();
-                            }
+            handleAction(new Runnable() {
+                @Override
+                public void run() {
+                    if (!hasFocus()) {
+                        requestAudioFocus();
+                    }
 
-                            if (hasFocus()) {
-                                boolean granted;
-                                if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                                    granted = updateBoardDabChannelAction();
+                    if (hasFocus()) {
+                        boolean granted;
+                        if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+                            granted = updateBoardDabChannelAction();
 
-                                } else {
-                                    granted = updateBoardFmFrequencyAction();
-                                }
-
-                                if (granted) {
-                                    Log.v(TAG, "Updating playstate");
-                                    handleUnmuteRequest();
-                                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
-                                } else {
-                                    Log.v(TAG, "Board denied play request");
-                                }
-                            }
+                        } else {
+                            granted = updateBoardFmFrequencyAction();
                         }
 
+                        if (granted) {
+                            Log.v(TAG, "Updating playstate");
+                            handleUnmuteRequest();
+                            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING);
+                        } else {
+                            Log.v(TAG, "Board denied play request");
+                        }
                     }
-            );
+                }
+
+            });
         }
     }
 
@@ -1024,18 +1034,23 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void handlePauseRequest() {
-        muted = true;
+        handleAction(new Runnable() {
+            @Override
+            public void run() {
+                muted = true;
 
-        // Used to make sure that the volume is lowered, command
-        // is executed until the volume is confirmed lowered
+                // Used to make sure that the volume is lowered, command
+                // is executed until the volume is confirmed lowered
 
-        //noinspection StatementWithEmptyBody
-        while (!radio.setVolume(0) && radio.isConnected()){}
+                //noinspection StatementWithEmptyBody
+                while (!radio.setVolume(0) && radio.isConnected()){}
 
-        if (radio.isConnected() && radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
-            radio.stopSearch();
-        }
-        updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
+                if (radio.isConnected() && radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
+                    radio.stopSearch();
+                }
+                updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
+            }
+        });
     }
 
 
@@ -1060,6 +1075,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
                                 // We are not currently on a station
                                 if (currentFmChannelIndex < 0) {
+                                    // So find what would be the next station
                                     for (int i = 0; i < radioStations.length; i++) {
                                         if (radioStations[i].getFrequency() >
                                                 getCurrentStation().getFrequency()) {
@@ -1241,7 +1257,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             currentFmRadioStation.setName(fmRadioStations.get(getCurrentSavedFmStationIndex()).getName());
         }
 
-        updateMetadata(currentFmRadioStation);
+        createNewPlaybackMetadataForStation(currentFmRadioStation);
     }
 
     private void updateFmStationNameMetadata(String name) {
@@ -1258,7 +1274,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             }
         }
 
-        updateMetadata(currentFmRadioStation);
+        createNewPlaybackMetadataForStation(currentFmRadioStation);
     }
 
     private void updateFmStationTypeMetadata(int genreId) {
@@ -1267,12 +1283,35 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         currentFmRadioStation.setGenreId(genreId);
-        updateMetadata(currentFmRadioStation);
+        createNewPlaybackMetadataForStation(currentFmRadioStation);
     }
 
-    private void updateMetadata(RadioStation station) {
+    private void addImageToPlaybackMetadata(Bitmap slideshowImage) {
+        if (mediaSession != null) {
+            mediaSession.setMetadata(
+                new MediaMetadataCompat.Builder(getMetadata())
+                        .putBitmap(MediaMetadataCompat.METADATA_KEY_ART,
+                                slideshowImage)
+                        .build()
+            );
+        }
+    }
+
+    private void addProgramTextToPlaybackMetadata(String programText) {
+        if (mediaSession != null) {
+            mediaSession.setMetadata(
+                    new MediaMetadataCompat.Builder(getMetadata())
+                            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION,
+                                    programText)
+                            .build()
+            );
+        }
+    }
+
+    private void createNewPlaybackMetadataForStation(RadioStation station) {
         if (mediaSession != null) {
             if (getMediaController().getMetadata() != null) {
+                // Check for infinite loops due to callbacks
                 if (getMediaController()
                         .getMetadata()
                         .getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER)
@@ -1296,10 +1335,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                     station.getFrequency())
                             .build()
             );
-
-            if (playerNotification != null) {
-                playerNotification.update();
-            }
         }
     }
 
@@ -1503,8 +1538,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private RadioDeviceListenerManager.DataListener dataListener =
             new RadioDeviceListenerManager.DataListener() {
         @Override
-        public void onProgramTextChanged(String programText) {
-
+        public void onNewProgramText(String programText) {
+            addProgramTextToPlaybackMetadata(programText);
         }
 
         @Override
@@ -1570,6 +1605,11 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         @Override
         public void onFmProgramTypeUpdated(int newFmProgramType) {
             updateFmStationTypeMetadata(newFmProgramType);
+        }
+
+        @Override
+        public void onNewSlideshowImage(Bitmap bitmap) {
+            addImageToPlaybackMetadata(bitmap);
         }
     };
 

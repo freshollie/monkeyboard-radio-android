@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
@@ -44,8 +43,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         public TextView stationName;
         public TextView stationGenre;
         public TextView stationEnsemble;
-        public View stationItemBackground;
-        public CardView stationSelectionLayout;
+        public CardView stationCardLayout;
         public View stationRemoveButton;
 
         public StationCard(View v) {
@@ -53,8 +51,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             stationName = (TextView) v.findViewById(R.id.station_name_card_text);
             stationGenre = (TextView) v.findViewById(R.id.station_genre_card_text);
             stationEnsemble = (TextView) v.findViewById(R.id.station_ensemble_name_card_text);
-            stationItemBackground = v.findViewById(R.id.station_item_background);
-            stationSelectionLayout = (CardView) v.findViewById(R.id.station_item_layout);
+            stationCardLayout = (CardView) v.findViewById(R.id.station_item_layout);
             stationRemoveButton = v.findViewById(R.id.station_remove_button);
         }
     }
@@ -107,9 +104,9 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 )
         );
 
-        stationCard.stationItemBackground.setAlpha(1f);
+        stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat.getColor(playerActivity, R.color.backgroundGrey));
         if (position == currentStationIndex) {
-            stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+            stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
                     .getColor(playerActivity, R.color.colorPrimaryDark)
             );
         }
@@ -117,27 +114,31 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         if (position == cursorIndex && !deleteMode) {
 
             if (position != currentStationIndex) {
-                stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+                stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
                         .getColor(playerActivity, R.color.colorAccent)
                 );
-                stationCard.stationItemBackground.setAlpha(0.3f);
+                stationCard.stationCardLayout.setCardBackgroundColor(
+                        stationCard.stationCardLayout.getCardBackgroundColor().withAlpha(80)
+                );
             }
 
         }
 
         if (position != currentStationIndex && position != cursorIndex) {
-            stationCard.stationItemBackground.setBackgroundColor(0);
+            //stationCard.stationItemBackground.setBackgroundColor(0);
         }
 
         if (deleteMode) {
-            stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+            stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
                     .getColor(playerActivity, R.color.colorHighlight)
             );
-            stationCard.stationItemBackground.setAlpha(0.3f);
+            stationCard.stationCardLayout.setCardBackgroundColor(
+                    stationCard.stationCardLayout.getCardBackgroundColor().withAlpha(80)
+            );
         }
 
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationCard.stationSelectionLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            stationCard.stationCardLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     if (deleteMode) {
@@ -151,7 +152,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
 
         if (deleteMode && radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationCard.stationSelectionLayout.setOnClickListener(null);
+            stationCard.stationCardLayout.setOnClickListener(null);
             stationCard.stationRemoveButton.setVisibility(View.VISIBLE);
             stationCard.stationRemoveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -161,7 +162,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 }
             });
         } else {
-            stationCard.stationSelectionLayout.setOnClickListener(new View.OnClickListener() {
+            stationCard.stationCardLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     playerActivity.handleChannelClicked(stationCard.getAdapterPosition());

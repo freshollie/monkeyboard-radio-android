@@ -1,6 +1,5 @@
 package com.freshollie.monkeyboard.keystoneradio.radio.mot;
 
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
@@ -19,6 +18,9 @@ import java.util.Arrays;
  */
 public class MSCDataGroup {
     private static final String TAG = MSCDataGroup.class.getSimpleName();
+
+    public static final int TYPE_HEADER = 3;
+
     // As we don't know how many packets we will get, we use a sparse array
     // to order them as they come in
     SparseArray<Packet> packets = new SparseArray<>();
@@ -43,7 +45,7 @@ public class MSCDataGroup {
     public String extension = "";
 
     // Session header
-    public boolean lastSegment = false;
+    public boolean last = false;
     public int segmentNumber = -1;
 
     // Session header user access
@@ -162,7 +164,7 @@ public class MSCDataGroup {
                     new byte[]{currentByte, bytes[byteNum++]}
             ) & ~(1 << 15) & 0xFFFF;
 
-            lastSegment = MOTObjectsManager.isBitSet(currentByte, 7);
+            last = MOTObjectsManager.isBitSet(currentByte, 7);
         }
 
         if (userAccessFlag) {

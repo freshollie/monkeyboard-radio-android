@@ -21,6 +21,27 @@ android {
     productFlavors {
     }
 }
+task generateSources(type: Exec) {
+    workingDir '.'
+    // Update this with your python
+    commandLine "python", "$rootDir/app/build_tools/make_vertical_layout.py"
+    doLast{
+        if (execResult.exitValue != 0) {
+            throw new GradleException(
+                "Failed to generate vertical layout, " +
+                "ensure python is in your system path, or " +
+                "update this gradle script with your python location"
+            )
+        }
+    }
+}
+
+project.afterEvaluate {
+    preBuild.dependsOn generateSources
+}
+
+clean.dependsOn generateSources
+clean.mustRunAfter generateSources
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -38,4 +59,5 @@ dependencies {
     compile 'com.github.deano2390:FlowTextView:2.0.5'
     compile 'com.github.felHR85:UsbSerial:4.5'
     testCompile 'junit:junit:4.12'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 }

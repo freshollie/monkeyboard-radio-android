@@ -14,6 +14,8 @@ public class MOTObjectsManager {
 
     private static final String TAG = MOTObjectsManager.class.getSimpleName();
 
+    public static boolean DEBUG = false;
+
     public static int intFromBitsRange(byte b, int from, int count) {
         StringBuilder bitStringBuilder = new StringBuilder();
         for (int i = from; i < from + count; i++) {
@@ -63,24 +65,26 @@ public class MOTObjectsManager {
 
     SparseArray<MOTObject> channelObjectMap = new SparseArray<>();
 
-    public MOTObject onNewData(int channelId, byte[] data) {
+    public void onNewData(int channelId, byte[] data) {
         Packet packet = Packet.fromBytes(data);
 
-        Log.i(TAG, Arrays.toString(packet.data));
+        if (packet.applicationType == MOTObject.APPLICATION_TYPE_SLIDESHOW) {
 
-        MOTObject channelObject = channelObjectMap.get(channelId);
+            MOTObject channelObject = channelObjectMap.get(channelId);
 
-        if (channelObject == null || channelObject.getId() != packet.motObjectId) {
-            Log.i(TAG, "Started downloading new object " + String.valueOf(packet.motObjectId));
-            channelObject = new MOTObject(packet.motObjectId, packet.applicationType);
-            channelObjectMap.put(channelId, channelObject);
+            if (channelObject == null || channelObject.getId() != packet.motObjectId) {
+                if (DEBUG) {
+                    Log.d(TAG, "Started downloading new object " + String.valueOf(packet.motObjectId));
+                }
+                channelObject = new MOTObject(packet.motObjectId, packet.applicationType);
+                channelObjectMap.put(channelId, channelObject);
+            }
+
+            channelObject.addPacket(packet);
         }
-
-        channelObject.addPacket(packet);
-        return null;
     }
 
-    public void reset() {
+    public void removeChannelObject(int channelId) {
         channelObjectMap.clear();
     }
 
