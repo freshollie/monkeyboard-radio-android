@@ -323,7 +323,7 @@ public class RadioPlayerNotification extends MediaControllerCompat.Callback {
         );
     }
 
-    public void update() {
+    private void update() {
         if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
             playerService.startForeground(
                     NOTIFICATION_ID,

@@ -10,10 +10,12 @@ package com.freshollie.monkeyboard.keystoneradio.ui;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
@@ -30,7 +32,9 @@ import java.text.DecimalFormat;
 
 public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.StationCard> {
     private RadioStation[] stationList = new RadioStation[0];
+
     private PlayerActivity playerActivity;
+
     private int cursorIndex = 0;
     private int currentStationIndex = 0;
     private int lastStationIndex = 0;
@@ -39,14 +43,62 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     private RecyclerView recyclerView;
     private int radioMode;
 
-    public static class StationCard extends RecyclerView.ViewHolder {
-        public TextView stationName;
-        public TextView stationGenre;
-        public TextView stationEnsemble;
-        public CardView stationCardLayout;
-        public View stationRemoveButton;
+    private int currentScrollIndex = 0;
 
-        public StationCard(View v) {
+    private StationListLayoutManager layoutManager;
+
+    private int targetScrollIndex = -1;
+
+    private Runnable scrollRunnable = null;
+
+    private int nextScrollIndex = -1;
+    private int lastScrollIndex = -1;
+
+    private boolean waitForIdleScroll;
+
+    private boolean readyForScroll = false;
+
+    private ViewTreeObserver.OnGlobalLayoutListener
+            recyclerViewLayoutDoneListener =
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        onLayoutReady();
+                    }
+            };
+
+    private OnScrollListener onScrollListener = new OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                if (waitForIdleScroll &&
+                        nextScrollIndex != -1
+                        ) {
+                    startNextScroll(nextScrollIndex);
+                }
+                currentScrollIndex = lastScrollIndex;
+            }
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (nextScrollIndex != -1) {
+                recyclerView.stopScroll();
+                startNextScroll(nextScrollIndex);
+            }
+        }
+    };
+
+    public static class StationCard extends RecyclerView.ViewHolder {
+        TextView stationName;
+        TextView stationGenre;
+        TextView stationEnsemble;
+        CardView stationCardLayout;
+        View stationRemoveButton;
+
+        StationCard(View v) {
             super(v);
             stationName = (TextView) v.findViewById(R.id.station_name_card_text);
             stationGenre = (TextView) v.findViewById(R.id.station_genre_card_text);
@@ -56,13 +108,13 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
     }
 
-    public StationListAdapter(PlayerActivity activity) {
-        playerActivity = activity;
+    public StationListAdapter(PlayerActivity playerActivity) {
+        this.playerActivity = playerActivity;
     }
 
-    // Create new views (invoked by the layout manager)
+    // Create a new station card for the station list
     @Override
-    public StationListAdapter.StationCard onCreateViewHolder(ViewGroup parent,
+    public StationCard onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         // create a new view
         CardView stationCardView = (CardView) LayoutInflater.from(parent.getContext())
@@ -74,12 +126,22 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         this.recyclerView = recyclerView;
+        this.recyclerView.addOnScrollListener(onScrollListener);
+        this.recyclerView
+                .getViewTreeObserver()
+                .addOnGlobalLayoutListener(recyclerViewLayoutDoneListener);
+        layoutManager = (StationListLayoutManager) recyclerView.getLayoutManager();
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
+        this.recyclerView.removeOnScrollListener(onScrollListener);
+        this.recyclerView
+                .getViewTreeObserver()
+                .removeOnGlobalLayoutListener(recyclerViewLayoutDoneListener);
         this.recyclerView = null;
+        this.layoutManager = null;
     }
 
     @Override
@@ -222,8 +284,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             stationList = stations;
         } else {
             stationList = new RadioStation[0];
-
-
         }
 
 
@@ -234,62 +294,172 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
     }
 
+
+    private void onLayoutReady() {
+        // When the layout has been rendered check if we need to start scrolling
+        if (!readyForScroll && nextScrollIndex != -1) {
+            recyclerView.post(new Runnable() {
+                @Override
+                public void run() {
+                    startNextScroll(nextScrollIndex);
+                }
+            });
+        }
+        readyForScroll = true;
+    }
+
     @Override
     public int getItemCount() {
         return stationList.length;
     }
 
-    public void updateStationList(RadioStation[] newStationList, int radioMode) {
-        stationList = newStationList.clone();
+    public void initialiseStationList(RadioStation[] newStationList, int radioMode) {
         this.radioMode = radioMode;
+
+        this.cursorIndex = -1;
+        this.currentStationIndex = -1;
+        this.lastStationIndex = -1;
+        this.lastScrollIndex = -1;
+        this.nextScrollIndex = -1;
+        this.currentScrollIndex = 0;
+
+        this.readyForScroll = false;
+        this.waitForIdleScroll = false;
+
         if (radioMode != RadioDevice.Values.STREAM_MODE_FM && isDeleteMode()) {
             closeDeleteMode();
         }
-        notifyDataSetChanged();
+
+        int lastSize = getItemCount();
+        stationList = newStationList.clone();
+
+        if (stationList.length < lastSize) {
+            notifyItemRangeRemoved(stationList.length, lastSize - stationList.length);
+        }
+
+        notifyItemRangeChanged(0, stationList.length);
+    }
+
+    public int getCursorIndex() {
+        return cursorIndex;
     }
 
     public RadioStation[] getStationList() {
         return stationList;
     }
 
+    private void startNextScroll(final int nextScroll) {
 
-    public void setCursorIndex(int channelIndex) {
-        Log.v("StationListAdapter", "Setting new cursorPosition " + String.valueOf(channelIndex));
-        cursorIndex = channelIndex;
-    }
-
-    public void notifyCursorPositionChanged() {
-        notifyItemChanged(lastCursorIndex);
-        notifyItemChanged(cursorIndex);
-        notifyCurrentStationChanged();
-        lastCursorIndex = cursorIndex;
-    }
-
-    public void setCurrentStationIndex(int channelIndex) {
-        currentStationIndex = channelIndex;
-    }
-
-    public int getCurrentStationIndex() {
-        return currentStationIndex;
-    }
-
-    public void notifyCurrentStationChanged() {
-        Log.v("StationListAdapter", "Updating current playing station " + String.valueOf(currentStationIndex));
-
-        if (currentStationIndex == lastStationIndex) {
+        if (nextScroll < 0) {
             return;
         }
-        int lastChannelCursor = cursorIndex;
-        cursorIndex = currentStationIndex;
 
-        notifyItemChanged(lastChannelCursor);
-        notifyItemChanged(currentStationIndex);
-        notifyItemChanged(lastStationIndex);
+        if (nextScroll == nextScrollIndex) {
+            nextScrollIndex = -1;
+        }
 
-        lastStationIndex = currentStationIndex;
+        int delay = 0;
+        // If the recycler view has just been initialised then we should wait 50 ms,
+        // I would rather this was more specific
+        if (lastScrollIndex == -1) {
+            delay = 300;
+        }
+
+        // If we have to move more than 20 items then we first need to probably
+        // scroll directly to there
+        // and then wait for the scroll to finish before starting a smooth scroll from that point
+        if ((layoutManager.findFirstVisibleItemPosition() > nextScroll || layoutManager.findLastVisibleItemPosition() < nextScroll) && !waitForIdleScroll)  {
+            recyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    lastScrollIndex = nextScroll;
+
+                    // Tell the scroll listener to perform this again
+                    // Once we have finished this scroll
+                    if (nextScrollIndex == -1) {
+                        nextScrollIndex = nextScroll;
+                    }
+                    waitForIdleScroll = true;
+
+                    recyclerView.scrollToPosition(nextScrollIndex);
+                }
+            }, delay);
+        } else {
+            waitForIdleScroll = false;
+            recyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    lastScrollIndex = nextScroll;
+                    recyclerView.smoothScrollToPosition(nextScroll);
+                    // Incase it was set to something else, change it back now
+                    layoutManager.setSnapDuration(StationListLayoutManager.DEFAULT_SNAP_SPEED);
+                }
+            }, delay);
+        }
     }
 
-    public int getCursorIndex() {
-        return cursorIndex;
+    public int getCurrentScrollIndex() {
+        return currentScrollIndex;
+    }
+
+    public int getLastScrollIndex() {
+        return lastScrollIndex;
+    }
+
+    private void scrollWhenPossible(int itemIndex) {
+        waitForIdleScroll = false;
+        if (nextScrollIndex != -1 || !readyForScroll) {
+            // The scroll or recyclerview  is currently busy
+            // So queue it
+            nextScrollIndex = itemIndex;
+        } else {
+            // Otherwise perform the action right now
+            startNextScroll(itemIndex);
+        }
+    }
+
+    public void onCursorPositionChanged(int newCursorIndex) {
+        if (newCursorIndex == -1 || newCursorIndex == cursorIndex) {
+            return;
+        }
+
+        int lastChannelCursor = cursorIndex;
+        cursorIndex = newCursorIndex;
+
+        notifyItemChanged(lastChannelCursor);
+        notifyItemChanged(cursorIndex);
+        recyclerView.stopScroll();
+
+        layoutManager.setSnapDuration(1);
+        scrollWhenPossible(cursorIndex);
+
+    }
+
+    public void onCurrentStationChanged(int newStationIndex) {
+        if (newStationIndex == -1) {
+            return;
+        }
+
+        // We are already scrolling to here so ignore
+        if (newStationIndex == currentStationIndex) {
+            return;
+        }
+
+        int lastChannelCursor = cursorIndex;
+        cursorIndex = newStationIndex;
+        lastStationIndex = currentStationIndex;
+        currentStationIndex = newStationIndex;
+
+        if (lastChannelCursor > -1) {
+            notifyItemChanged(lastChannelCursor);
+        }
+
+        notifyItemChanged(currentStationIndex);
+
+        if (lastStationIndex > -1) {
+            notifyItemChanged(lastStationIndex);
+        }
+
+        scrollWhenPossible(currentStationIndex);
     }
 }
