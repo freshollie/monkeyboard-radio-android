@@ -1,304 +1,87 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:clipToPadding="false"
-    android:clipChildren="false"
-    tools:context="com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity">
+<?xml version='1.0' encoding='UTF-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" xmlns:ns1="http://schemas.android.com/tools" xmlns:ns2="http://schemas.android.com/apk/res-auto" ns0:clipChildren="false" ns0:clipToPadding="false" ns0:id="@+id/activity_main" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:orientation="vertical" ns1:context="com.freshollie.monkeyboard.keystoneradio.ui.PlayerActivity">
 
-    <android.support.design.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:clipToPadding="false"
-            android:id="@+id/playing_panel">
+    <!--AUTOMATICALLY GENERATED FROM LANDSCAPE LAYOUT, DO NOT EDIT--><android.support.design.widget.CoordinatorLayout ns0:layout_height="0dp" ns0:layout_weight="2" ns0:layout_width="match_parent">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:id="@+id/player_attributes_panel">
+        <LinearLayout ns0:clipToPadding="false" ns0:id="@+id/playing_panel" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:orientation="vertical">
 
-                <ImageButton
-                    android:contentDescription="@string/settings_icon_description"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:id="@+id/settings_button"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_settings_white_24dp"
-                    android:scaleType="fitXY"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginTop="@dimen/activity_vertical_margin" />
+            <RelativeLayout ns0:id="@+id/player_attributes_panel" ns0:layout_height="0dp" ns0:layout_weight="3" ns0:layout_width="match_parent">
 
-                <TextView
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/signal_strength_icon"
-                    android:layout_alignLeft="@+id/signal_strength_icon"
-                    android:id="@+id/play_status"
-                    android:text="@string/radio_status_connecting"
-                    android:textSize="15sp" />
+                <android.support.v7.widget.CardView ns2:cardElevation="5dp" ns2:cardUseCompatPadding="true" ns0:id="@+id/channel_status_bar" ns0:layout_height="wrap_content" ns0:layout_width="match_parent">
+                    <LinearLayout ns0:layout_height="wrap_content" ns0:layout_width="match_parent" ns0:orientation="vertical" ns0:padding="5dp">
 
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:gravity="right"
-                    android:textAlignment="gravity"
-                    android:id="@+id/signal_strength"
-                    android:text="100%"
-                    android:textSize="20sp"
-                    android:layout_toLeftOf="@id/settings_button"
-                    android:paddingRight="20dp" />
+                        <RelativeLayout ns0:layout_height="wrap_content" ns0:layout_width="match_parent">
 
-                <ImageView
-                    android:layout_margin="@dimen/activity_vertical_margin"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp"
-                    android:id="@+id/signal_strength_icon"
-                    android:layout_toLeftOf="@id/signal_strength" />
+                            <ImageButton ns2:srcCompat="@drawable/ic_settings_white_24dp" ns0:background="?selectableItemBackgroundBorderless" ns0:contentDescription="@string/settings_icon_description" ns0:id="@+id/settings_button" ns0:layout_alignParentRight="true" ns0:layout_height="40dp" ns0:layout_margin="@dimen/activity_vertical_margin" ns0:layout_width="40dp" ns0:scaleType="fitXY" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/data_rate"
-                    android:textSize="15sp"
-                    android:text="128 Kbps"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true" />
+                            <TextView ns0:id="@+id/play_status" ns0:layout_centerHorizontal="true" ns0:layout_height="wrap_content" ns0:layout_width="wrap_content" ns0:text="@string/radio_status_connecting" ns0:textSize="15sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/program_stereo_mode"
-                    android:textSize="15sp"
-                    android:text="Stereo"
-                    android:layout_below="@id/data_rate"
-                    android:layout_centerHorizontal="true" />
+                            <TextView ns0:gravity="left" ns0:id="@+id/signal_strength" ns0:layout_alignBottom="@id/signal_strength_icon" ns0:layout_height="wrap_content" ns0:layout_toLeftOf="@id/settings_button" ns0:layout_width="55dp" ns0:paddingRight="5dp" ns0:text="100%" ns0:textAlignment="gravity" ns0:textSize="20sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_margin="@dimen/activity_vertical_margin"
-                    android:id="@+id/station_ensemble_name"
-                    android:textSize="20sp"
-                    android:text="BBC National DAB"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:layout_alignParentLeft="true" />
+                            <ImageView ns2:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp" ns0:id="@+id/signal_strength_icon" ns0:layout_height="20dp" ns0:layout_marginRight="2dp" ns0:layout_marginTop="5dp" ns0:layout_toLeftOf="@id/signal_strength" ns0:layout_width="20dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/station_ensemble_name"
-                    android:layout_margin="5dp"
-                    android:id="@+id/station_genre"
-                    android:textSize="20sp"
-                    android:text="Pop"
-                    android:textAppearance="?android:textAppearanceSmall" />
+                            <TextView ns0:id="@+id/data_rate" ns0:layout_below="@id/program_stereo_mode" ns0:layout_height="wrap_content" ns0:layout_toLeftOf="@id/signal_strength_icon" ns0:layout_width="wrap_content" ns0:paddingRight="15dp" ns0:text="128 Kbps" ns0:textSize="15sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/station_genre"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_alignParentLeft="true"
-                    android:text="Mode"
-                    android:id="@+id/mode_switch_label"/>
-                <Switch
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/mode_switch_label"
-                    android:layout_alignParentLeft="true"
-                    android:id="@+id/mode_switch"
-                    android:layout_marginLeft="5dp"
-                    android:showText="true"
-                    android:textOn="FM"
-                    android:textOff="DAB" />
+                            <TextView ns0:id="@+id/program_stereo_mode" ns0:layout_height="wrap_content" ns0:layout_toLeftOf="@id/signal_strength_icon" ns0:layout_width="wrap_content" ns0:paddingRight="15dp" ns0:text="Stereo" ns0:textSize="15sp" />
 
-                <ImageButton
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_alignParentBottom="true"
-                    app:srcCompat="@drawable/ic_volume_mute_white_24dp"
-                    android:scaleType="fitXY"
-                    android:id="@+id/volume_button"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:layout_alignParentLeft="true" />
+                            <TextView ns0:id="@+id/station_ensemble_name" ns0:layout_height="wrap_content" ns0:layout_marginLeft="5dp" ns0:layout_width="wrap_content" ns0:text="BBC National DAB" ns0:textAppearance="?android:textAppearanceSmall" ns0:textSize="20sp" />
 
-                <SeekBar
-                    android:layout_width="400dp"
-                    android:layout_height="40dp"
-                    android:layout_above="@+id/volume_button"
-                    android:id="@+id/volume_seek_bar"
-                    android:visibility="invisible"
-                    android:max="16"
-                    android:layout_alignParentLeft="true" />
+                            <TextView ns0:id="@+id/fm_frequency_text" ns0:includeFontPadding="false" ns0:layout_below="@+id/play_status" ns0:layout_centerHorizontal="true" ns0:layout_height="wrap_content" ns0:layout_width="wrap_content" ns0:text="100.3" ns0:textSize="40sp" ns0:visibility="visible" />
 
-                <SeekBar
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_margin="10dp"
-                    android:layout_above="@+id/volume_button"
-                    android:id="@+id/fm_seek_bar"/>
+                            <TextView ns0:id="@+id/station_genre" ns0:layout_below="@+id/station_ensemble_name" ns0:layout_height="wrap_content" ns0:layout_marginLeft="5dp" ns0:layout_width="wrap_content" ns0:text="Pop" ns0:textAppearance="?android:attr/textAppearanceSmall" ns0:textSize="20sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:layout_above="@+id/volume_seek_bar"
-                    android:id="@+id/volume_text"
-                    android:visibility="invisible"
-                    android:paddingLeft="@dimen/activity_vertical_margin" />
+                        </RelativeLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/status_panel_middle_point"
-                    android:layout_centerHorizontal="true"
-                    android:text="BBC Radio 1"
-                    android:textSize="60dp"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:id="@+id/channel_name"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/channel_name"
-                    android:layout_centerHorizontal="true"
-                    android:id="@+id/fm_frequency_text"
-                    android:textSize="40sp"/>
+                        <android.support.v7.widget.AppCompatTextView ns2:autoSizeMaxTextSize="60sp" ns2:autoSizeTextType="uniform" ns0:gravity="left|bottom" ns0:id="@+id/channel_name" ns0:includeFontPadding="false" ns0:layout_height="wrap_content" ns0:layout_width="match_parent" ns0:maxLines="1" ns0:text="BBC Radio 1" ns0:textAppearance="?android:attr/textAppearanceLarge" ns0:textSize="60sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/status_panel_middle_point"/>
+                    </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/status_panel_middle_point"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginRight="1dp"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:textSize="30sp"
-                    android:text="Test program text, this will display text about the program"
-                    android:id="@+id/program_text"
-                    android:textAppearance="?android:attr/textAppearance" />
+                </android.support.v7.widget.CardView>
+
+                <SeekBar ns0:id="@+id/fm_seek_bar" ns0:layout_below="@id/channel_status_bar" ns0:layout_height="40dp" ns0:layout_width="match_parent" />
+
+                <LinearLayout ns0:layout_above="@id/mode_switch" ns0:layout_below="@id/fm_seek_bar" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:orientation="horizontal" ns0:padding="12dp">
+
+                    <ImageView ns0:adjustViewBounds="true" ns0:id="@+id/slideshow_image" ns0:layout_height="match_parent" ns0:layout_width="wrap_content" ns0:paddingRight="10dp" ns0:scaleType="fitCenter" ns0:src="@mipmap/ic_launcher" ns0:visibility="visible" />
+
+                    <android.support.v7.widget.AppCompatTextView ns2:autoSizeMaxTextSize="30sp" ns2:autoSizeMinTextSize="5sp" ns2:autoSizeTextType="uniform" ns0:id="@+id/program_text" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:text="Test program text, this will display text about the program" ns0:textAppearance="?android:attr/textAppearance" />
+
+                </LinearLayout>
+
+
+                <Switch ns0:id="@+id/mode_switch" ns0:layout_alignParentBottom="true" ns0:layout_centerHorizontal="true" ns0:layout_height="wrap_content" ns0:layout_width="wrap_content" ns0:showText="true" ns0:textOff="@string/dab" ns0:textOn="@string/fm" />
+
+                <ImageButton ns2:srcCompat="@drawable/ic_volume_mute_white_24dp" ns0:background="?selectableItemBackgroundBorderless" ns0:id="@+id/volume_button" ns0:layout_alignParentBottom="true" ns0:layout_alignParentLeft="true" ns0:layout_height="30dp" ns0:layout_width="30dp" ns0:scaleType="fitXY" />
+
+                <TextView ns0:id="@+id/volume_text" ns0:layout_alignParentBottom="true" ns0:layout_height="wrap_content" ns0:layout_toRightOf="@id/volume_button" ns0:layout_width="wrap_content" ns0:padding="5dp" ns0:text="11" ns0:textAppearance="?android:textAppearanceSmall" />
+
+                <android.support.v7.widget.CardView ns2:cardCornerRadius="20dp" ns2:cardUseCompatPadding="true" ns0:id="@+id/volume_seekbar_holder" ns0:layout_above="@+id/volume_button" ns0:layout_height="wrap_content" ns0:layout_width="wrap_content" ns0:visibility="visible">
+                    <SeekBar ns0:id="@+id/volume_seek_bar" ns0:layout_above="@+id/volume_button" ns0:layout_height="40dp" ns0:layout_width="300dp" ns0:max="16" />
+                </android.support.v7.widget.CardView>
             </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@color/colorPrimary"
-                android:id="@+id/player_control_panel">
+            <LinearLayout ns0:background="@color/colorPrimary" ns0:id="@+id/player_control_panel" ns0:layout_height="0dp" ns0:layout_weight="1" ns0:layout_width="match_parent" ns0:orientation="horizontal">
 
-                <ImageButton
-                    android:clickable="true"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:id="@+id/skip_next_button"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_skip_next_white_24dp"
-                    android:scaleType="fitXY"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"/>
+                <ImageButton ns2:srcCompat="@drawable/ic_skip_previous_white_24dp" ns0:background="?selectableItemBackgroundBorderless" ns0:clickable="true" ns0:id="@+id/skip_previous_button" ns0:layout_height="match_parent" ns0:layout_weight="1" ns0:layout_width="0dp" ns0:scaleType="fitXY" />
 
-                <ImageButton
-                    android:clickable="true"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:id="@+id/search_forward_button"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_fast_forward_white_24dp"
-                    android:scaleType="fitXY"
-                    android:layout_toLeftOf="@+id/skip_next_button"
-                    android:layout_centerVertical="true"/>
+                <ImageButton ns2:srcCompat="@drawable/ic_fast_rewind_white_24dp" ns0:background="?selectableItemBackgroundBorderless" ns0:clickable="true" ns0:focusable="true" ns0:id="@+id/search_backwards_button" ns0:layout_height="match_parent" ns0:layout_weight="1" ns0:layout_width="0dp" ns0:scaleType="fitXY" />
 
-                <ImageButton
-                    android:clickable="true"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_play_arrow_white_24dp"
-                    android:scaleType="fitXY"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:id="@+id/play_pause_button"
-                    android:layout_centerInParent="true" />
+                <ImageButton ns2:srcCompat="@drawable/ic_play_arrow_white_24dp" ns0:background="?selectableItemBackgroundBorderless" ns0:clickable="true" ns0:focusable="true" ns0:id="@+id/play_pause_button" ns0:layout_height="match_parent" ns0:layout_weight="1" ns0:layout_width="0dp" ns0:scaleType="fitXY" />
 
-                <ImageButton
-                    android:clickable="true"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:id="@+id/search_backwards_button"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_fast_rewind_white_24dp"
-                    android:scaleType="fitXY"
-                    android:layout_toRightOf="@+id/skip_previous_button"
-                    android:layout_centerVertical="true"/>
+                <ImageButton ns2:srcCompat="@drawable/ic_fast_forward_white_24dp" ns0:background="?selectableItemBackgroundBorderless" ns0:clickable="true" ns0:id="@+id/search_forward_button" ns0:layout_height="match_parent" ns0:layout_weight="1" ns0:layout_width="0dp" ns0:scaleType="fitXY" />
 
-                <ImageButton
-                    android:clickable="true"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_skip_previous_white_24dp"
-                    android:scaleType="fitXY"
-                    android:id="@+id/skip_previous_button"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"/>
-            </RelativeLayout>
+                <ImageButton ns2:srcCompat="@drawable/ic_skip_next_white_24dp" ns0:background="?selectableItemBackgroundBorderless" ns0:clickable="true" ns0:focusable="true" ns0:id="@+id/skip_next_button" ns0:layout_height="match_parent" ns0:layout_weight="1" ns0:layout_width="0dp" ns0:scaleType="fitXY" />
+
+            </LinearLayout>
         </LinearLayout>
-        <android.support.design.widget.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_add_white_24dp"
-            android:layout_margin="16dp"
-            android:clickable="true"
-            android:id="@+id/add_channel_fab"
-            app:layout_anchor="@id/player_attributes_panel"
-            app:layout_anchorGravity="bottom|right|end"/>
+
+        <android.support.design.widget.FloatingActionButton ns2:layout_anchor="@id/player_attributes_panel" ns2:layout_anchorGravity="bottom|right|end" ns2:srcCompat="@drawable/ic_add_white_24dp" ns0:clickable="true" ns0:id="@+id/add_channel_fab" ns0:layout_height="wrap_content" ns0:layout_margin="16dp" ns0:layout_width="wrap_content" />
     </android.support.design.widget.CoordinatorLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:background="@color/backgroundDarkAccent"
-        android:id="@+id/station_list_container">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="No saved stations"
-            android:gravity="center"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            android:id="@+id/no_saved_stations_text"
-            android:visibility="gone"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/station_list"
-            android:scrollbars="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbarAlwaysDrawVerticalTrack="true"
-            android:fadeScrollbars="false"
-            android:clickable="true"
-            android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
-            android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"/>
+<LinearLayout ns0:background="@color/backgroundDarkAccent" ns0:clipToPadding="false" ns0:id="@+id/station_list_container" ns0:layout_height="0dp" ns0:layout_weight="1" ns0:layout_width="match_parent" ns0:orientation="horizontal">
+
+        <TextView ns0:gravity="center" ns0:id="@+id/no_saved_stations_text" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:text="@string/no_saved_stations_message" ns0:textAppearance="@android:style/TextAppearance.Large" ns0:visibility="gone" />
+
+        <android.support.v7.widget.RecyclerView ns0:fadeScrollbars="false" ns0:id="@+id/station_list" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:scrollbarAlwaysDrawVerticalTrack="true" ns0:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb" ns0:scrollbarTrackVertical="@drawable/scrollbar_vertical_track" ns0:scrollbars="vertical" />
     </LinearLayout>
-</LinearLayout>
+
+    </LinearLayout>

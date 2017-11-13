@@ -2,13 +2,11 @@
 
 <img align="right" src="screenshots/demo.gif">
 
-[Latest Build](/app/build/outputs/apk) (Minimum version 4.2)
+[Latest Build](/app/build/outputs/apk/debug) (Minimum supported android version 4.2)
 
 Build has only been tested on 6.0 & 5.1. 
 
-If the app crashes on your system submit an issue with a full log file (Look this up if you dont know how to do this)
-
-
+If the app crashes on your system submit an issue with a full log file (Google it if you dont know how to do this)
 
 ## About
 
@@ -23,6 +21,14 @@ The monkeyboard does not transmit audio to the device, so the user will need to 
 I wrote this application to be compatible with another one of my custom written applications (http://github.com/freshollie/AndroidHeadunitController) and so input can be turned on for this app in the setting.
 
 I designed this app for use in my car, as so the interface has been designed to work in a car.
+
+## Features
+
+- DAB Slideshow! This streams an image from the board and displays it along side the program text information
+- Radio station list
+- Notification controls
+- Automatic android audio handling (Will not play over the top of any other android audio)
+
 
 ## Libraries
 ~

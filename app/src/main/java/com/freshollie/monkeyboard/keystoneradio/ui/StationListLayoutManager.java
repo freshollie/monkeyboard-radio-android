@@ -23,6 +23,9 @@ public class StationListLayoutManager extends LinearLayoutManager {
     private static final float MILLISECONDS_PER_INCH = 50f;
     private int snapDuration = 150;
 
+    public static int DEFAULT_SNAP_SPEED = 250;
+
+
     public void setSnapDuration(int duration) {
         snapDuration = duration;
     }
