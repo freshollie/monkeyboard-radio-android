@@ -42,9 +42,9 @@
 
                 <LinearLayout ns0:layout_above="@id/mode_switch" ns0:layout_below="@id/fm_seek_bar" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:orientation="horizontal" ns0:padding="12dp">
 
-                    <ImageView ns0:id="@+id/slideshow_image" ns0:layout_height="match_parent" ns0:layout_weight="1" ns0:layout_width="0dp" ns0:paddingRight="5dp" ns0:scaleType="fitStart" ns0:src="@mipmap/ic_launcher" ns0:visibility="visible" />
+                    <ImageView ns0:adjustViewBounds="true" ns0:id="@+id/slideshow_image" ns0:layout_height="match_parent" ns0:layout_width="wrap_content" ns0:paddingRight="10dp" ns0:scaleType="fitCenter" ns0:src="@mipmap/ic_launcher" ns0:visibility="visible" />
 
-                    <android.support.v7.widget.AppCompatTextView ns2:autoSizeMaxTextSize="30sp" ns2:autoSizeMinTextSize="5sp" ns2:autoSizeTextType="uniform" ns0:id="@+id/program_text" ns0:layout_height="match_parent" ns0:layout_weight="1" ns0:layout_width="0dp" ns0:text="Test program text, this will display text about the program" ns0:textAppearance="?android:attr/textAppearance" />
+                    <android.support.v7.widget.AppCompatTextView ns2:autoSizeMaxTextSize="30sp" ns2:autoSizeMinTextSize="5sp" ns2:autoSizeTextType="uniform" ns0:id="@+id/program_text" ns0:layout_height="match_parent" ns0:layout_width="match_parent" ns0:text="Test program text, this will display text about the program" ns0:textAppearance="?android:attr/textAppearance" />
 
                 </LinearLayout>
 

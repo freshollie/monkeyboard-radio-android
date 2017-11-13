@@ -188,7 +188,7 @@ public class SettingsFragment extends PreferenceFragment {
                 (CheckBoxPreference) findPreference(getString(R.string.setting_play_on_open));
 
         playInputPreference.setChecked(
-                sharedPreferences.getBoolean(getString(R.string.PLAY_ON_OPEN_KEY), false)
+                sharedPreferences.getBoolean(getString(R.string.PREF_PLAY_ON_OPEN), false)
         );
 
         playInputPreference.setOnPreferenceChangeListener(
@@ -196,7 +196,7 @@ public class SettingsFragment extends PreferenceFragment {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object o) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean(getString(R.string.PLAY_ON_OPEN_KEY), (boolean) o);
+                        editor.putBoolean(getString(R.string.PREF_PLAY_ON_OPEN), (boolean) o);
                         editor.apply();
                         return true;
                     }
@@ -208,7 +208,7 @@ public class SettingsFragment extends PreferenceFragment {
                 (CheckBoxPreference) findPreference(getString(R.string.setting_headunitcontroller_input));
 
         headunitInputPreference.setChecked(
-                sharedPreferences.getBoolean(getString(R.string.HEADUNIT_MAIN_INPUT_KEY), false)
+                sharedPreferences.getBoolean(getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT), false)
         );
 
         headunitInputPreference.setOnPreferenceChangeListener(
@@ -216,7 +216,7 @@ public class SettingsFragment extends PreferenceFragment {
                       @Override
                       public boolean onPreferenceChange(Preference preference, Object o) {
                           SharedPreferences.Editor editor = sharedPreferences.edit();
-                          editor.putBoolean(getString(R.string.HEADUNIT_MAIN_INPUT_KEY), (boolean) o);
+                          editor.putBoolean(getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT), (boolean) o);
                           editor.apply();
                           return true;
                       }
@@ -228,7 +228,7 @@ public class SettingsFragment extends PreferenceFragment {
                 (CheckBoxPreference) findPreference(getString(R.string.setting_scroll_wrap));
 
         scrollWrapPreference.setChecked(
-                sharedPreferences.getBoolean(getString(R.string.SCROLL_WRAP_KEY), false)
+                sharedPreferences.getBoolean(getString(R.string.PREF_CURSOR_SCROLL_WRAP), false)
         );
 
         scrollWrapPreference.setOnPreferenceChangeListener(
@@ -236,7 +236,7 @@ public class SettingsFragment extends PreferenceFragment {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object o) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean(getString(R.string.SCROLL_WRAP_KEY), (boolean) o);
+                        editor.putBoolean(getString(R.string.PREF_CURSOR_SCROLL_WRAP), (boolean) o);
                         editor.apply();
                         return true;
                     }

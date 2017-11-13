@@ -157,10 +157,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 3
                         );
                 Log.v(TAG, "Duck volume set to " + String.valueOf(duckVolume));
-            } else if (s.equals(getString(R.string.HEADUNIT_MAIN_INPUT_KEY))) {
+            } else if (s.equals(getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT))) {
                 controllerInput =
                         sharedPreferences.getBoolean(
-                                getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
+                                getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT),
                                 false
                         );
                 Log.v(TAG, "Headunit input set to: " + String.valueOf(controllerInput));
@@ -322,9 +322,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         radio.getListenerManager().registerDataListener(dataListener);
         radio.getListenerManager().registerConnectionStateChangedListener(connectionStateListener);
 
-        // Make the notification
-        playerNotification = new RadioPlayerNotification(this);
-
         saveVolume(volume);
 
         loadPreferences();
@@ -344,7 +341,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                     Log.v(TAG, "Received stop intent");
                     notifyDismissed();
                     closeConnection();
-                    stopSelf();
                     break;
                 case ACTION_SEARCH_FORWARDS:
                     handleSearchForwards();
@@ -496,7 +492,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
         controllerInput =
                 sharedPreferences.getBoolean(
-                        getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
+                        getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT),
                         false
                 );
         currentDabChannelIndex = sharedPreferences.getInt(getString(R.string.DAB_CURRENT_CHANNEL_INDEX_KEY), 0);
@@ -635,6 +631,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             }
         });
 
+        if (playerNotification != null) {
+            playerNotification.cancel();
+        }
+
+        playerNotification = new RadioPlayerNotification(this);
+
         if (queuedAction != null) {
             handleAction(queuedAction);
             queuedAction = null;
@@ -649,10 +651,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
             handlePlayRequest();
         }
-
-        if (playerNotification != null) {
-            //playerNotification.update();
-        }
     }
 
     public void openConnection() {
@@ -660,8 +658,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             Log.v(TAG, "Starting device connection");
 
             if (playerNotification != null) {
-                //playerNotification.update();
+                playerNotification.cancel();
             }
+
+            playerNotification = new RadioPlayerNotification(this);
 
             openingConnection = true;
             waitForAttachThread = new Thread(waitForAttachRunnable);
@@ -1233,10 +1233,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                                 1)
                         .build()
             );
-
-            if (playerNotification != null) {
-                playerNotification.update();
-            }
         }
     }
 
@@ -1395,14 +1391,16 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             waitForAttachThread.interrupt();
         }
 
+        if (playerNotification != null) {
+            playerNotification.cancel();
+        }
+
         abandonAudioFocus();
 
         if (radio.isConnected()) {
             handlePauseRequest();
             radio.disconnect();
         }
-
-        playerNotification.cancel();
     }
 
     @Override

@@ -69,7 +69,7 @@
             android:background="?selectableItemBackgroundBorderless"
             android:scaleType="fitXY"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
+            android:layout_alignParentTop="true"
             app:srcCompat="@drawable/ic_remove_circle_white_24dp"
             android:visibility="invisible"/>
     </RelativeLayout>

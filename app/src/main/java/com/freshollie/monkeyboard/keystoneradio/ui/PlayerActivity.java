@@ -64,8 +64,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public static final String HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT =
             "com.freshollie.headunitcontroller.action.SEND_KEYEVENT";
 
-    private static int SNAP_SPEED = 250;
-
     private RadioPlayerService playerService;
     private Boolean playerBound = false;
     private RadioDevice radio;
@@ -125,51 +123,20 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private Runnable cursorScrollRunnable;
     private Runnable selectChannelScrollRunnable;
 
-    private boolean preferenceControllerInput = false;
-    private boolean preferenceCursorScrollWrap = true;
-    private boolean preferencePlayOnOpen = false;
-
     private boolean isRestartedInstance = false;
 
     private BroadcastReceiver controllerInputReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT)) {
-            if (intent.hasExtra("keyCode") && preferenceControllerInput) {
+            if (intent.hasExtra("keyCode") &&
+                    sharedPreferences.getBoolean(
+                            getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT),
+                            false
+                    )) {
                 handleKeyDown(intent.getIntExtra("keyCode", -1));
             }
         }
-        }
-    };
-
-    /**
-     * Updates our internal player preferences when changed
-     */
-    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-            if (s.equals(getString(R.string.SCROLL_WRAP_KEY))) {
-                preferenceCursorScrollWrap =
-                        sharedPreferences.getBoolean(
-                                getString(R.string.SCROLL_WRAP_KEY),
-                                false
-                        );
-                Log.v(TAG, "Cursor Scroll wrap set to: " + String.valueOf(preferenceCursorScrollWrap));
-            } else if (s.equals(getString(R.string.HEADUNIT_MAIN_INPUT_KEY))) {
-                preferenceControllerInput =
-                        sharedPreferences.getBoolean(
-                                getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
-                                false
-                        );
-                Log.v(TAG, "Headunit input set to: " + String.valueOf(preferenceControllerInput));
-            } else if (s.equals(getString(R.string.PLAY_ON_OPEN_KEY))) {
-                preferencePlayOnOpen =
-                        sharedPreferences.getBoolean(
-                                getString(R.string.PLAY_ON_OPEN_KEY),
-                                false
-                        );
-                Log.v(TAG, "Play on open set to: " + String.valueOf(preferencePlayOnOpen));
-            }
         }
     };
 
@@ -203,39 +170,27 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Only 1 player activity should be open at a time
+        // For some reason some launchers launch multiple
         if (!isTaskRoot()) {
             finish();
             return;
         }
+
+        setContentView(R.layout.activity_player);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
-        setContentView(R.layout.activity_player);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-        preferenceControllerInput = sharedPreferences.getBoolean(
-                getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
-                false
-        );
-
-        preferenceCursorScrollWrap = sharedPreferences.getBoolean(
-                getString(R.string.SCROLL_WRAP_KEY),
-                false
-        );
-
-        preferencePlayOnOpen = sharedPreferences.getBoolean(
-                getString(R.string.PLAY_ON_OPEN_KEY),
-                false
-        );
-
 
         bindPlayerService();
+
         initialisePlayerAttributesUi(savedInstanceState);
-        setupStationList();
+        initialiseStationList();
 
         if (savedInstanceState == null) {
             clearPlayerAttributes();
@@ -280,19 +235,21 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             if (!Arrays.equals(playerService.getDabRadioStations(),
                     stationListAdapter.getStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                initialiseStationListUi(playerService.getRadioMode());
-                if (playerService.getDabRadioStations().length < 1) {
-                    if (sharedPreferences.getBoolean(
+                // if we don't have any stations and the user has the ability to
+                // use FM mode, switch to FM mode
+                if (playerService.getDabRadioStations().length < 1 &&
+                        sharedPreferences.getBoolean(
                             getString(R.string.pref_fm_mode_enabled_key),
                             true)
                             ) {
-                        playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
-                    }
+                    playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
+                } else {
+                    updateStationList(playerService.getRadioMode());
                 }
             } else if (!Arrays.equals(playerService.getFmRadioStations(),
                     stationListAdapter.getStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
-                initialiseStationListUi(playerService.getRadioMode());
+                updateStationList(playerService.getRadioMode());
             }
 
             // Re-Register the callback
@@ -300,7 +257,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
             refreshSwitchControls();
 
-            if (preferencePlayOnOpen) {
+            if (sharedPreferences.getBoolean(
+                    getString(R.string.PREF_PLAY_ON_OPEN),
+                    false
+            )) {
                 playerService.handlePlayRequest();
             }
         } else {
@@ -348,7 +308,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
 
         // then sets the animations back to normal
-        stationListLayoutManager.setSnapDuration(SNAP_SPEED);
+        stationListLayoutManager.setSnapDuration(StationListLayoutManager.DEFAULT_SNAP_SPEED);
         stationListRecyclerView.getItemAnimator().setChangeDuration(0);
         stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
         stationListRecyclerView.getItemAnimator().setMoveDuration(0);
@@ -356,7 +316,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         updatePlayerAttributesFromMetadata(!isRestartedInstance);
 
-        if (preferencePlayOnOpen) {
+        if (sharedPreferences.getBoolean(
+                getString(R.string.PREF_PLAY_ON_OPEN),
+                false
+            )) {
             playerService.handlePlayRequest();
         }
 
@@ -413,10 +376,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
     }
 
-    public void setupStationList() {
+    public void initialiseStationList() {
         stationListLayoutManager = new StationListLayoutManager(this);
 
         stationListRecyclerView = (RecyclerView) findViewById(R.id.station_list);
+        stationListRecyclerView.setHasFixedSize(true);
         stationListRecyclerView.setLayoutManager(stationListLayoutManager);
         stationListRecyclerView.setAdapter(stationListAdapter);
 
@@ -490,7 +454,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 if (playerBound) {
                     if (stationListAdapter != null && !stationListAdapter.isDeleteMode()) {
                         if (playerService.saveCurrentFmStation()) {
-                            initialiseStationListUi(playerService.getRadioMode());
+                            updateStationList(playerService.getRadioMode());
                         } else {
                             Snackbar.make(
                                     stationListRecyclerView,
@@ -712,7 +676,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
         }
         modeSwitch.setChecked(mode == RadioDevice.Values.STREAM_MODE_FM);
-        initialiseStationListUi(mode);
+        updateStationList(mode);
 
         if (clearAttributes) {
             clearPlayerAttributes();
@@ -953,22 +917,21 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
     }
 
-    public void initialiseStationListUi(int radioMode) {
+    public void updateStationList(int radioMode) {
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationListAdapter.updateStationList(playerService.getFmRadioStations(), radioMode);
-            if (stationListAdapter.getCurrentStationIndex() > -1) {
-                updateStationListSelection(playerService.getCurrentSavedFmStationIndex());
+            stationListAdapter.initialiseStationList(playerService.getFmRadioStations(), radioMode);
+            if (playerService.getCurrentSavedFmStationIndex() > -1) {
+                stationListAdapter.onCurrentStationChanged(playerService.getCurrentSavedFmStationIndex());
             }
-
             if (playerService.getFmRadioStations().length < 1) {
                 noStationsTextView.setVisibility(View.VISIBLE);
             } else {
                 noStationsTextView.setVisibility(View.GONE);
             }
         } else {
-            stationListAdapter.updateStationList(playerService.getDabRadioStations(), radioMode);
-            if (stationListAdapter.getCurrentStationIndex() > -1) {
-                updateStationListSelection(playerService.getCurrentDabChannelIndex());
+            stationListAdapter.initialiseStationList(playerService.getDabRadioStations(), radioMode);
+            if (playerService.getCurrentDabChannelIndex() > -1) {
+                stationListAdapter.onCurrentStationChanged(playerService.getCurrentDabChannelIndex());
             }
 
             if (playerService.getDabRadioStations().length < 1) {
@@ -981,137 +944,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void updateStationListSelection(final int channelIndex) {
-        if (channelIndex == stationListAdapter.getCurrentStationIndex()) {
-            return;
-        }
-
-        Log.d(TAG, "UpdateStationListSelection");
-
-        int difference = (channelIndex - stationListAdapter.getCurrentStationIndex());
-        Log.e(TAG, String.valueOf(channelIndex));
-        stationListAdapter.setCurrentStationIndex(channelIndex);
-
-        if (selectChannelScrollRunnable != null) {
-            stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
-        }
-
-        stationListRecyclerView.stopScroll();
-        stationListRecyclerView.clearOnScrollListeners();
-
-        selectChannelScrollRunnable =  new Runnable() {
-            @Override
-            public void run() {
-                stationListRecyclerView.clearOnScrollListeners();
-                stationListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    private boolean done = false;
-                    @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                        updateSelection();
-                    }
-
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        updateSelection();
-                    }
-
-                    private void updateSelection() {
-                        if (!done) {
-                            done = true;
-                            if (channelIndex == stationListAdapter.getCurrentStationIndex() && false) {
-                                stationListRecyclerView.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        stationListAdapter.notifyCurrentStationChanged();
-                                    }
-                                });
-                            }
-                            stationListRecyclerView.removeOnScrollListener(this);
-                        }
-                    }
-                });
-
-                if (playerBound &&
-                        stationListAdapter.getCurrentStationIndex() <
-                                stationListAdapter.getItemCount()) {
-                    if (stationListAdapter.getCurrentStationIndex() != -1) {
-                        //stationListRecyclerView.scrollToPosition(stationListAdapter.getCurrentStationIndex());
-                        Log.e(TAG, String.valueOf(stationListAdapter.getCurrentStationIndex()));
-                        stationListRecyclerView.smoothScrollToPosition(
-                                stationListAdapter.getCurrentStationIndex()
-                        );
-                    } else {
-                        stationListAdapter.notifyCurrentStationChanged();
-                    }
-                }
-            }
-        };
-        //if (stationListAdapter.getCurrentStationIndex() != -1) {
-            //stationListRecyclerView.scrollToPosition(stationListAdapter.getCurrentStationIndex());
-            //stationListRecyclerView.smoothScrollToPosition(
-                    //stationListAdapter.getCurrentStationIndex()
-            //);
-        //stationListAdapter.notifyCurrentStationChanged();
-        stationListRecyclerView.postDelayed(selectChannelScrollRunnable, 0);
+        stationListAdapter.onCurrentStationChanged(channelIndex);
     }
 
-    public void updateCursorPosition(final int newCursorIndex) {
-        if (cursorScrollRunnable != null) {
-            stationListRecyclerView.removeCallbacks(cursorScrollRunnable);
-        }
-
-        Log.d(TAG, "updateCursorPosition");
-
-        stationListAdapter.setCursorIndex(newCursorIndex);
-        stationListRecyclerView.stopScroll();
-        stationListRecyclerView.clearOnScrollListeners();
-
-        cursorScrollRunnable =  new Runnable() {
-            @Override
-            public void run() {
-                if (newCursorIndex == stationListAdapter.getCursorIndex()) {
-                    stationListRecyclerView.clearOnScrollListeners();
-                    stationListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                        private boolean done = false;
-
-                        @Override
-                        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                            super.onScrollStateChanged(recyclerView, newState);
-                            updateSelection();
-                        }
-
-                        @Override
-                        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                            super.onScrolled(recyclerView, dx, dy);
-                            updateSelection();
-                        }
-
-                        private void updateSelection() {
-                            if (!done) {
-                                done = true;
-                                if (newCursorIndex == stationListAdapter.getCursorIndex()) {
-                                    stationListRecyclerView.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            stationListAdapter.notifyCursorPositionChanged();
-                                        }
-                                    });
-                                }
-
-                                stationListRecyclerView.removeOnScrollListener(this);
-                            }
-                        }
-                    });
-
-                    stationListLayoutManager.setSnapDuration(1);
-                    stationListRecyclerView.smoothScrollToPosition(stationListAdapter.getCursorIndex());
-                    stationListLayoutManager.setSnapDuration(SNAP_SPEED);
-                }
-            }
-        };
-
-        //stationListRecyclerView.post(cursorScrollRunnable);
+    public void updateStationListCursorPosition(final int newCursorIndex) {
+        stationListAdapter.onCursorPositionChanged(newCursorIndex);
     }
 
     public void onChannelListDeleteModeChanged(boolean deleteMode) {
@@ -1141,14 +978,24 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void handleRemoveFmChannel(RadioStation radioStation) {
         playerService.removeFmRadioStation(radioStation);
         if (playerService.getFmRadioStations().length < 1) {
-            initialiseStationListUi(playerService.getRadioMode());
+            updateStationList(playerService.getRadioMode());
         }
     }
 
     public void handleNextCursorPosition() {
-        int newPosition = stationListAdapter.getCursorIndex() + 1;
+        int newPosition;
+
+        if (sharedPreferences.getBoolean(getString(R.string.pref_cursor_beta_mode), false)) {
+            newPosition = stationListAdapter.getLastScrollIndex() + 1;
+        } else {
+            newPosition = stationListAdapter.getCurrentScrollIndex() + 1;
+        }
+
         if (newPosition >= stationListAdapter.getItemCount()) {
-            if (preferenceCursorScrollWrap) {
+            if (sharedPreferences.getBoolean(
+                    getString(R.string.PREF_CURSOR_SCROLL_WRAP),
+                    false
+                )) {
                 newPosition = 0;
             } else {
                 newPosition = -1;
@@ -1156,21 +1003,31 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
 
         if (newPosition != -1) {
-            updateCursorPosition(newPosition);
+            updateStationListCursorPosition(newPosition);
         }
     }
 
     public void handlePreviousCursorPosition() {
-        int newPosition = stationListAdapter.getCursorIndex() - 1;
+        int newPosition;
+
+        if (sharedPreferences.getBoolean(getString(R.string.pref_cursor_beta_mode), false)) {
+            newPosition = stationListAdapter.getLastScrollIndex() - 1;
+        } else {
+            newPosition = stationListAdapter.getCurrentScrollIndex() - 1;
+        }
+
         if (newPosition < 0) {
-            if (preferenceCursorScrollWrap) {
+            if (sharedPreferences.getBoolean(
+                    getString(R.string.PREF_CURSOR_SCROLL_WRAP),
+                    false
+                )) {
                 newPosition = stationListAdapter.getItemCount() - 1;
             } else {
                 newPosition = -1;
             }
         }
         if (newPosition != -1) {
-            updateCursorPosition(newPosition);
+            updateStationListCursorPosition(newPosition);
         }
     }
 
@@ -1339,7 +1196,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onStationListCopyComplete() {
         if (playerBound) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                initialiseStationListUi(playerService.getRadioMode());
+                updateStationList(playerService.getRadioMode());
             }
             playerService.handlePlayRequest();
         }
@@ -1353,10 +1210,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onDestroy() {
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        if (sharedPreferences != null) {
-            sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-        }
 
         if (playerBound) {
             playerService.getMediaController().unregisterCallback(mediaControllerCallback);
@@ -1473,7 +1326,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                     updateVolume(playerService.getPlayerVolume());
                 }
             }
-        } else if (!preferenceControllerInput) {
+        } else if (!sharedPreferences.getBoolean(
+                getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT),
+                false
+            )) {
             if (handleKeyDown(keyCode)) {
                 return true;
             }
