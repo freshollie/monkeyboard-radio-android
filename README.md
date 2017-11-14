@@ -14,7 +14,7 @@ A [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-f
 
 This app interfaces with a Monkeyboard and provides a control and feedback interface for the user. The Monkeyboard communicates via USB serial, and so to use the board a USB Host cable is required to connect the board to the android device.
 
-The app is designed to act as if it is a normal music player as so will act accordingly, for example audio focus will be follow a mediaplayer notification is provided. 
+The app is designed to act as if it is a normal music player as so will act accordingly, for example audio focus will be followed, and a mediaplayer notification is provided. 
 
 The monkeyboard does not transmit audio over the USB connection, so the user will need to mix this audio with the tablet audio externally. (Think of the android device as being a screen for the monkeyboard)
 
