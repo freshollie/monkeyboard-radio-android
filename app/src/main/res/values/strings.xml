@@ -98,6 +98,9 @@
     <string name="pref_cursor_beta_mode">pref_cursor_beta</string>
     <string name="settings_cursor_beta_title">Beta cursor scrolling</string>
     <string name="settings_cursor_beta_summary">Having this on means the cursor is more responsive but more laggy</string>
+    <string name="pref_fm_stereo_mode_enabled_key">pref_fm_stereo_mode_enabled</string>
+    <string name="pref_fm_stereo_mode_enabled_title">FM Stereo mode</string>
+    <string name="pref_fm_stereo_mode_enabled_summary">If enabled this produces a stereo sound, but a worse signal quality</string>
 
 
     <string-array name="STATION_GENRES">

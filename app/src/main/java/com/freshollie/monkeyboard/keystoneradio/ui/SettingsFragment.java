@@ -156,8 +156,13 @@ public class SettingsFragment extends PreferenceFragment {
                 });
         final CheckBoxPreference dabEnabledPreference =
                 (CheckBoxPreference) findPreference(getString(R.string.pref_dab_mode_enabled_key));
+
         final CheckBoxPreference fmEnabledPreference =
                 (CheckBoxPreference) findPreference(getString(R.string.pref_fm_mode_enabled_key));
+
+        final CheckBoxPreference fmStereoModeEnabledPreference =
+                (CheckBoxPreference) findPreference(getString(R.string.pref_fm_stereo_mode_enabled_key));
+
 
         dabEnabledPreference.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
@@ -180,6 +185,27 @@ public class SettingsFragment extends PreferenceFragment {
                     return false;
                 }
                 return true;
+            }
+        });
+
+        fmStereoModeEnabledPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                boolean enabled = fmStereoModeEnabledPreference.isChecked();
+                // Edit the preference ourselves,
+                // so it is up to date ready for the service to handle
+                sharedPreferences
+                        .edit()
+                        .putBoolean(getString(R.string.pref_fm_stereo_mode_enabled_key), enabled)
+                        .apply();
+
+                // Tell the player that the value has been changed
+                if (playerBound) {
+                    playerService.handleFmStereoModeUpdated();
+                }
+
+                return false;
             }
         });
 

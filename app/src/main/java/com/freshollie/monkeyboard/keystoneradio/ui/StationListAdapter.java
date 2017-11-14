@@ -56,6 +56,8 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     private boolean waitForIdleScroll;
 
+    private boolean firstScrollDone = false;
+
     private boolean readyForScroll = false;
 
     private ViewTreeObserver.OnGlobalLayoutListener
@@ -361,9 +363,11 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         int delay = 0;
         // If the recycler view has just been initialised then we should wait 50 ms,
         // I would rather this was more specific
-        if (lastScrollIndex == -1) {
+        if (lastScrollIndex == -1 && firstScrollDone) {
             delay = 300;
         }
+
+        firstScrollDone = true;
 
         // If we have to move more than 20 items then we first need to probably
         // scroll directly to there
@@ -436,10 +440,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     }
 
     public void onCurrentStationChanged(int newStationIndex) {
-        if (newStationIndex == -1) {
-            return;
-        }
-
         // We are already scrolling to here so ignore
         if (newStationIndex == currentStationIndex) {
             return;
@@ -454,12 +454,14 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             notifyItemChanged(lastChannelCursor);
         }
 
-        notifyItemChanged(currentStationIndex);
 
         if (lastStationIndex > -1) {
             notifyItemChanged(lastStationIndex);
         }
 
-        scrollWhenPossible(currentStationIndex);
+        if (currentStationIndex > -1) {
+            notifyItemChanged(currentStationIndex);
+            scrollWhenPossible(currentStationIndex);
+        }
     }
 }

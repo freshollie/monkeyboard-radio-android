@@ -18,12 +18,17 @@ import android.hardware.usb.UsbManager;
 import android.util.Log;
 
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
+import com.hoho.android.usbserial.driver.Ch34xSerialDriver;
+import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
+import com.hoho.android.usbserial.driver.FtdiSerialDriver;
+import com.hoho.android.usbserial.driver.ProlificSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Handles all connection interaction with the monkeyboard over the usb serial connection
@@ -342,12 +347,12 @@ public class DeviceConnection {
     }
 
     /**
-     * Gets the returned data from the given command serial number
+     * Reads the response data until it finds the returned data from the given command serial number
      *
      * @param serialNumber
      * @return
      */
-    private byte[] getResponse(byte serialNumber) throws IOException{
+    private byte[] getResponse(byte serialNumber) {
         /*
         * It does this by reading the in bytes until it gets a start command
         * byte, then once a full command is received it checks the serial number of the command to
@@ -364,8 +369,13 @@ public class DeviceConnection {
         // Keep trying to read for a response byte until we time out
         while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && isConnectionOpen()) {
             byte[] readBytes = new byte[4096];
+            int numBytesRead = 0;
 
-            int numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
+            try {
+                numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
+            } catch (Exception e) {
+                break;
+            }
 
             for (int i = 0; i < numBytesRead; i++) {
                 byte readByte = readBytes[i];
@@ -470,18 +480,44 @@ public class DeviceConnection {
         if (isConnectionOpen()) {
             try {
                 // Sign our command with a serial number so we know the response is correct
-                byte serialNumber = generateCommandSerialNumber();
+                final byte serialNumber = generateCommandSerialNumber();
                 commandBuffer[3] = serialNumber;
 
                 if (DEBUG_OUTPUT) {
                     Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
                 }
 
+                // New method to help read more values
+                // start reading response before we even send the request
+                final AtomicBoolean gotResponse = new AtomicBoolean();
+                gotResponse.set(false);
+
+                final AtomicBoolean threadStarted = new AtomicBoolean();
+                threadStarted.set(false);
+
+                final byte[][] threadResponse = new byte[1][MAX_PACKET_LENGTH];
+
+                // Make a new thread for the read request
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        threadStarted.set(true);
+                        threadResponse[0] = getResponse(serialNumber);
+                        gotResponse.set(true);
+                    }
+                }).start();
+
+                // Wait until we know the thread has started before continuing
+                while (!threadStarted.get());
+
+                // Write the command
                 deviceSerialInterface.write(commandBuffer, COMMUNICATION_TIMEOUT_LENGTH);
 
-                //TimeUnit.MILLISECONDS.sleep(20);
+                // Wait until we have a response, or the response has timed out
+                while (!gotResponse.get());
 
-                responseBytes = getResponse(serialNumber);
+                // Fill the response with what we got from the thread
+                responseBytes = threadResponse[0];
 
                 if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
                     Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
@@ -491,6 +527,8 @@ public class DeviceConnection {
                 //e.printStackTrace();
             //} catch (InterruptedException e) {
                 //e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         } else {
             throw new NotConnectedException();
