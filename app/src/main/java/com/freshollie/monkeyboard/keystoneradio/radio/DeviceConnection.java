@@ -478,57 +478,52 @@ public class DeviceConnection {
         byte[] responseBytes = new byte[MAX_PACKET_LENGTH];
 
         if (isConnectionOpen()) {
+            // Sign our command with a serial number so we know the response is correct
+            final byte serialNumber = generateCommandSerialNumber();
+            commandBuffer[3] = serialNumber;
+
+            if (DEBUG_OUTPUT) {
+                Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
+            }
+
+            // New method to help read more values
+            // start reading response before we even send the request
+            final AtomicBoolean gotResponse = new AtomicBoolean();
+            gotResponse.set(false);
+
+            final AtomicBoolean threadStarted = new AtomicBoolean();
+            threadStarted.set(false);
+
+            final byte[][] threadResponse = new byte[1][MAX_PACKET_LENGTH];
+
+            // Make a new thread for the read request
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    threadStarted.set(true);
+                    threadResponse[0] = getResponse(serialNumber);
+                    gotResponse.set(true);
+                }
+            }).start();
+
+            // Wait until we know the thread has started before continuing
+            while (!threadStarted.get());
+
+            // Write the command
             try {
-                // Sign our command with a serial number so we know the response is correct
-                final byte serialNumber = generateCommandSerialNumber();
-                commandBuffer[3] = serialNumber;
-
-                if (DEBUG_OUTPUT) {
-                    Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
-                }
-
-                // New method to help read more values
-                // start reading response before we even send the request
-                final AtomicBoolean gotResponse = new AtomicBoolean();
-                gotResponse.set(false);
-
-                final AtomicBoolean threadStarted = new AtomicBoolean();
-                threadStarted.set(false);
-
-                final byte[][] threadResponse = new byte[1][MAX_PACKET_LENGTH];
-
-                // Make a new thread for the read request
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        threadStarted.set(true);
-                        threadResponse[0] = getResponse(serialNumber);
-                        gotResponse.set(true);
-                    }
-                }).start();
-
-                // Wait until we know the thread has started before continuing
-                while (!threadStarted.get());
-
-                // Write the command
                 deviceSerialInterface.write(commandBuffer, COMMUNICATION_TIMEOUT_LENGTH);
+            } catch (Exception ignore) {
 
-                // Wait until we have a response, or the response has timed out
-                while (!gotResponse.get());
+            }
 
-                // Fill the response with what we got from the thread
-                responseBytes = threadResponse[0];
+            // Wait until we have a response, or the response has timed out
+            while (!gotResponse.get());
 
-                if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
-                    Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
-                }
+            // Fill the response with what we got from the thread
+            responseBytes = threadResponse[0];
 
-            } catch (IOException e) {
-                //e.printStackTrace();
-            //} catch (InterruptedException e) {
-                //e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
+                Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
             }
         } else {
             throw new NotConnectedException();
