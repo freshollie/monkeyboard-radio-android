@@ -8,8 +8,8 @@ android {
         applicationId 'com.freshollie.monkeyboard.keystoneradio'
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 88
-        versionName "Beta 2.0"
+        versionCode 90
+        versionName "Beta 2.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

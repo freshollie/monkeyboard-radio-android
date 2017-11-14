@@ -10,25 +10,24 @@ If the app crashes on your system submit an issue with a full log file (Google i
 
 ## About
 
-This app will interface with a [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-fm-digital-radio-development-board) and provides a control and feedback interface for the user.
+A [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-fm-digital-radio-development-board) (Keystone radio) is a full DAB & FM radio on a circuitboard.
 
-The Monkeyboard communicates via USB serial and so I used the specifcation from the manufacturer to write a simple API interface for the board (com.freshollie.monkeyboard.keystoneradio.radio). 
+This app interfaces with a Monkeyboard and provides a control and feedback interface for the user. The Monkeyboard communicates via USB serial, and so to use the board a USB Host cable is required to connect the board to the android device.
 
 The app is designed to act as if it is a normal music player as so will act accordingly, for example audio focus will be follow a mediaplayer notification is provided. 
 
-The monkeyboard does not transmit audio to the device, so the user will need to mix this audio with the tablet audio externally.
+The monkeyboard does not transmit audio over the USB connection, so the user will need to mix this audio with the tablet audio externally. (Think of the android device as being a screen for the monkeyboard)
 
-I wrote this application to be compatible with another one of my custom written applications (http://github.com/freshollie/AndroidHeadunitController) and so input can be turned on for this app in the setting.
-
-I designed this app for use in my car, as so the interface has been designed to work in a car.
+I designed this app for use in my car, as so the interface has been designed for large screens.
 
 ## Features
 
-- DAB Slideshow! This streams an image from the board and displays it along side the program text information
-- Radio station list
-- Notification controls
-- Automatic android audio handling (Will not play over the top of any other android audio)
-
+- DAB Slideshow! This streams an image from the board and displays it along side the program text information. **This does not require internet**
+- DAB Program text
+- FM RDS information
+- Radio station list. Editable FM saved stations list
+- Player notificiation controls
+- Automatic android audio handling (Radio will not play over the top of any other android audio)
 
 ## Libraries
 ~
@@ -38,10 +37,9 @@ The application uses several third party libraries to acheive full functionallit
 - [SnappySmoothScroller](https://github.com/nshmura/SnappySmoothScroller)
 - [CircularProgressView](https://github.com/rahatarmanahmed/CircularProgressView)
 
-
 ## Contributing
 
-If you wish to make a fix, fork this project commit and then make a pull request describing the fix in detail.
+If you wish to make a fix, fork this project, commit, and make a pull request describing the fix in detail.
 
 If you wish to report a bug, create an issue and I will look into it.
 
@@ -51,12 +49,23 @@ If you wish to report a bug, create an issue and I will look into it.
 </p>
 
 <p align="center">
+    <img src="screenshots/notification.png" alt="Notification with controls, program infromation, and slideshow image" width="800"/>
+</p>
+
+
+<p align="center">
+    <img src="screenshots/settings_interface.png" align="center" alt="Settings interface" width="800"/>
+</p>
+
+
+<p align="center">
     <img src="screenshots/dab_search.gif" alt="Searching interface" width="800"/>
 </p>
 
-<p align="center">>
-    <img src="screenshots/settings_interface.png" align="center" alt="Settings interface" width="800"/>
+<p align="center">
+    <img src="screenshots/portrait.png" alt="Main interface protrait" width="400"/>
 </p>
+
 
 ## Licence
 
