@@ -26,7 +26,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -190,7 +189,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         bindPlayerService();
 
         initialisePlayerAttributesUi(savedInstanceState);
-        initialiseStationList();
+        initialiseStationListUi();
 
         if (savedInstanceState == null) {
             clearPlayerAttributes();
@@ -376,7 +375,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
     }
 
-    public void initialiseStationList() {
+    public void initialiseStationListUi() {
         stationListLayoutManager = new StationListLayoutManager(this);
 
         stationListRecyclerView = (RecyclerView) findViewById(R.id.station_list);
@@ -384,8 +383,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         stationListRecyclerView.setLayoutManager(stationListLayoutManager);
         stationListRecyclerView.setAdapter(stationListAdapter);
 
-        ViewCompat.setElevation(findViewById(R.id.station_list_container), 100);
-        ViewCompat.setElevation(findViewById(R.id.player_control_panel), 50);
+        //ViewCompat.setElevation(findViewById(R.id.station_list_container), 100);
+        //ViewCompat.setElevation(findViewById(R.id.player_control_panel), 50);
     }
 
     public void initialisePlayerControls() {
@@ -919,7 +918,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void updateStationList(int radioMode) {
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationListAdapter.initialiseStationList(playerService.getFmRadioStations(), radioMode);
+            stationListAdapter.initialiseNewStationList(playerService.getFmRadioStations(), radioMode);
             if (playerService.getCurrentSavedFmStationIndex() > -1) {
                 stationListAdapter.onCurrentStationChanged(playerService.getCurrentSavedFmStationIndex());
             }
@@ -929,7 +928,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 noStationsTextView.setVisibility(View.GONE);
             }
         } else {
-            stationListAdapter.initialiseStationList(playerService.getDabRadioStations(), radioMode);
+            stationListAdapter.initialiseNewStationList(playerService.getDabRadioStations(), radioMode);
             if (playerService.getCurrentDabChannelIndex() > -1) {
                 stationListAdapter.onCurrentStationChanged(playerService.getCurrentDabChannelIndex());
             }
