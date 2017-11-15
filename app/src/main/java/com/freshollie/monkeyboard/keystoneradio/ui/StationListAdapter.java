@@ -315,7 +315,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         return stationList.length;
     }
 
-    public void initialiseStationList(RadioStation[] newStationList, int radioMode) {
+    public void initialiseNewStationList(RadioStation[] newStationList, int radioMode) {
         this.radioMode = radioMode;
 
         this.cursorIndex = -1;
