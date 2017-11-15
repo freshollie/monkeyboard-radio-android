@@ -133,6 +133,8 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 .getViewTreeObserver()
                 .addOnGlobalLayoutListener(recyclerViewLayoutDoneListener);
         layoutManager = (StationListLayoutManager) recyclerView.getLayoutManager();
+
+        setAnimations(true);
     }
 
     @Override
@@ -315,6 +317,20 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         return stationList.length;
     }
 
+    public void setAnimations(boolean on) {
+        if (on) {
+            recyclerView.getItemAnimator().setChangeDuration(0);
+            recyclerView.getItemAnimator().setRemoveDuration(0);
+            recyclerView.getItemAnimator().setMoveDuration(100);
+            recyclerView.getItemAnimator().setAddDuration(100);
+        } else {
+            recyclerView.getItemAnimator().setChangeDuration(0);
+            recyclerView.getItemAnimator().setRemoveDuration(0);
+            recyclerView.getItemAnimator().setMoveDuration(0);
+            recyclerView.getItemAnimator().setAddDuration(0);
+        }
+    }
+
     public void initialiseNewStationList(RadioStation[] newStationList, int radioMode) {
         this.radioMode = radioMode;
 
@@ -325,7 +341,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         this.nextScrollIndex = -1;
         this.currentScrollIndex = 0;
 
-        this.readyForScroll = false;
+        this.readyForScroll = true;
         this.waitForIdleScroll = false;
 
         if (radioMode != RadioDevice.Values.STREAM_MODE_FM && isDeleteMode()) {
@@ -364,7 +380,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         // If the recycler view has just been initialised then we should wait 50 ms,
         // I would rather this was more specific
         if (lastScrollIndex == -1 && firstScrollDone) {
-            delay = 300;
+            delay = 0;
         }
 
         firstScrollDone = true;
@@ -373,21 +389,16 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         // scroll directly to there
         // and then wait for the scroll to finish before starting a smooth scroll from that point
         if ((layoutManager.findFirstVisibleItemPosition() > nextScroll || layoutManager.findLastVisibleItemPosition() < nextScroll) && !waitForIdleScroll)  {
-            recyclerView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    lastScrollIndex = nextScroll;
+            lastScrollIndex = nextScroll;
 
-                    // Tell the scroll listener to perform this again
-                    // Once we have finished this scroll
-                    if (nextScrollIndex == -1) {
-                        nextScrollIndex = nextScroll;
-                    }
-                    waitForIdleScroll = true;
+            // Tell the scroll listener to perform this again
+            // Once we have finished this scroll
+            if (nextScrollIndex == -1) {
+                nextScrollIndex = nextScroll;
+            }
+            waitForIdleScroll = true;
 
-                    recyclerView.scrollToPosition(nextScrollIndex);
-                }
-            }, delay);
+            recyclerView.scrollToPosition(nextScrollIndex);
         } else {
             waitForIdleScroll = false;
             recyclerView.postDelayed(new Runnable() {

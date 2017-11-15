@@ -161,7 +161,7 @@ public class SettingsFragment extends PreferenceFragment {
                 (CheckBoxPreference) findPreference(getString(R.string.pref_fm_mode_enabled_key));
 
         final CheckBoxPreference fmStereoModeEnabledPreference =
-                (CheckBoxPreference) findPreference(getString(R.string.pref_fm_stereo_mode_enabled_key));
+                (CheckBoxPreference) findPreference(getString(R.string.pref_fm_stereo_enabled_key));
 
 
         dabEnabledPreference.setOnPreferenceChangeListener(
@@ -197,7 +197,7 @@ public class SettingsFragment extends PreferenceFragment {
                 // so it is up to date ready for the service to handle
                 sharedPreferences
                         .edit()
-                        .putBoolean(getString(R.string.pref_fm_stereo_mode_enabled_key), enabled)
+                        .putBoolean(getString(R.string.pref_fm_stereo_enabled_key), enabled)
                         .apply();
 
                 // Tell the player that the value has been changed

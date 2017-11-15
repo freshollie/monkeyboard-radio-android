@@ -19,6 +19,7 @@ import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObject;
 import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObjectsManager;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -275,7 +276,11 @@ public class RadioDevice {
     }
 
     public static String getStringFromBytes(byte[] bytes) {
-        return new String(bytes, Charset.forName("UTF-16")).trim();
+        try {
+            return new String(bytes, "UTF-16BE");
+        } catch (UnsupportedEncodingException e) {
+            return "";
+        }
     }
 
     /*
@@ -589,7 +594,7 @@ public class RadioDevice {
                 );
 
         if (response != null) {
-            byte[] programNameBytes = Arrays.copyOfRange(response, 6, response.length-3);
+            byte[] programNameBytes = Arrays.copyOfRange(response, 6, response.length - 1);
 
             try {
                 return getStringFromBytes(programNameBytes);
@@ -617,7 +622,7 @@ public class RadioDevice {
                 );
 
         if (response != null) {
-            byte[] programTextBytes = Arrays.copyOfRange(response, 6, response.length - 3);
+            byte[] programTextBytes = Arrays.copyOfRange(response, 6, response.length - 1);
 
             try {
                 return getStringFromBytes(programTextBytes);
@@ -755,7 +760,7 @@ public class RadioDevice {
 
         if (response != null) {
 
-            byte[] ensembleNameBytes = Arrays.copyOfRange(response, 6, response.length - 3);
+            byte[] ensembleNameBytes = Arrays.copyOfRange(response, 6, response.length - 1);
 
             try {
                 return getStringFromBytes(ensembleNameBytes);

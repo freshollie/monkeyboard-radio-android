@@ -3,44 +3,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        android:id="@+id/no_saved_stations_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="5dp"
-        android:gravity="center"
-        android:text="@string/no_saved_stations_message"
-        android:textAppearance="@android:style/TextAppearance.Large"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/station_list"
-        app:layout_constraintEnd_toEndOf="@+id/station_list"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/station_list" />
+    android:layout_height="match_parent"
+    android:id="@+id/player_layout">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/station_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/backgroundDarkAccent"
-        android:elevation="2dp"
         android:fadeScrollbars="false"
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
         android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/player_and_station_list_separator"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/player_and_station_list_separator" />
+
+    <TextView
+        android:id="@+id/no_saved_stations_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/no_saved_stations_message"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/station_list"
+        app:layout_constraintEnd_toEndOf="@+id/station_list"
+        app:layout_constraintStart_toStartOf="@id/station_list"
+        app:layout_constraintTop_toTopOf="@+id/station_list" />
 
     <android.support.constraint.Guideline
         android:id="@+id/player_and_station_list_separator"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.33" />
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.66" />
 
     <android.support.v7.widget.CardView
         android:id="@+id/channel_status_bar"
@@ -50,16 +49,17 @@
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="wrap"
-        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/channel_status_bar_constraint_layout"
             android:padding="5dp">
-
             <ImageButton
                 android:id="@+id/settings_button"
-                android:layout_width="42dp"
+                android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/settings_icon_description"
@@ -189,19 +189,19 @@
         android:layout_below="@id/channel_status_bar"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/channel_status_bar" />
 
-    <ImageView
+    <!-- When 1.1.0 is Released this might be better-->
+    <!--<ImageView
         android:id="@+id/slideshow_image"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginLeft="12dp"
         android:layout_marginBottom="2dp"
-        android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:src="@mipmap/ic_launcher"
         android:visibility="visible"
+        android:adjustViewBounds="true"
         app:layout_constraintBottom_toTopOf="@+id/volume_button"
         app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator"
         app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar" />
@@ -210,17 +210,51 @@
         android:id="@+id/program_text"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginLeft="12dp"
+        android:textSize="30sp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
         android:text="Test program text, this will display text about the program"
         android:textAppearance="?android:attr/textAppearance"
+        app:layout_constraintBottom_toTopOf="@+id/volume_button"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/slideshow_image"
+        app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar"
         app:autoSizeMaxTextSize="30sp"
-        app:autoSizeMinTextSize="5sp"
-        app:autoSizeTextType="uniform"
-        app:layout_constraintBottom_toBottomOf="@+id/slideshow_image"
+        app:autoSizeTextType="uniform" />-->
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="13dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="13dp"
+        app:layout_constraintBottom_toTopOf="@+id/volume_button"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/slideshow_image"
-        app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/slideshow_image"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher"
+            android:visibility="visible"
+            android:adjustViewBounds="true"
+            android:layout_marginRight="13dp"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/program_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="30sp"
+            android:layout_marginLeft="10dp"
+            android:text="Test program text, this will display text about the program"
+            android:textAppearance="?android:attr/textAppearance"
+
+            app:autoSizeMaxTextSize="30sp"
+            app:autoSizeTextType="uniform"/>
+    </LinearLayout>
 
     <android.support.v7.widget.CardView
         android:id="@+id/volume_seekbar_holder"
@@ -253,8 +287,6 @@
         android:id="@+id/volume_button"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:background="?selectableItemBackgroundBorderless"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toTopOf="@+id/player_controls_top_guideline"
@@ -270,7 +302,7 @@
         android:textOn="@string/fm"
         app:layout_constraintBottom_toTopOf="@+id/player_controls_top_guideline"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_channel_fab"
@@ -288,87 +320,91 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.75" />
+        app:layout_constraintGuide_percent="0.482" />
 
-    <View
+    <android.support.v7.widget.CardView
         android:id="@+id/player_control_panel_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardUseCompatPadding="true"
+        app:cardElevation="5dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/player_and_station_list_separator"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator"
-        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline" />
+        app:layout_constraintTop_toBottomOf="@+id/player_controls_top_guideline" >
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/test"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageButton
+                android:id="@+id/skip_previous_button"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/search_backwards_button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_skip_previous_white_24dp" />
 
-    <ImageButton
-        android:id="@+id/skip_previous_button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/player_and_station_list_separator"
-        app:layout_constraintEnd_toStartOf="@+id/search_backwards_button"
-        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline"
-        app:srcCompat="@drawable/ic_skip_previous_white_24dp" />
+            <ImageButton
+                android:id="@+id/search_backwards_button"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/skip_previous_button"
+                app:layout_constraintEnd_toStartOf="@+id/play_pause_button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_fast_rewind_white_24dp" />
 
-    <ImageButton
-        android:id="@+id/search_backwards_button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/skip_previous_button"
-        app:layout_constraintEnd_toStartOf="@+id/play_pause_button"
-        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline"
-        app:srcCompat="@drawable/ic_fast_rewind_white_24dp" />
+            <ImageButton
+                android:id="@+id/play_pause_button"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/search_backwards_button"
+                app:layout_constraintEnd_toStartOf="@+id/search_forward_button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_play_arrow_white_24dp" />
 
-    <ImageButton
-        android:id="@+id/play_pause_button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/search_backwards_button"
-        app:layout_constraintEnd_toStartOf="@+id/search_forward_button"
-        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline"
-        app:srcCompat="@drawable/ic_play_arrow_white_24dp" />
+            <ImageButton
+                android:id="@+id/search_forward_button"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/play_pause_button"
+                app:layout_constraintEnd_toStartOf="@+id/skip_next_button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_fast_forward_white_24dp" />
 
-    <ImageButton
-        android:id="@+id/search_forward_button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/play_pause_button"
-        app:layout_constraintEnd_toStartOf="@+id/skip_next_button"
-        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline"
-        app:srcCompat="@drawable/ic_fast_forward_white_24dp" />
-
-    <ImageButton
-        android:id="@+id/skip_next_button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/search_forward_button"
-        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/ic_skip_next_white_24dp" />
-
-
-
+            <ImageButton
+                android:id="@+id/skip_next_button"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/search_forward_button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_skip_next_white_24dp" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
 </android.support.constraint.ConstraintLayout>

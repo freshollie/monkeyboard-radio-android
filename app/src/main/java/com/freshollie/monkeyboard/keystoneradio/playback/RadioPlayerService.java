@@ -814,7 +814,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     private void updateBoardStereoModeAction() {
         int stereoMode = 0;
 
-        if (sharedPreferences.getBoolean(getString(R.string.pref_fm_stereo_mode_enabled_key), false) ||
+        if (sharedPreferences.getBoolean(getString(R.string.pref_fm_stereo_enabled_key), false) ||
                 getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
             stereoMode = 1;
         }

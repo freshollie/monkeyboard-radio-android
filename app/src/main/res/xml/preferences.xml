@@ -23,9 +23,9 @@
             android:summaryOff="@string/pref_dab_mode_enabled_summary_off"
             android:defaultValue="true" />
         <CheckBoxPreference
-            android:key="@string/pref_fm_stereo_mode_enabled_key"
-            android:title="@string/pref_fm_stereo_mode_enabled_title"
-            android:summary="@string/pref_fm_stereo_mode_enabled_summary"
+            android:key="@string/pref_fm_stereo_enabled_key"
+            android:title="@string/pref_fm_stereo_enabled_title"
+            android:summary="@string/pref_fm_stereo_enabled_summary"
             android:defaultValue="false" />
     </PreferenceCategory>
 
