@@ -21,18 +21,27 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.transition.ChangeBounds;
+import android.support.transition.Fade;
+import android.support.transition.TransitionManager;
+import android.support.transition.TransitionSet;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.transition.ChangeTransform;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -75,9 +84,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private ImageButton playButton;
     private ImageButton volumeButton;
     private ImageButton settingsButton;
-
-    private Animation fadeInAnimation;
-    private Animation fadeOutAnimation;
 
     private Switch modeSwitch;
 
@@ -164,6 +170,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             radio = null;
         }
     };
+    private ConstraintLayout channelStatusBarLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -308,10 +315,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         // then sets the animations back to normal
         stationListLayoutManager.setSnapDuration(StationListLayoutManager.DEFAULT_SNAP_SPEED);
-        stationListRecyclerView.getItemAnimator().setChangeDuration(0);
-        stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
-        stationListRecyclerView.getItemAnimator().setMoveDuration(0);
-        stationListRecyclerView.getItemAnimator().setAddDuration(0);
 
         updatePlayerAttributesFromMetadata(!isRestartedInstance);
 
@@ -391,10 +394,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         addChannelFab = (FloatingActionButton) findViewById(R.id.add_channel_fab);
         fabForwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_forwards);
         fabBackwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_backwards);
-        fadeInAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-        fadeInAnimation.setDuration(200);
-        fadeOutAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
-        fadeOutAnimation.setDuration(200);
 
         modeSwitch = (Switch) findViewById(R.id.mode_switch);
         modeSwitch.setChecked(playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM);
@@ -620,7 +619,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void onRadioModeChanged(int mode, boolean clearAttributes) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
-
+            Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+            fadeOutAnimation.setDuration(200);
             fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -645,6 +645,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             searchForwardsButton.startAnimation(fadeOutAnimation);
             addChannelFab.hide();
         } else {
+            Animation fadeInAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+            fadeInAnimation.setDuration(200);
             fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -732,6 +734,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void initialisePlayerAttributesUi(Bundle savedInstanceState) {
+        channelStatusBarLayout = (ConstraintLayout) findViewById(R.id.channel_status_bar_constraint_layout);
         fmFrequencyTextView = (TextView) findViewById(R.id.fm_frequency_text);
         channelNameTextView = (TextView) findViewById(R.id.channel_name);
         slideshowImageView = (ImageView) findViewById(R.id.slideshow_image);
@@ -817,7 +820,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         genreTextView.setText("");
         ensembleTextView.setText("");
 
-        updateChannelNameText("");
+        channelNameTextView.setText("");
 
         updatePlayerAttributesFromMetadata();
     }
@@ -890,12 +893,24 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     }
 
     public void updateChannelNameText(String channelName) {
-        channelNameTextView.setText(channelName);
-        if (channelNameTextView.getText().toString().length() > 0) {
-            channelNameTextView.setVisibility(View.VISIBLE);
+        final int newVisibility;
+
+        if (channelName.length() > 0) {
+            newVisibility = View.VISIBLE;
         } else {
-            channelNameTextView.setVisibility(View.GONE);
+            newVisibility = View.GONE;
         }
+
+        //if (channelNameTextView.getVisibility() != newVisibility) {
+        /*Log.e(TAG, "APPLYING TRANSISION?");
+        TransitionManager.beginDelayedTransition((ConstraintLayout) findViewById(R.id.player_layout), new TransitionSet()
+                .addTransition(new ChangeBounds()).addTransition(new Fade()));
+*/
+        //TransitionManager.endTransitions((ConstraintLayout) findViewById(R.id.player_layout));
+        //}
+
+        channelNameTextView.setVisibility(newVisibility);
+        channelNameTextView.setText(channelName);
     }
 
     public void updateEnsembleName(String ensembleName) {
@@ -919,9 +934,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void updateStationList(int radioMode) {
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
             stationListAdapter.initialiseNewStationList(playerService.getFmRadioStations(), radioMode);
+
             if (playerService.getCurrentSavedFmStationIndex() > -1) {
                 stationListAdapter.onCurrentStationChanged(playerService.getCurrentSavedFmStationIndex());
             }
+
             if (playerService.getFmRadioStations().length < 1) {
                 noStationsTextView.setVisibility(View.VISIBLE);
             } else {
