@@ -221,9 +221,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             if (waitForAttachThread.isAlive()) {
                 waitForAttachThread.interrupt();
             } else {
-                if (hasFocus()) {
-                    handlePauseRequest();
-                }
+                handlePauseRequest();
             }
         }
     };
@@ -315,7 +313,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
             switch (intent.getAction()) {
                 case ACTION_STOP:
-                    Log.v(TAG, "Received stop intent");
                     notifyDismissed();
                     closeConnection();
                     break;
@@ -407,6 +404,10 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
             mediaSession.setPlaybackToRemote(volumeProvider);
         }
+    }
+
+    private int modulus(int a, int b) {
+        return (a % b + b) % b;
     }
 
     private void loadPreferences() {
@@ -884,11 +885,11 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void handleSetDabChannelRequest(final int channelIndex) {
-        // Saves the new current channel
         if (channelIndex < 0 || channelIndex >= dabRadioStations.length) {
             return;
         }
 
+        // Saves the new current channel
         setCurrentDabChannelIndex(channelIndex);
 
         if (radio.isAttached()) {
@@ -1024,6 +1025,11 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public void handlePauseRequest() {
+        if (!radio.isAttached()) {
+            updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
+            return;
+        }
+
         handleAction(new Runnable() {
             @Override
             public void run() {
@@ -1033,7 +1039,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 // is executed until the volume is confirmed lowered
 
                 //noinspection StatementWithEmptyBody
-                while (!radio.setVolume(0) && radio.isConnected()){}
+                while (!radio.setVolume(0) && radio.isConnected()) ;
 
                 if (radio.isConnected() && radio.getPlayStatus() == RadioDevice.Values.PLAY_STATUS_SEARCHING) {
                     radio.stopSearch();
@@ -1043,114 +1049,63 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         });
     }
 
+    private void handleMoveChannelRequest(int direction) {
+        if (direction == 0) {
+            return;
+        }
 
-    public void handleNextChannelRequest() {
-        handleAction(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                            if (currentDabChannelIndex < getDabRadioStations().length - 1) {
-                                handleSetDabChannelRequest(currentDabChannelIndex + 1);
-                            } else {
-                                handleSetDabChannelRequest(0);
+        if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+            if (getDabRadioStations().length > 0) {
+                int nextDabChannel =
+                        modulus(
+                                currentDabChannelIndex + direction,
+                                getDabRadioStations().length
+                        );
+                handleSetDabChannelRequest(nextDabChannel);
+            }
+
+        } else {
+            RadioStation[] radioStations = getFmRadioStations();
+            // We have saved stations
+            if (radioStations.length > 0) {
+                int currentFmChannelIndex = getCurrentSavedFmStationIndex();
+
+                int nextChannelIndex = radioStations.length;
+
+                // We are not currently on a station
+                if (currentFmChannelIndex < 0) {
+                    // So find what would be the next station
+                    for (int i = 0; i < radioStations.length; i++) {
+                        if (radioStations[i].getFrequency() >
+                                getCurrentStation().getFrequency()) {
+                            if (direction > 0) {
+                                nextChannelIndex = i;
                             }
-                        } else {
-                            int currentFmChannelIndex = getCurrentSavedFmStationIndex();
-                            RadioStation[] radioStations = getFmRadioStations();
-
-                            // We have saved stations
-                            if (radioStations.length > 0) {
-                                int nextChannelIndex = -1;
-
-                                // We are not currently on a station
-                                if (currentFmChannelIndex < 0) {
-                                    // So find what would be the next station
-                                    for (int i = 0; i < radioStations.length; i++) {
-                                        if (radioStations[i].getFrequency() >
-                                                getCurrentStation().getFrequency()) {
-                                            nextChannelIndex = i;
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    if (currentFmChannelIndex < radioStations.length - 1) {
-                                        nextChannelIndex = currentFmChannelIndex + 1;
-                                    }
-                                }
-
-                                if (nextChannelIndex != -1) {
-                                    handleSetFmFrequencyRequest(
-                                            radioStations[nextChannelIndex].getFrequency()
-                                    );
-                                } else {
-                                    if (fmRadioStations.size() > 0) {
-                                        handleSetFmFrequencyRequest(
-                                                fmRadioStations.get(0)
-                                                        .getFrequency()
-                                        );
-                                    }
-                                }
-                            }
+                            break;
+                        }
+                        if (direction < 0) {
+                            nextChannelIndex = i;
                         }
                     }
+                } else {
+                     nextChannelIndex = currentFmChannelIndex + direction;
                 }
-        );
+
+                // Wrap around
+                nextChannelIndex = modulus(nextChannelIndex, radioStations.length);
+                handleSetFmFrequencyRequest(
+                        radioStations[nextChannelIndex].getFrequency()
+                );
+            }
+        }
+    }
+
+    public void handleNextChannelRequest() {
+        handleMoveChannelRequest(+1);
     }
 
     public void handlePreviousChannelRequest() {
-        handleAction(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                            if (currentDabChannelIndex > 0) {
-                                handleSetDabChannelRequest(currentDabChannelIndex - 1);
-                            } else {
-                                handleSetDabChannelRequest(getDabRadioStations().length - 1);
-                            }
-                        } else {
-                            int currentFmChannelIndex = getCurrentSavedFmStationIndex();
-                            RadioStation[] radioStations = getFmRadioStations();
-
-                            // We have saved stations
-                            if (radioStations.length > 0) {
-                                int nextChannelIndex = -1;
-
-                                // We are not currently on a station
-                                if (currentFmChannelIndex < 0) {
-                                    // Go through the stations backwards until we find the next lowest station
-                                    for (int i = radioStations.length - 1; i > -1; i--) {
-                                        if (radioStations[i].getFrequency() <
-                                                getCurrentStation().getFrequency()) {
-                                            nextChannelIndex = i;
-                                            break;
-                                        }
-                                    }
-
-                                } else {
-                                    if (currentFmChannelIndex > 0) {
-                                        nextChannelIndex = currentFmChannelIndex - 1;
-                                    }
-                                }
-
-                                if (nextChannelIndex != -1) {
-                                    handleSetFmFrequencyRequest(
-                                            radioStations[nextChannelIndex].getFrequency()
-                                    );
-                                } else {
-                                    if (fmRadioStations.size() > 0) {
-                                        handleSetFmFrequencyRequest(
-                                                fmRadioStations.get(fmRadioStations.size() - 1)
-                                                        .getFrequency()
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-        );
+        handleMoveChannelRequest(-1);
     }
 
     private void handleFocusDuck() {
@@ -1390,6 +1345,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (playerNotification != null) {
             playerNotification.cancel();
         }
+        playerNotification = null;
 
         abandonAudioFocus();
 
@@ -1423,7 +1379,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (radio.isConnected()) {
             radio.disconnect();
         }
-        playerNotification.cancel();
     }
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback {

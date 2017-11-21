@@ -53,10 +53,11 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/channel_status_bar_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/channel_status_bar_constraint_layout"
             android:padding="5dp">
+
             <ImageButton
                 android:id="@+id/settings_button"
                 android:layout_width="40dp"
@@ -68,61 +69,52 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_settings_white_24dp" />
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/signal_strength"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                app:flexWrap="wrap"
-                app:flexDirection="row_reverse"
+                android:maxLines="1"
+                android:minEms="2"
+                android:text="100%"
+                android:textSize="20sp"
                 app:layout_constraintEnd_toStartOf="@+id/settings_button"
-                app:layout_constraintStart_toEndOf="@+id/play_status"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/signal_strength"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:minEms="2"
-                    android:text="100%"
-                    android:textSize="20sp" />
+            <ImageView
+                android:id="@+id/signal_strength_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="Signal strength icon"
+                android:layout_marginRight="3dp"
+                android:scaleType="fitXY"
+                app:layout_constraintBottom_toBottomOf="@+id/signal_strength"
+                app:layout_constraintEnd_toStartOf="@+id/signal_strength"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp" />
 
-                <ImageView
-                    android:id="@+id/signal_strength_icon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginTop="3dp"
-                    android:scaleType="fitStart"
-                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp" />
+            <TextView
+                android:id="@+id/program_stereo_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="Stereo"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="@+id/signal_strength_icon"
+                app:layout_constraintTop_toBottomOf="@+id/signal_strength" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginRight="10dp">
-
-                    <TextView
-                        android:id="@+id/program_stereo_mode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="right"
-                        android:maxLines="1"
-                        android:text="Stereo"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:id="@+id/data_rate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:maxLines="1"
-                        android:text="128 Kbps"
-                        android:textSize="15sp"/>
-                </LinearLayout>
-            </com.google.android.flexbox.FlexboxLayout>
-
+            <TextView
+                android:id="@+id/data_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:gravity="left"
+                android:maxLines="1"
+                android:text="128 Kbps"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="@+id/signal_strength_icon"
+                app:layout_constraintTop_toBottomOf="@+id/program_stereo_mode" />
 
             <TextView
                 android:id="@+id/play_status"
@@ -169,7 +161,7 @@
                 app:autoSizeMaxTextSize="20sp"
                 app:autoSizeMinTextSize="8sp"
                 app:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toStartOf="@+id/play_status"
+                app:layout_constraintEnd_toStartOf="@+id/fm_frequency_text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/station_ensemble_name" />
 
@@ -187,14 +179,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/play_status" />
 
-            <!--<android.support.constraint.Barrier
-                android:id="@+id/bottom_of_attributes"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="fm_frequency_text, station_genre"
-                app:layout_constraintTop_toTopOf="parent" />-->
-
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/channel_name"
                 android:layout_width="0dp"
@@ -209,7 +193,7 @@
                 app:autoSizeTextType="uniform"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/station_genre" />
+                app:layout_constraintTop_toBottomOf="@+id/data_rate" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 
@@ -259,20 +243,21 @@
         android:layout_marginLeft="13dp"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="13dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/volume_button"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar"
-        android:orientation="horizontal">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar">
+
         <ImageView
             android:id="@+id/slideshow_image"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginRight="13dp"
+            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:src="@mipmap/ic_launcher"
-            android:visibility="visible"
-            android:adjustViewBounds="true"
-            android:layout_marginRight="13dp"/>
+            android:visibility="visible" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/program_text"
@@ -282,7 +267,6 @@
             android:layout_marginLeft="10dp"
             android:text="Test program text, this will display text about the program"
             android:textAppearance="?android:attr/textAppearance"
-
             app:autoSizeMaxTextSize="30sp"
             app:autoSizeTextType="uniform"/>
     </LinearLayout>
@@ -335,17 +319,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_channel_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/player_controls_top_guideline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline"
-        app:srcCompat="@drawable/ic_add_white_24dp" />
-
     <android.support.constraint.Guideline
         android:id="@+id/player_controls_top_guideline"
         android:layout_width="wrap_content"
@@ -358,17 +331,19 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:cardBackgroundColor="@color/colorPrimary"
-        app:cardUseCompatPadding="true"
-        app:cardElevation="5dp"
         app:cardCornerRadius="10dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:cardElevation="5dp"
+        app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toTopOf="@id/player_and_station_list_separator"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/player_controls_top_guideline" >
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/player_controls_top_guideline">
+
         <android.support.constraint.ConstraintLayout
             android:id="@+id/test"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <ImageButton
                 android:id="@+id/skip_previous_button"
                 android:layout_width="0dp"
@@ -377,8 +352,8 @@
                 android:clickable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/search_backwards_button"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_skip_previous_white_24dp" />
 
@@ -391,8 +366,8 @@
                 android:focusable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/skip_previous_button"
                 app:layout_constraintEnd_toStartOf="@+id/play_pause_button"
+                app:layout_constraintStart_toEndOf="@+id/skip_previous_button"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_fast_rewind_white_24dp" />
 
@@ -405,8 +380,8 @@
                 android:focusable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/search_backwards_button"
                 app:layout_constraintEnd_toStartOf="@+id/search_forward_button"
+                app:layout_constraintStart_toEndOf="@+id/search_backwards_button"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_play_arrow_white_24dp" />
 
@@ -418,8 +393,8 @@
                 android:clickable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/play_pause_button"
                 app:layout_constraintEnd_toStartOf="@+id/skip_next_button"
+                app:layout_constraintStart_toEndOf="@+id/play_pause_button"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_fast_forward_white_24dp" />
 
@@ -438,4 +413,15 @@
                 app:srcCompat="@drawable/ic_skip_next_white_24dp" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_channel_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toTopOf="@+id/player_controls_top_guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/player_controls_top_guideline"
+        app:srcCompat="@drawable/ic_add_white_24dp" />
 </android.support.constraint.ConstraintLayout>
