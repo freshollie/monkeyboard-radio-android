@@ -2,9 +2,10 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/player_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/player_layout">
+    tools:layout_editor_absoluteY="25dp">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/station_list"
@@ -49,14 +50,15 @@
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="wrap"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator">
+        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator"
+        app:layout_constraintTop_toTopOf="parent">
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/channel_status_bar_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/channel_status_bar_constraint_layout"
             android:padding="5dp">
+
             <ImageButton
                 android:id="@+id/settings_button"
                 android:layout_width="40dp"
@@ -68,87 +70,118 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_settings_white_24dp" />
 
-            <TextView
-                android:id="@+id/signal_strength"
-                android:layout_width="55dp"
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="left"
-                android:paddingRight="5dp"
-                android:text="100%"
-                android:textAlignment="gravity"
-                android:textSize="20sp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                app:flexWrap="wrap"
+                app:flexDirection="row_reverse"
                 app:layout_constraintEnd_toStartOf="@+id/settings_button"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/play_status"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/signal_strength_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginRight="2dp"
-                app:layout_constraintBottom_toBottomOf="@+id/signal_strength"
-                app:layout_constraintEnd_toStartOf="@+id/signal_strength"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp" />
+                <TextView
+                    android:id="@+id/signal_strength"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:minEms="2"
+                    android:text="100%"
+                    android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/program_stereo_mode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingRight="15dp"
-                android:text="Stereo"
-                android:textSize="15sp"
-                app:layout_constraintEnd_toStartOf="@+id/signal_strength_icon"
-                app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/signal_strength_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="3dp"
+                    android:layout_marginTop="3dp"
+                    android:scaleType="fitStart"
+                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_white_24dp" />
 
-            <TextView
-                android:id="@+id/data_rate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingRight="15dp"
-                android:text="128 Kbps"
-                android:textSize="15sp"
-                app:layout_constraintEnd_toEndOf="@+id/program_stereo_mode"
-                app:layout_constraintTop_toBottomOf="@+id/program_stereo_mode" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginRight="10dp">
 
-            <TextView
-                android:id="@+id/station_ensemble_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="BBC National DAB"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:textSize="20sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/program_stereo_mode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:maxLines="1"
+                        android:text="Stereo"
+                        android:textSize="15sp" />
 
-            <TextView
-                android:id="@+id/station_genre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/station_ensemble_name"
-                android:layout_marginLeft="5dp"
-                android:text="Pop"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textSize="20sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/station_ensemble_name" />
+                    <TextView
+                        android:id="@+id/data_rate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:text="128 Kbps"
+                        android:textSize="15sp"/>
+                </LinearLayout>
+            </com.google.android.flexbox.FlexboxLayout>
+
 
             <TextView
                 android:id="@+id/play_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:gravity="top|center"
+                android:maxLines="1"
                 android:text="@string/radio_status_connecting"
                 android:textSize="15sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/station_ensemble_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:gravity="left|top"
+                android:maxLines="1"
+                android:text="BBC National DAB"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textSize="20sp"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeMinTextSize="5sp"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintEnd_toStartOf="@id/play_status"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/station_genre"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/station_ensemble_name"
+                android:layout_marginLeft="5dp"
+                android:maxLines="1"
+                android:text="Pop music"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="20sp"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeMinTextSize="8sp"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintEnd_toStartOf="@+id/play_status"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/station_ensemble_name" />
 
             <TextView
                 android:id="@+id/fm_frequency_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/play_status"
+                android:gravity="center|top"
                 android:includeFontPadding="false"
+                android:maxLines="1"
                 android:text="100.3"
                 android:textSize="40sp"
                 android:visibility="visible"
@@ -225,35 +258,36 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginLeft="13dp"
         android:layout_marginBottom="5dp"
+        android:layout_marginLeft="13dp"
         android:layout_marginRight="13dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/volume_button"
-        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar"
-        android:orientation="horizontal">
+        app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator"
+        app:layout_constraintTop_toBottomOf="@+id/fm_seek_bar">
+
         <ImageView
             android:id="@+id/slideshow_image"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginRight="13dp"
+            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:src="@mipmap/ic_launcher"
-            android:visibility="visible"
-            android:adjustViewBounds="true"
-            android:layout_marginRight="13dp"/>
+            android:visibility="visible" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/program_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="30sp"
             android:layout_marginLeft="10dp"
             android:text="Test program text, this will display text about the program"
             android:textAppearance="?android:attr/textAppearance"
+            android:textSize="30sp"
 
             app:autoSizeMaxTextSize="30sp"
-            app:autoSizeTextType="uniform"/>
+            app:autoSizeTextType="uniform" />
     </LinearLayout>
 
     <android.support.v7.widget.CardView
@@ -327,17 +361,19 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:cardUseCompatPadding="true"
-        app:cardElevation="5dp"
-        app:cardCornerRadius="10dp"
         app:layout_constraintStart_toStartOf="@+id/player_and_station_list_separator"
-        app:layout_constraintTop_toBottomOf="@+id/player_controls_top_guideline" >
+        app:layout_constraintTop_toBottomOf="@+id/player_controls_top_guideline">
+
         <android.support.constraint.ConstraintLayout
             android:id="@+id/test"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <ImageButton
                 android:id="@+id/skip_previous_button"
                 android:layout_width="0dp"
@@ -346,8 +382,8 @@
                 android:clickable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/search_backwards_button"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_skip_previous_white_24dp" />
 
@@ -360,8 +396,8 @@
                 android:focusable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/skip_previous_button"
                 app:layout_constraintEnd_toStartOf="@+id/play_pause_button"
+                app:layout_constraintStart_toEndOf="@+id/skip_previous_button"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_fast_rewind_white_24dp" />
 
@@ -374,8 +410,8 @@
                 android:focusable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/search_backwards_button"
                 app:layout_constraintEnd_toStartOf="@+id/search_forward_button"
+                app:layout_constraintStart_toEndOf="@+id/search_backwards_button"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_play_arrow_white_24dp" />
 
@@ -387,8 +423,8 @@
                 android:clickable="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/play_pause_button"
                 app:layout_constraintEnd_toStartOf="@+id/skip_next_button"
+                app:layout_constraintStart_toEndOf="@+id/play_pause_button"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_fast_forward_white_24dp" />
 
