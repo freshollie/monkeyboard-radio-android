@@ -8,8 +8,8 @@ android {
         applicationId 'com.freshollie.monkeyboard.keystoneradio'
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 90
-        versionName "Beta 2.0.2"
+        versionCode 95
+        versionName "Beta 2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -55,7 +55,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:26.1.0'
     compile 'com.android.support:transition:26.1.0'
     compile 'com.android.support:design:26.1.0'
-    compile 'com.google.android:flexbox:0.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Third party libraries
