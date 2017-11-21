@@ -14,7 +14,7 @@
     android:id="@+id/station_item_layout"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardBackgroundColor="@color/backgroundGrey">
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/station_item_inner_layout"
@@ -24,41 +24,63 @@
         android:layout_marginBottom="2dp">
 
         <android.support.v7.widget.AppCompatTextView
-            android:layout_height="30dp"
-            android:layout_width="match_parent"
             android:id="@+id/station_name_card_text"
-            android:textColor="@android:color/white"
-            android:text="BBC Radio 1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/station_remove_button"
+            android:gravity="left"
             android:maxLines="1"
-            android:gravity="center|left"
-            android:textSize="25sp"
-            android:autoSizeMaxTextSize="25sp"
-            app:autoSizeTextType="uniform"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"/>
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/station_genre_card_text"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Pop Music"
-            android:layout_gravity="left"
-            android:layout_below="@id/station_name_card_text"
-            android:layout_alignParentLeft="true"/>
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/station_ensemble_name_card_text"
-            android:text="BBC National DAB"
-            android:textSize="15sp"
-            android:alpha="0.8"
+            android:text="BBC Radio 1"
             android:textColor="@android:color/white"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/station_name_card_text"
-            android:layout_gravity="center"/>
+            android:textSize="25sp"
+            app:autoSizeMaxTextSize="25sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintEnd_toStartOf="@+id/station_remove_button"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@+id/station_remove_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_default="spread" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/station_genre_card_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_default="spread"
+            android:maxLines="1"
+            android:text="Pop Music"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="15sp"
+            android:gravity="bottom|left"
+            android:layout_gravity="left|bottom"
+            android:textAlignment="gravity"
+            app:autoSizeMaxTextSize="15sp"
+            app:autoSizeMinTextSize="7sp"
+            app:autoSizeTextType="uniform"
+            android:layout_marginRight="5dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/station_ensemble_name_card_text"
+            app:layout_constraintTop_toBottomOf="@id/station_name_card_text" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/station_ensemble_name_card_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_default="spread"
+            android:alpha="0.8"
+            android:text="BBC National DAB"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:gravity="bottom|right"
+            android:layout_gravity="right|bottom"
+            android:textAlignment="gravity"
+            android:maxLines="1"
+            android:layout_marginLeft="5dp"
+            app:autoSizeMaxTextSize="15sp"
+            app:autoSizeMinTextSize="7sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/station_genre_card_text"
+            app:layout_constraintTop_toBottomOf="@id/station_name_card_text" />
 
         <ImageButton
             android:contentDescription="@string/remove_station_description"
@@ -67,9 +89,9 @@
             android:id="@+id/station_remove_button"
             android:background="?selectableItemBackgroundBorderless"
             android:scaleType="fitXY"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:srcCompat="@drawable/ic_remove_circle_white_24dp"
-            android:visibility="invisible"/>
-    </RelativeLayout>
+            android:visibility="visible"/>
+    </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

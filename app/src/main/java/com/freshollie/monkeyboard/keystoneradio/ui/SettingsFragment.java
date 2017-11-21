@@ -202,7 +202,7 @@ public class SettingsFragment extends PreferenceFragment {
 
                 // Tell the player that the value has been changed
                 if (playerBound) {
-                    playerService.handleFmStereoModeUpdated();
+                    playerService.handleUpdateBoardStereoMode();
                 }
 
                 return false;

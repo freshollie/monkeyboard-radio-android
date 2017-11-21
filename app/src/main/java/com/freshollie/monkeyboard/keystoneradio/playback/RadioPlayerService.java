@@ -976,7 +976,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
     }
 
-    public void handleFmStereoModeUpdated() {
+    public void handleUpdateBoardStereoMode() {
         handleAction(new Runnable() {
             @Override
             public void run() {
@@ -1175,6 +1175,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
 
     public void handleSetRadioMode(int newRadioMode) {
         setRadioMode(newRadioMode);
+        handleUpdateBoardStereoMode();
         notifyRadioModeChanged(newRadioMode);
         if (newRadioMode == RadioDevice.Values.STREAM_MODE_DAB) {
             currentFmRadioStation = null;
