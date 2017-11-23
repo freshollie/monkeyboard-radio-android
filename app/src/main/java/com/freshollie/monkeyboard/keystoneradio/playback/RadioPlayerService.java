@@ -220,9 +220,9 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
             openingConnection = false;
             if (waitForAttachThread.isAlive()) {
                 waitForAttachThread.interrupt();
-            } else {
-                handlePauseRequest();
             }
+
+            updatePlaybackState(PlaybackStateCompat.STATE_STOPPED);
         }
     };
 
@@ -406,7 +406,7 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
     }
 
-    private int modulus(int a, int b) {
+    public static int modulus(int a, int b) {
         return (a % b + b) % b;
     }
 
