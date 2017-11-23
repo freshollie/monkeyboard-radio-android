@@ -22,26 +22,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.transition.ChangeBounds;
-import android.support.transition.Fade;
-import android.support.transition.TransitionManager;
-import android.support.transition.TransitionSet;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.support.transition.ChangeTransform;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -998,53 +990,25 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
     }
 
-    public void handleNextCursorPosition() {
+    public void handleMoveCursor(int direction) {
         int newPosition;
 
-        if (sharedPreferences.getBoolean(getString(R.string.pref_cursor_beta_mode), false)) {
-            newPosition = stationListAdapter.getLastScrollIndex() + 1;
-        } else {
-            newPosition = stationListAdapter.getCurrentScrollIndex() + 1;
-        }
+        newPosition = stationListAdapter.getCursorIndex() + direction;
 
-        if (newPosition >= stationListAdapter.getItemCount()) {
+        if (newPosition >= stationListAdapter.getItemCount() || newPosition < 0) {
             if (sharedPreferences.getBoolean(
                     getString(R.string.PREF_CURSOR_SCROLL_WRAP),
                     false
-                )) {
-                newPosition = 0;
+            )) {
+                newPosition =
+                        RadioPlayerService.modulus(newPosition, stationListAdapter.getItemCount());
             } else {
-                newPosition = -1;
+                // Ignore this request as we have been told not to wrap
+                return;
             }
         }
 
-        if (newPosition != -1) {
-            updateStationListCursorPosition(newPosition);
-        }
-    }
-
-    public void handlePreviousCursorPosition() {
-        int newPosition;
-
-        if (sharedPreferences.getBoolean(getString(R.string.pref_cursor_beta_mode), false)) {
-            newPosition = stationListAdapter.getLastScrollIndex() - 1;
-        } else {
-            newPosition = stationListAdapter.getCurrentScrollIndex() - 1;
-        }
-
-        if (newPosition < 0) {
-            if (sharedPreferences.getBoolean(
-                    getString(R.string.PREF_CURSOR_SCROLL_WRAP),
-                    false
-                )) {
-                newPosition = stationListAdapter.getItemCount() - 1;
-            } else {
-                newPosition = -1;
-            }
-        }
-        if (newPosition != -1) {
-            updateStationListCursorPosition(newPosition);
-        }
+        updateStationListCursorPosition(newPosition);
     }
 
     @Override
@@ -1315,11 +1279,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 return true;
 
             case KeyEvent.KEYCODE_TAB:
-                handleNextCursorPosition();
+                handleMoveCursor(+1);
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_UP:
-                handlePreviousCursorPosition();
+                handleMoveCursor(-1);
                 return true;
 
             case KeyEvent.KEYCODE_BACK:
