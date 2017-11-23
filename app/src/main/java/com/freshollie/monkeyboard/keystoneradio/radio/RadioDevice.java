@@ -8,13 +8,18 @@
 package com.freshollie.monkeyboard.keystoneradio.radio;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
+import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObject;
+import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObjectsManager;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -86,6 +91,9 @@ public class RadioDevice {
         static byte STREAM_GetEnsembleName = 0x15; // Name of the DAB collection
         static byte STREAM_GetTotalProgram = 0x16;
         static byte STREAM_GetSearchProgram = 0x1B;
+
+        static byte CLASS_MOT = 0x03;
+        static byte MOT_GetMOTData = 0x00;
     }
 
     public static class Values {
@@ -108,6 +116,8 @@ public class RadioDevice {
 
         public static final int SEARCH_BACKWARDS = 0;
         public static final int SEARCH_FORWARDS = 1;
+
+        public static final byte WITH_APPLICATION_TYPE = 0x01;
     }
 
 
@@ -160,12 +170,14 @@ public class RadioDevice {
 
     private RadioDeviceListenerManager listenerManager;
 
+    private MOTObjectsManager motObjectsManager = new MOTObjectsManager();
+
     private Runnable pollLoop = new Runnable() {
         @Override
         public void run() {
             Log.v(TAG, "Poll Loop started");
             while (true) {
-                if (!poll() || !connection.isRunning() || Thread.currentThread().isInterrupted()) {
+                if (!poll() || !connection.isConnectionOpen() || Thread.currentThread().isInterrupted()) {
                     Log.v(TAG, "Poll Loop stopped");
                     break;
                 }
@@ -215,7 +227,7 @@ public class RadioDevice {
             }
         });
 
-        if (!connection.isRunning()) {
+        if (!connection.isConnectionOpen()) {
             connection.start();
         }
     }
@@ -245,14 +257,14 @@ public class RadioDevice {
         pollThread.interrupt();
     }
 
-    private byte[] getBytesFromInt(int integer, int numBytes) {
+    public static byte[] getBytesFromInt(int integer, int numBytes) {
         byte[] bytes = new byte[numBytes];
         ByteBuffer wrapped = ByteBuffer.wrap(bytes);
         wrapped.putInt(integer);
         return bytes;
     }
 
-    private int getIntFromBytes(byte[] bytes){
+    public static int getIntFromBytes(byte[] bytes){
         ByteBuffer wrapped = ByteBuffer.wrap(bytes);
         int value;
         if (bytes.length < 4) {
@@ -263,8 +275,12 @@ public class RadioDevice {
         return value;
     }
 
-    private String getStringFromBytes(byte[] bytes) {
-        return new String(bytes, Charset.forName("UTF-16")).trim();
+    public static String getStringFromBytes(byte[] bytes) {
+        try {
+            return new String(bytes, "UTF-16BE");
+        } catch (UnsupportedEncodingException e) {
+            return "";
+        }
     }
 
     /*
@@ -316,7 +332,7 @@ public class RadioDevice {
 
         long startTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - startTime) < COMMAND_ATTEMPTS_TIMEOUT &&
-                connection.isRunning()) {
+                connection.isConnectionOpen()) {
 
             byte[] response;
 
@@ -578,7 +594,7 @@ public class RadioDevice {
                 );
 
         if (response != null) {
-            byte[] programNameBytes = Arrays.copyOfRange(response, 6, response.length-3);
+            byte[] programNameBytes = Arrays.copyOfRange(response, 6, response.length - 1);
 
             try {
                 return getStringFromBytes(programNameBytes);
@@ -606,7 +622,7 @@ public class RadioDevice {
                 );
 
         if (response != null) {
-            byte[] programTextBytes = Arrays.copyOfRange(response, 6, response.length - 3);
+            byte[] programTextBytes = Arrays.copyOfRange(response, 6, response.length - 1);
 
             try {
                 return getStringFromBytes(programTextBytes);
@@ -744,7 +760,7 @@ public class RadioDevice {
 
         if (response != null) {
 
-            byte[] ensembleNameBytes = Arrays.copyOfRange(response, 6, response.length - 3);
+            byte[] ensembleNameBytes = Arrays.copyOfRange(response, 6, response.length - 1);
 
             try {
                 return getStringFromBytes(ensembleNameBytes);
@@ -805,6 +821,27 @@ public class RadioDevice {
         ) != null;
     }
 
+    private byte[] getMOTData() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getMotData()");
+        }
+
+        byte[] response = call(
+                ByteValues.CLASS_MOT,
+                ByteValues.MOT_GetMOTData,
+                new byte[]{
+                        Values.WITH_APPLICATION_TYPE
+                }
+        );
+
+        // Ensure that the response contains at least 1 piece of data
+        if (response != null && response.length > 8) {
+            return Arrays.copyOfRange(response, 6, response.length - 1);
+        } else {
+            return new byte[0];
+        }
+    }
+
     private RadioStation getRadioStation(int channelId) {
         String name = getProgramName(channelId, false);
         int genre = getProgramType(channelId);
@@ -831,7 +868,7 @@ public class RadioDevice {
         // After a reset we need to wait for the board to respond to this command;
         long startTime = SystemClock.currentThreadTimeMillis();
         while ((SystemClock.currentThreadTimeMillis() - startTime) < 5000 &&
-                connection.isRunning()) {
+                connection.isConnectionOpen()) {
             if (getSysReady()) {
                 break;
             }
@@ -1011,7 +1048,6 @@ public class RadioDevice {
 
             int newVolume = getVolume();
             if (newVolume != lastVolume && newVolume != -1) {
-                Log.v(TAG, "new Volume: " + newVolume);
                 listenerManager.notifyVolumeChanged(newVolume);
                 lastVolume = newVolume;
             }
@@ -1021,7 +1057,6 @@ public class RadioDevice {
                 if (getPlayMode() == Values.STREAM_MODE_DAB) {
                     int newProgramDataRate = getProgramDataRate();
                     if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
-                        Log.v(TAG, "new DataRate: " + newProgramDataRate);
                         listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
                         lastProgramDataRate = newProgramDataRate;
                     }
@@ -1029,26 +1064,51 @@ public class RadioDevice {
 
                 int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
                 if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
-                    Log.v(TAG, "new Program Type: " + newFmProgramType);
                     listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
                     lastFmProgramType = newFmProgramType;
 
                 }
 
                 int newStereoState = getStereo();
-                if (newStereoState != lastStereoState && newStereoState != -1) {
-                    Log.v(TAG, "new NewStereoState: " + newStereoState);
-                    listenerManager.notifyStereoStateChanged(newStereoState);
+                if (newStereoState != lastStereoState) {
                     lastStereoState = newStereoState;
+                    if (newStereoState != -1) {
+                        listenerManager.notifyStereoStateChanged(newStereoState);
+                    }
                 }
             }
 
             if (currentStreamMode == Values.STREAM_MODE_DAB) {
                 int newSignalQuality = getSignalQuality();
                 if (newSignalQuality != lastSignalQuality && newSignalQuality != -1) {
-                    Log.v(TAG, "new Signal Quality: " + newSignalQuality);
                     listenerManager.notifyDabSignalQualityChanged(newSignalQuality);
                     lastSignalQuality = newSignalQuality;
+                }
+
+                int channelId = getPlayIndex();
+
+                byte[] motData = getMOTData();
+                if (motData.length > 0) {
+                    motObjectsManager.onNewData(channelId, motData);
+                    MOTObject channelObject = motObjectsManager.getChannelObject(channelId);
+
+                    if (channelObject != null && channelObject.isComplete()) {
+                        if (MOTObjectsManager.DEBUG) Log.i(TAG, "MOT object completed");
+                        if (channelObject.getApplicationType() == MOTObject.APPLICATION_TYPE_SLIDESHOW) {
+                            byte[] body = motObjectsManager.getChannelObject(channelId).getBodyData();
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(body, 0, body.length, options);
+                            if (options.outWidth < 1000 && options.outHeight < 1000 && bitmap != null) {
+                                if (MOTObjectsManager.DEBUG) Log.i(TAG, "Notifying new slideshow image");
+                                listenerManager.notifyNewSlideshowImage(
+                                        bitmap
+                                );
+                            } else {
+                                if (MOTObjectsManager.DEBUG) Log.e(TAG, "Made bad image");
+                            }
+                        }
+                        motObjectsManager.removeChannelObject(channelId);
+                    }
                 }
 
             } else {
@@ -1056,7 +1116,6 @@ public class RadioDevice {
 
                 int newSignalStrength = getSignalStrength();
                 if (newSignalStrength != lastFmSignalStrength && newSignalStrength != -1) {
-                    Log.v(TAG, "new Signal strength: " + newSignalStrength);
                     listenerManager.notifyFmSignalStrengthChanged(newSignalStrength);
                     lastFmSignalStrength = newSignalStrength;
                 }
@@ -1065,7 +1124,6 @@ public class RadioDevice {
                 if (newFmProgramName != null &&
                         !newFmProgramName.equals(lastFmProgramName) &&
                         !newFmProgramName.isEmpty()) {
-                    Log.v(TAG, "new Program Name: " + newFmProgramName);
                     listenerManager.notifyFmProgramNameUpdated(newFmProgramName);
                     lastFmProgramName = newFmProgramName;
                 }
@@ -1075,36 +1133,28 @@ public class RadioDevice {
                 if (lastPlayStatus == Values.PLAY_STATUS_SEARCHING) {
                     int newSearchFrequency = getPlayIndex();
                     if (newSearchFrequency != lastFmFrequency && newSearchFrequency != -1) {
-                        Log.v(TAG, "new Frequency: " + newSearchFrequency);
                         listenerManager.notifyFmSearchFrequencyChanged(newSearchFrequency);
                         lastFmFrequency = newSearchFrequency;
                     }
                 }
-
-
-
-
             }
 
 
             String newProgramText = getProgramText();
             if (newProgramText != null) {
-                if (!newProgramText.equals(lastProgramText) && !newProgramText.isEmpty()) {
-                    Log.v(TAG, "new ProgramText: " + newProgramText);
+                if (!newProgramText.isEmpty()) {
                     listenerManager.notifyProgramTextChanged(newProgramText);
-                    lastProgramText = newProgramText;
                 }
             }
 
             int newPlayStatus = getPlayStatus();
 
             if (newPlayStatus != lastPlayStatus && newPlayStatus != -1) {
-                Log.v(TAG, "new PlayStatus: " + newPlayStatus);
                 listenerManager.notifyPlayStatusChanged(newPlayStatus);
                 lastPlayStatus = newPlayStatus;
             }
         } catch (Exception e) {
-            if (connection.isDeviceAttached() && connection.isRunning()) {
+            if (connection.isDeviceAttached() && connection.isConnectionOpen()) {
                 e.printStackTrace();
             }
             return false;
@@ -1120,6 +1170,6 @@ public class RadioDevice {
     }
 
     public boolean isConnected() {
-        return connection.isRunning();
+        return connection.isConnectionOpen();
     }
 }

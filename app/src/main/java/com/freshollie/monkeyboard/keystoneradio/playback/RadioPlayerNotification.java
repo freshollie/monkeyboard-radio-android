@@ -8,17 +8,27 @@
 package com.freshollie.monkeyboard.keystoneradio.playback;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import java.text.DecimalFormat;
+
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.app.NotificationCompat.MediaStyle;
+import android.util.FloatMath;
 import android.util.Log;
 
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
@@ -29,7 +39,7 @@ import com.freshollie.monkeyboard.keystoneradio.R;
  * Handles the player service notification, will update using the players metadata when
  * requested
  */
-public class RadioPlayerNotification {
+public class RadioPlayerNotification extends MediaControllerCompat.Callback {
     private RadioPlayerService playerService;
     private NotificationCompat.Builder mediaNotificationBuilder;
     private NotificationManager notificationManager;
@@ -39,22 +49,85 @@ public class RadioPlayerNotification {
 
     private int NOTIFICATION_ID = 1;
 
+    private static final String CHANNEL_ID = "RADIO";
+
     public RadioPlayerNotification(RadioPlayerService service) {
         playerService = service;
         notificationManager = (NotificationManager)
                 playerService.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // Create a notification channel for
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Media playback";
+            String description = "Media playback controls";
+
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    name,
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            channel.setDescription(description);
+            channel.setShowBadge(false);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+            notificationManager.createNotificationChannel(channel);
+        }
 
         Log.d("RadioPlayerNotification", "Starting foreground");
         playerService.getMediaSession().setActive(true);
+        playerService.getMediaController().registerCallback(this);
+
         update();
+    }
+
+    private int getDominantColor(Bitmap bitmap) {
+        if (null == bitmap) return Color.TRANSPARENT;
+
+        int redBucket = 0;
+        int greenBucket = 0;
+        int blueBucket = 0;
+        int alphaBucket = 0;
+
+        boolean hasAlpha = bitmap.hasAlpha();
+        int pixelCount = bitmap.getWidth() * bitmap.getHeight();
+        int[] pixels = new int[pixelCount];
+        bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        for (int y = 0, h = bitmap.getHeight(); y < h; y++)
+        {
+            for (int x = 0, w = bitmap.getWidth(); x < w; x++)
+            {
+                int color = pixels[x + y * w]; // x + y * width
+                redBucket += (color >> 16) & 0xFF; // Color.red
+                greenBucket += (color >> 8) & 0xFF; // Color.greed
+                blueBucket += (color & 0xFF); // Color.blue
+                if (hasAlpha) alphaBucket += (color >>> 24); // Color.alpha
+            }
+        }
+
+        return Color.argb(
+                (hasAlpha) ? (alphaBucket / pixelCount) : 255,
+                redBucket / pixelCount,
+                greenBucket / pixelCount,
+                blueBucket / pixelCount);
+    }
+
+    private Bitmap letterboxImage(Bitmap srcBmp) {
+        int dim = Math.max(srcBmp.getWidth(), srcBmp.getHeight());
+        Bitmap dstBmp = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(dstBmp);
+        canvas.drawColor(getDominantColor(srcBmp));
+        canvas.drawBitmap(srcBmp, (dim - srcBmp.getWidth()) / 2, (dim - srcBmp.getHeight()) / 2, null);
+
+        return dstBmp;
     }
 
     private Notification buildNotification() {
         int playIcon;
         String playAction;
         String playDescription;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(playerService);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(playerService, CHANNEL_ID);
 
         // Used for setting a pause of play icon and action depending on the current play state
         if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
@@ -88,8 +161,7 @@ public class RadioPlayerNotification {
                                     R.mipmap.ic_launcher,
                                     480,
                                     null
-                            )
-                            ).getBitmap()
+                            )).getBitmap()
                     )
                     .setSmallIcon(R.drawable.ic_notification_radio)
                     .setColor(ContextCompat.getColor(playerService, R.color.colorPrimaryDark))
@@ -102,7 +174,7 @@ public class RadioPlayerNotification {
                             )
                     )
                     .setStyle(
-                            new NotificationCompat.MediaStyle()
+                            new MediaStyle()
                                     .setMediaSession(
                                             playerService.getMediaSession()
                                                     .getSessionToken()
@@ -116,9 +188,14 @@ public class RadioPlayerNotification {
                                     )
                     )
                     .setContentTitle(trackName)
-                    .setContentText(
+                    .setContentInfo(
                             playerService.getMetadata().getString(
                                     MediaMetadataCompat.METADATA_KEY_GENRE
+                            )
+                    )
+                    .setContentText(
+                            playerService.getMetadata().getString(
+                                    MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION
                             )
                     )
                     .addAction(
@@ -154,16 +231,26 @@ public class RadioPlayerNotification {
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .build();
         } else {
+            Bitmap notificationImage =
+                    playerService
+                    .getMetadata()
+                    .getBitmap(MediaMetadataCompat.METADATA_KEY_ART);
+
+            if (notificationImage == null) {
+                notificationImage = ((BitmapDrawable) ResourcesCompat.getDrawableForDensity(
+                        playerService.getResources(),
+                        R.mipmap.ic_launcher,
+                        480,
+                        null
+                )).getBitmap();
+            } else {
+                // Letterbox the image inside a square so that it displays probably in the
+                // notification
+                notificationImage = letterboxImage(notificationImage);
+            }
+
             return builder.setShowWhen(false)
-                    .setLargeIcon(
-                            ((BitmapDrawable) ResourcesCompat.getDrawableForDensity(
-                                    playerService.getResources(),
-                                    R.mipmap.ic_launcher,
-                                    480,
-                                    null
-                            )
-                            ).getBitmap()
-                    )
+                    .setLargeIcon(notificationImage)
                     .setSmallIcon(R.drawable.ic_notification_radio)
                     .setColor(ContextCompat.getColor(playerService, R.color.colorPrimaryDark))
                     .setContentIntent(
@@ -175,7 +262,7 @@ public class RadioPlayerNotification {
                             )
                     )
                     .setStyle(
-                            new NotificationCompat.MediaStyle()
+                            new MediaStyle()
                                     .setMediaSession(
                                             playerService.getMediaSession()
                                                     .getSessionToken()
@@ -191,10 +278,15 @@ public class RadioPlayerNotification {
                     .setContentTitle(playerService.getMetadata()
                             .getString(MediaMetadataCompat.METADATA_KEY_TITLE)
                     )
-                    .setContentText(
+                    .setContentInfo(
                             playerService.getMetadata().getString(
                                     MediaMetadataCompat.METADATA_KEY_GENRE
                             )
+                    )
+                    .setContentText(
+                            playerService.getMetadata().getString(
+                                MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION
+                        )
                     )
                     .addAction(
                             R.drawable.ic_notification_skip_prev,
@@ -231,7 +323,7 @@ public class RadioPlayerNotification {
         );
     }
 
-    public void update() {
+    private void update() {
         if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
             playerService.startForeground(
                     NOTIFICATION_ID,
@@ -250,5 +342,16 @@ public class RadioPlayerNotification {
         playerService.getMediaSession().setActive(false);
         notificationManager.cancel(NOTIFICATION_ID);
         playerService.stopForeground(true);
+        playerService.getMediaController().unregisterCallback(this);
+    }
+
+    @Override
+    public void onMetadataChanged(MediaMetadataCompat metadata) {
+        update();
+    }
+
+    @Override
+    public void onPlaybackStateChanged(PlaybackStateCompat state) {
+        update();
     }
 }

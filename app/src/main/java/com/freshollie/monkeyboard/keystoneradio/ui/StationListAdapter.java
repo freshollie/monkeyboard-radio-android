@@ -8,12 +8,12 @@
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
@@ -30,48 +30,81 @@ import java.text.DecimalFormat;
 
 public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.StationCard> {
     private RadioStation[] stationList = new RadioStation[0];
+
     private PlayerActivity playerActivity;
+
     private int cursorIndex = 0;
     private int currentStationIndex = 0;
-    private int lastStationIndex = 0;
-    private int lastCursorIndex;
     private boolean deleteMode;
     private RecyclerView recyclerView;
     private int radioMode;
 
-    public static class StationCard extends RecyclerView.ViewHolder {
-        public TextView stationName;
-        public TextView stationGenre;
-        public TextView stationEnsemble;
-        public View stationItemBackground;
-        public RelativeLayout stationSelectionLayout;
-        public View stationTopDivide;
-        public View stationBottomDivide;
-        public View stationRemoveButton;
+    private int currentScrollIndex = 0;
 
-        public StationCard(View v) {
+    private StationListLayoutManager layoutManager;
+
+    private int targetScrollIndex = -1;
+
+    private Runnable scrollRunnable = null;
+
+    private int nextScrollIndex = -1;
+    private int scrollingToIndex = -1;
+
+    private boolean waitForIdleScroll = false;
+
+    private OnScrollListener onScrollListener = new OnScrollListener() {
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE && scrollingToIndex != -1) {
+                currentScrollIndex = scrollingToIndex;
+            }
+
+            if (waitForIdleScroll && recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) {
+                return;
+            }
+
+            if (nextScrollIndex != -1) {
+                scrollingToIndex = -1;
+                startNextScroll();
+            }
+        }
+    };
+
+    public static class StationCard extends RecyclerView.ViewHolder {
+        TextView stationName;
+        TextView stationGenre;
+        TextView stationEnsemble;
+        CardView stationCardLayout;
+        View stationRemoveButton;
+
+        StationCard(View v) {
             super(v);
             stationName = (TextView) v.findViewById(R.id.station_name_card_text);
             stationGenre = (TextView) v.findViewById(R.id.station_genre_card_text);
             stationEnsemble = (TextView) v.findViewById(R.id.station_ensemble_name_card_text);
-            stationItemBackground = v.findViewById(R.id.station_item_background);
-            stationSelectionLayout = (RelativeLayout) v.findViewById(R.id.station_item_layout);
-            stationTopDivide = v.findViewById(R.id.top_divide);
-            stationBottomDivide = v.findViewById(R.id.bottom_divide);
+            stationCardLayout = (CardView) v.findViewById(R.id.station_item_layout);
             stationRemoveButton = v.findViewById(R.id.station_remove_button);
         }
     }
 
-    public StationListAdapter(PlayerActivity activity) {
-        playerActivity = activity;
+    public StationListAdapter(PlayerActivity playerActivity) {
+        this.playerActivity = playerActivity;
     }
 
-    // Create new views (invoked by the layout manager)
+    // Create a new station card for the station list
     @Override
-    public StationListAdapter.StationCard onCreateViewHolder(ViewGroup parent,
+    public StationCard onCreateViewHolder(ViewGroup parent,
                                                              int viewType) {
         // create a new view
-        RelativeLayout stationCardView = (RelativeLayout) LayoutInflater.from(parent.getContext())
+        CardView stationCardView = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.station_card_layout, parent, false);
         return new StationCard(stationCardView);
     }
@@ -80,12 +113,18 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         this.recyclerView = recyclerView;
+        this.recyclerView.addOnScrollListener(onScrollListener);
+        layoutManager = (StationListLayoutManager) recyclerView.getLayoutManager();
+
+        setAnimations(true);
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
+        this.recyclerView.removeOnScrollListener(onScrollListener);
         this.recyclerView = null;
+        this.layoutManager = null;
     }
 
     @Override
@@ -110,53 +149,44 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 )
         );
 
-        stationCard.stationItemBackground.setAlpha(1f);
+        stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat.getColor(playerActivity, R.color.backgroundGrey));
         if (position == currentStationIndex) {
-            stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+            stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
                     .getColor(playerActivity, R.color.colorPrimaryDark)
             );
         }
 
         if (position == cursorIndex && !deleteMode) {
-            stationCard.stationBottomDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.colorPrimaryDark)
-            );
-
-            stationCard.stationTopDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.colorPrimaryDark)
-            );
 
             if (position != currentStationIndex) {
-                stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+                stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
                         .getColor(playerActivity, R.color.colorAccent)
                 );
-                stationCard.stationItemBackground.setAlpha(0.3f);
+                stationCard.stationCardLayout.setCardBackgroundColor(
+                        stationCard.stationCardLayout.getCardBackgroundColor().withAlpha(80)
+                );
             }
 
-        } else {
-            stationCard.stationBottomDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.backgroundDarker)
-            );
-            stationCard.stationTopDivide.setBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.backgroundDarker)
-            );
         }
 
         if (position != currentStationIndex && position != cursorIndex) {
-            stationCard.stationItemBackground.setBackgroundColor(0);
+            //stationCard.stationItemBackground.setBackgroundColor(0);
         }
 
         if (deleteMode) {
-            stationCard.stationItemBackground.setBackgroundColor(ContextCompat
+            stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
                     .getColor(playerActivity, R.color.colorHighlight)
             );
-            stationCard.stationItemBackground.setAlpha(0.3f);
+            stationCard.stationCardLayout.setCardBackgroundColor(
+                    stationCard.stationCardLayout.getCardBackgroundColor().withAlpha(80)
+            );
         }
 
-        if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationCard.stationSelectionLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
+
+        stationCard.stationCardLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
                     if (deleteMode) {
                         closeDeleteMode();
                     } else {
@@ -164,28 +194,30 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                     }
                     return true;
                 }
-            });
-        }
+                return false;
+            }
+        });
 
         if (deleteMode && radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationCard.stationSelectionLayout.setOnClickListener(null);
+            stationCard.stationCardLayout.setOnClickListener(null);
             stationCard.stationRemoveButton.setVisibility(View.VISIBLE);
-            stationCard.stationRemoveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    playerActivity.handleRemoveFmChannel(radioStation);
-                    onStationRemoved(stationCard.getAdapterPosition());
-                }
-            });
         } else {
-            stationCard.stationSelectionLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    playerActivity.handleChannelClicked(stationCard.getAdapterPosition());
-                }
-            });
             stationCard.stationRemoveButton.setVisibility(View.INVISIBLE);
         }
+
+        stationCard.stationCardLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (deleteMode) {
+                    playerActivity.handleRemoveFmChannel(radioStation);
+                    onStationRemoved(stationCard.getAdapterPosition());
+                } if (currentStationIndex == stationCard.getAdapterPosition()) {
+                    scrollWhenPossible(stationCard.getAdapterPosition());
+                } else {
+                    playerActivity.handleChannelClicked(stationCard.getAdapterPosition());
+                }
+            }
+        });
     }
 
     public void openDeleteMode() {
@@ -238,8 +270,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             stationList = stations;
         } else {
             stationList = new RadioStation[0];
-
-
         }
 
 
@@ -255,57 +285,146 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         return stationList.length;
     }
 
-    public void updateStationList(RadioStation[] newStationList, int radioMode) {
-        stationList = newStationList.clone();
+    public void setAnimations(boolean on) {
+        if (on) {
+            recyclerView.getItemAnimator().setChangeDuration(0);
+            recyclerView.getItemAnimator().setRemoveDuration(0);
+            recyclerView.getItemAnimator().setMoveDuration(0);
+            recyclerView.getItemAnimator().setAddDuration(0);
+        } else {
+            recyclerView.getItemAnimator().setChangeDuration(0);
+            recyclerView.getItemAnimator().setRemoveDuration(0);
+            recyclerView.getItemAnimator().setMoveDuration(0);
+            recyclerView.getItemAnimator().setAddDuration(0);
+        }
+    }
+
+    public void initialiseNewStationList(RadioStation[] newStationList, int radioMode) {
         this.radioMode = radioMode;
+
+        this.cursorIndex = -1;
+        this.currentStationIndex = -1;
+        this.scrollingToIndex = -1;
+        this.nextScrollIndex = -1;
+        this.currentScrollIndex = 0;
+
+        this.waitForIdleScroll = false;
+
         if (radioMode != RadioDevice.Values.STREAM_MODE_FM && isDeleteMode()) {
             closeDeleteMode();
         }
-        notifyDataSetChanged();
+
+        int lastSize = getItemCount();
+        stationList = newStationList.clone();
+
+        if (stationList.length < lastSize) {
+            notifyItemRangeRemoved(stationList.length, lastSize - stationList.length);
+        }
+
+        notifyItemRangeChanged(0, stationList.length);
+    }
+
+    public int getCursorIndex() {
+        return cursorIndex;
     }
 
     public RadioStation[] getStationList() {
         return stationList;
     }
 
-
-    public void setCursorIndex(int channelIndex) {
-        Log.v("StationListAdapter", "Setting new cursorPosition " + String.valueOf(channelIndex));
-        cursorIndex = channelIndex;
-    }
-
-    public void notifyCursorPositionChanged() {
-        notifyItemChanged(lastCursorIndex);
-        notifyItemChanged(cursorIndex);
-        notifyCurrentStationChanged();
-        lastCursorIndex = cursorIndex;
-    }
-
-    public void setCurrentStationIndex(int channelIndex) {
-        currentStationIndex = channelIndex;
-    }
-
-    public int getCurrentStationIndex() {
-        return currentStationIndex;
-    }
-
-    public void notifyCurrentStationChanged() {
-        Log.v("StationListAdapter", "Updating current playing station " + String.valueOf(currentStationIndex));
-
-        if (currentStationIndex == lastStationIndex) {
+    private void startNextScroll() {
+        if (scrollingToIndex == nextScrollIndex) {
             return;
         }
-        int lastChannelCursor = cursorIndex;
-        cursorIndex = currentStationIndex;
 
-        notifyItemChanged(lastChannelCursor);
-        notifyItemChanged(currentStationIndex);
-        notifyItemChanged(lastStationIndex);
+        recyclerView.stopScroll();
+        final int nextScroll = nextScrollIndex;
 
-        lastStationIndex = currentStationIndex;
+        if (nextScroll < 0) {
+            return;
+        }
+
+        nextScrollIndex = -1;
+
+        // As the next item is not on screen, we are going to scroll directly to that page
+        // and then do a smooth scroll after we have reached near that items
+        if ((layoutManager.findFirstVisibleItemPosition() > nextScroll || layoutManager.findLastVisibleItemPosition() < nextScroll))  {
+            scrollingToIndex = nextScroll;
+
+            // Setup a listener to scroll when this is done
+            waitForIdleScroll = true;
+            if (nextScrollIndex == -1) {
+                nextScrollIndex = nextScroll;
+            }
+
+            // Perform a jump scroll
+            recyclerView.scrollToPosition(nextScrollIndex);
+        } else {
+            scrollingToIndex = nextScroll;
+            recyclerView.smoothScrollToPosition(nextScroll);
+            // In case it was set to something else, change it back now
+            layoutManager.setSnapDuration(StationListLayoutManager.DEFAULT_SNAP_SPEED);
+        }
     }
 
-    public int getCursorIndex() {
-        return cursorIndex;
+    public int getCurrentScrollIndex() {
+        return currentScrollIndex;
+    }
+
+    public int getScrollingToIndex() {
+        return scrollingToIndex;
+    }
+
+    private void scrollWhenPossible(int itemIndex) {
+        waitForIdleScroll = false;
+        nextScrollIndex = itemIndex;
+
+        // If we are not scrolling start the next scroll now
+        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+            startNextScroll();
+        }
+    }
+
+    public void onCursorPositionChanged(int newCursorIndex) {
+        if (newCursorIndex == -1 || newCursorIndex == cursorIndex) {
+            return;
+        }
+
+        notifyItemChanged(cursorIndex);
+        notifyItemChanged(newCursorIndex);
+
+        cursorIndex = newCursorIndex;
+
+        layoutManager.setSnapDuration(1);
+        scrollWhenPossible(cursorIndex);
+    }
+
+
+    public void onCurrentStationChanged(int newStationIndex) {
+        if (currentStationIndex == newStationIndex) {
+            return;
+        }
+
+        int lastCursorIndex = cursorIndex;
+        int lastStationIndex = currentStationIndex;
+
+        cursorIndex = newStationIndex;
+        currentStationIndex = newStationIndex;
+
+
+        if (lastCursorIndex > -1 && cursorIndex != lastCursorIndex) {
+            notifyItemChanged(lastCursorIndex);
+        }
+
+
+        if (lastStationIndex > -1  &&
+                lastCursorIndex != lastStationIndex) {
+            notifyItemChanged(lastStationIndex);
+        }
+
+        if (currentStationIndex > -1) {
+            notifyItemChanged(currentStationIndex);
+            scrollWhenPossible(currentStationIndex);
+        }
     }
 }
