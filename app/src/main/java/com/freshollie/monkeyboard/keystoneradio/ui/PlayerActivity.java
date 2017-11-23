@@ -15,16 +15,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -62,8 +64,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public static final String HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT =
             "com.freshollie.headunitcontroller.action.SEND_KEYEVENT";
 
-    private static int SNAP_SPEED = 250;
-
     private RadioPlayerService playerService;
     private Boolean playerBound = false;
     private RadioDevice radio;
@@ -77,12 +77,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private ImageButton volumeButton;
     private ImageButton settingsButton;
 
-    private Animation fadeInAnimation;
-    private Animation fadeOutAnimation;
-
     private Switch modeSwitch;
-
-    private SeekBar volumeSeekBar;
 
     private SeekBar fmSeekBar;
 
@@ -93,8 +88,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private boolean userChangingFmFrequency = false;
 
     private TextView fmFrequencyTextView;
-    private TextView currentChannelView;
+
+    private TextView channelNameTextView;
     private TextView programTextTextView;
+    private ImageView slideshowImageView;
+
     private TextView signalStrengthView;
     private TextView playStatusTextView;
     private TextView genreTextView;
@@ -102,12 +100,17 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private TextView dataRateTextView;
     private TextView stereoStateTextView;
     private ImageView signalStrengthIcon;
-    private TextView volumeText;
 
-    private TextView noStationsText;
+    private TextView volumeText;
+    private SeekBar volumeSeekBar;
+    private View volumeSeekbarHolder;
+
+    private TextView noStationsTextView;
     private RecyclerView stationListRecyclerView;
     private StationListAdapter stationListAdapter = new StationListAdapter(this);
     private StationListLayoutManager stationListLayoutManager;
+
+    private Bitmap currentSlideshowImageBitmap;
 
     private RadioStatusDialog radioStatusDialog = new RadioStatusDialog();
 
@@ -117,51 +120,20 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private Runnable cursorScrollRunnable;
     private Runnable selectChannelScrollRunnable;
 
-    private boolean preferenceControllerInput = false;
-    private boolean preferenceCursorScrollWrap = true;
-    private boolean preferencePlayOnOpen = false;
-
     private boolean isRestartedInstance = false;
 
-    private BroadcastReceiver controlInputReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver controllerInputReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT)) {
-                if (intent.hasExtra("keyCode") && preferenceControllerInput) {
-                    handleKeyDown(intent.getIntExtra("keyCode", -1));
-                }
+        if (intent.getAction().equals(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT)) {
+            if (intent.hasExtra("keyCode") &&
+                    sharedPreferences.getBoolean(
+                            getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT),
+                            false
+                    )) {
+                handleKeyDown(intent.getIntExtra("keyCode", -1));
             }
         }
-    };
-
-    /**
-     * Updates our internal player preferences when changed
-     */
-    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-            if (s.equals(getString(R.string.SCROLL_WRAP_KEY))) {
-                preferenceCursorScrollWrap =
-                        sharedPreferences.getBoolean(
-                                getString(R.string.SCROLL_WRAP_KEY),
-                                false
-                        );
-                Log.v(TAG, "Cursor Scroll wrap set to: " + String.valueOf(preferenceCursorScrollWrap));
-            } else if (s.equals(getString(R.string.HEADUNIT_MAIN_INPUT_KEY))) {
-                preferenceControllerInput =
-                        sharedPreferences.getBoolean(
-                                getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
-                                false
-                        );
-                Log.v(TAG, "Headunit input set to: " + String.valueOf(preferenceControllerInput));
-            } else if (s.equals(getString(R.string.PLAY_ON_OPEN_KEY))) {
-                preferencePlayOnOpen =
-                        sharedPreferences.getBoolean(
-                                getString(R.string.PLAY_ON_OPEN_KEY),
-                                false
-                        );
-                Log.v(TAG, "Play on open set to: " + String.valueOf(preferencePlayOnOpen));
-            }
         }
     };
 
@@ -190,44 +162,33 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             radio = null;
         }
     };
+    private ConstraintLayout channelStatusBarLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Only 1 player activity should be open at a time
+        // For some reason some launchers launch multiple
         if (!isTaskRoot()) {
             finish();
             return;
         }
+
+        setContentView(R.layout.activity_player);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
-        setContentView(R.layout.activity_player);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-        preferenceControllerInput = sharedPreferences.getBoolean(
-                getString(R.string.HEADUNIT_MAIN_INPUT_KEY),
-                false
-        );
-
-        preferenceCursorScrollWrap = sharedPreferences.getBoolean(
-                getString(R.string.SCROLL_WRAP_KEY),
-                false
-        );
-
-        preferencePlayOnOpen = sharedPreferences.getBoolean(
-                getString(R.string.PLAY_ON_OPEN_KEY),
-                false
-        );
-
 
         bindPlayerService();
-        setupPlayerAttributes(savedInstanceState);
-        setupStationList();
+
+        initialisePlayerAttributesUi(savedInstanceState);
+        initialiseStationListUi();
 
         if (savedInstanceState == null) {
             clearPlayerAttributes();
@@ -258,7 +219,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onResume() {
         super.onResume();
         Log.v(TAG, "On Resume");
-        registerReceiver(controlInputReceiver,
+        registerReceiver(controllerInputReceiver,
                 new IntentFilter(HEADUNITCONTROLLER_ACTION_SEND_KEYEVENT));
 
         userChangingFmFrequency = false;
@@ -272,19 +233,21 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             if (!Arrays.equals(playerService.getDabRadioStations(),
                     stationListAdapter.getStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                showStationList(playerService.getRadioMode());
-                if (playerService.getDabRadioStations().length < 1) {
-                    if (sharedPreferences.getBoolean(
+                // if we don't have any stations and the user has the ability to
+                // use FM mode, switch to FM mode
+                if (playerService.getDabRadioStations().length < 1 &&
+                        sharedPreferences.getBoolean(
                             getString(R.string.pref_fm_mode_enabled_key),
                             true)
                             ) {
-                        playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
-                    }
+                    playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
+                } else {
+                    updateStationList(playerService.getRadioMode());
                 }
             } else if (!Arrays.equals(playerService.getFmRadioStations(),
                     stationListAdapter.getStationList()) &&
                     playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
-                showStationList(playerService.getRadioMode());
+                updateStationList(playerService.getRadioMode());
             }
 
             // Re-Register the callback
@@ -292,7 +255,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
             refreshSwitchControls();
 
-            if (preferencePlayOnOpen) {
+            if (sharedPreferences.getBoolean(
+                    getString(R.string.PREF_PLAY_ON_OPEN),
+                    false
+            )) {
                 playerService.handlePlayRequest();
             }
         } else {
@@ -303,7 +269,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(controlInputReceiver);
+        unregisterReceiver(controllerInputReceiver);
         if (playerBound) {
             playerService.unregisterCallback(this);
         }
@@ -320,9 +286,9 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         playerService.getMediaController().registerCallback(mediaControllerCallback);
         playerService.registerCallback(this);
 
-        setupPlaybackControls();
-        setupVolumeControls();
-        setupSettingsButton();
+        initialisePlayerControls();
+        initialiseVolumeControls();
+        initialiseSettingsButton();
 
         updateVolume(playerService.getPlayerVolume());
 
@@ -332,7 +298,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         // Stop the animation from happening when the activity is first created
         if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
             fmSeekBar.clearAnimation();
-            fmSeekBar.setVisibility(View.INVISIBLE);
+            fmSeekBar.setVisibility(View.GONE);
             searchBackwardsButton.clearAnimation();
             searchBackwardsButton.setVisibility(View.INVISIBLE);
             searchForwardsButton.clearAnimation();
@@ -340,16 +306,44 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         }
 
         // then sets the animations back to normal
-        stationListLayoutManager.setSnapDuration(SNAP_SPEED);
-        stationListRecyclerView.getItemAnimator().setChangeDuration(0);
-        stationListRecyclerView.getItemAnimator().setRemoveDuration(0);
-        stationListRecyclerView.getItemAnimator().setMoveDuration(0);
-        stationListRecyclerView.getItemAnimator().setAddDuration(0);
+        stationListLayoutManager.setSnapDuration(StationListLayoutManager.DEFAULT_SNAP_SPEED);
 
         updatePlayerAttributesFromMetadata(!isRestartedInstance);
 
-        if (preferencePlayOnOpen) {
+        if (sharedPreferences.getBoolean(
+                getString(R.string.PREF_PLAY_ON_OPEN),
+                false
+            )) {
             playerService.handlePlayRequest();
+        }
+
+        // Make sure these attributes are up to date also
+        if (radio.isConnected()) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final int playStatus = radio.getPlayStatus();
+                    final int stereoMode = radio.getStereo();
+
+                    final int programDataRate = radio.getProgramDataRate();
+                    final int dabSignalQuality = radio.getSignalQuality();
+                    final int fmSignalStrength = radio.getSignalStrength();
+
+                    new Handler(getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onPlayStatusChanged(playStatus);
+                            onStereoStateChanged(stereoMode);
+                            if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
+                                onDabProgramDataRateChanged(programDataRate);
+                                onDabSignalQualityChanged(dabSignalQuality);
+                            } else {
+                                onFmSignalStrengthChanged(fmSignalStrength);
+                            }
+                        }
+                    });
+                }
+            }).start();
         }
     }
 
@@ -359,47 +353,39 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         boolean dabModeEnabled =
                 sharedPreferences.getBoolean(getString(R.string.pref_dab_mode_enabled_key), true);
 
-        TextView modeSwitchLabel = (TextView) findViewById(R.id.mode_switch_label);
-
         if (!fmModeEnabled) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM) {
                 playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_DAB);
             }
-            modeSwitchLabel.setVisibility(View.GONE);
             modeSwitch.setVisibility(View.GONE);
         } else if (!dabModeEnabled) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
                 playerService.handleSetRadioMode(RadioDevice.Values.STREAM_MODE_FM);
             }
-            modeSwitchLabel.setVisibility(View.GONE);
             modeSwitch.setVisibility(View.GONE);
         } else {
             modeSwitch.setChecked(playerService.getRadioMode() ==
                     RadioDevice.Values.STREAM_MODE_FM);
             modeSwitch.setVisibility(View.VISIBLE);
-            modeSwitchLabel.setVisibility(View.VISIBLE);
         }
     }
 
-    public void setupStationList() {
+    public void initialiseStationListUi() {
         stationListLayoutManager = new StationListLayoutManager(this);
 
         stationListRecyclerView = (RecyclerView) findViewById(R.id.station_list);
+        stationListRecyclerView.setHasFixedSize(true);
         stationListRecyclerView.setLayoutManager(stationListLayoutManager);
         stationListRecyclerView.setAdapter(stationListAdapter);
 
-        ViewCompat.setElevation(findViewById(R.id.station_list_container), 100);
-        ViewCompat.setElevation(findViewById(R.id.player_control_panel), 50);
+        //ViewCompat.setElevation(findViewById(R.id.station_list_container), 100);
+        //ViewCompat.setElevation(findViewById(R.id.player_control_panel), 50);
     }
 
-    public void setupPlaybackControls() {
+    public void initialisePlayerControls() {
         addChannelFab = (FloatingActionButton) findViewById(R.id.add_channel_fab);
         fabForwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_forwards);
         fabBackwardsAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_backwards);
-        fadeInAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-        fadeInAnimation.setDuration(200);
-        fadeOutAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
-        fadeOutAnimation.setDuration(200);
 
         modeSwitch = (Switch) findViewById(R.id.mode_switch);
         modeSwitch.setChecked(playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_FM);
@@ -450,7 +436,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             }
         });
 
-        fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.INVISIBLE);
+        fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
         addChannelFab.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
         addChannelFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -458,7 +444,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 if (playerBound) {
                     if (stationListAdapter != null && !stationListAdapter.isDeleteMode()) {
                         if (playerService.saveCurrentFmStation()) {
-                            showStationList(playerService.getRadioMode());
+                            updateStationList(playerService.getRadioMode());
                         } else {
                             Snackbar.make(
                                     stationListRecyclerView,
@@ -563,11 +549,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     private Runnable seekBarIdle = new Runnable() {
         @Override
         public void run() {
-            onCloseVolumeSeekBar();
+            closeVolumeUi();
         }
     };
 
-    public void setupVolumeControls() {
+    public void initialiseVolumeControls() {
         volumeButton = (ImageButton) findViewById(R.id.volume_button);
         volumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -575,14 +561,16 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 if (stationListAdapter != null) {
                     stationListAdapter.closeDeleteMode();
                 }
-                if (volumeSeekBar.getVisibility() == View.VISIBLE) {
-                    onCloseVolumeSeekBar();
 
+                if (volumeSeekbarHolder.getVisibility() == View.VISIBLE) {
+                    closeVolumeUi();
                 } else {
+                    // Update the volume if the volume has not been set recently
+                    // due to the player being disabled
                     if (!playerService.isPlaying()) {
                         updateVolume(playerService.getPlayerVolume());
                     }
-                    onOpenVolumeSeekBar();
+                    openVolumeUi();
                 }
             }
         });
@@ -623,7 +611,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void onRadioModeChanged(int mode, boolean clearAttributes) {
         if (mode == RadioDevice.Values.STREAM_MODE_DAB) {
-
+            Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+            fadeOutAnimation.setDuration(200);
             fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -632,7 +621,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    fmSeekBar.setVisibility(View.INVISIBLE);
+                    fmSeekBar.setVisibility(View.GONE);
                     searchBackwardsButton.setVisibility(View.INVISIBLE);
                     searchForwardsButton.setVisibility(View.INVISIBLE);
                 }
@@ -648,6 +637,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             searchForwardsButton.startAnimation(fadeOutAnimation);
             addChannelFab.hide();
         } else {
+            Animation fadeInAnimation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+            fadeInAnimation.setDuration(200);
             fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -666,6 +657,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
                 }
             });
+            fmSeekBar.setVisibility(View.INVISIBLE);
             fmSeekBar.startAnimation(fadeInAnimation);
             searchBackwardsButton.startAnimation(fadeInAnimation);
             searchForwardsButton.startAnimation(fadeInAnimation);
@@ -677,23 +669,23 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             fmSeekBar.setProgress(playerService.getCurrentFmFrequency() - RadioDevice.Values.MIN_FM_FREQUENCY);
         }
         modeSwitch.setChecked(mode == RadioDevice.Values.STREAM_MODE_FM);
-        showStationList(mode);
+        updateStationList(mode);
 
         if (clearAttributes) {
             clearPlayerAttributes();
         }
     }
 
-    public void onOpenVolumeSeekBar() {
-        volumeSeekBar.setVisibility(View.VISIBLE);
+    public void openVolumeUi() {
+        volumeSeekbarHolder.setVisibility(View.VISIBLE);
         volumeText.setVisibility(View.VISIBLE);
-        volumeSeekBar.postDelayed(seekBarIdle, 2000);
+        volumeSeekbarHolder.postDelayed(seekBarIdle, 2000);
     }
 
-    public void onCloseVolumeSeekBar() {
-        volumeSeekBar.setVisibility(View.INVISIBLE);
+    public void closeVolumeUi() {
+        volumeSeekbarHolder.setVisibility(View.INVISIBLE);
         volumeText.setVisibility(View.INVISIBLE);
-        volumeSeekBar.removeCallbacks(seekBarIdle);
+        volumeSeekbarHolder.removeCallbacks(seekBarIdle);
 
     }
 
@@ -718,7 +710,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         volumeButton.setImageResource(icon);
     }
 
-    public void setupSettingsButton() {
+    public void initialiseSettingsButton() {
         settingsButton = (ImageButton) findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -733,9 +725,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         });
     }
 
-    public void setupPlayerAttributes(Bundle savedInstanceState) {
+    public void initialisePlayerAttributesUi(Bundle savedInstanceState) {
+        channelStatusBarLayout = (ConstraintLayout) findViewById(R.id.channel_status_bar_constraint_layout);
         fmFrequencyTextView = (TextView) findViewById(R.id.fm_frequency_text);
-        currentChannelView = (TextView) findViewById(R.id.channel_name);
+        channelNameTextView = (TextView) findViewById(R.id.channel_name);
+        slideshowImageView = (ImageView) findViewById(R.id.slideshow_image);
         dataRateTextView = (TextView) findViewById(R.id.data_rate);
         ensembleTextView = (TextView) findViewById(R.id.station_ensemble_name);
         genreTextView = (TextView) findViewById(R.id.station_genre);
@@ -744,18 +738,31 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         signalStrengthIcon = (ImageView) findViewById(R.id.signal_strength_icon);
         programTextTextView = (TextView) findViewById(R.id.program_text);
         stereoStateTextView = (TextView) findViewById(R.id.program_stereo_mode);
+
         volumeSeekBar = (SeekBar) findViewById(R.id.volume_seek_bar);
         volumeText = (TextView) findViewById(R.id.volume_text);
-        noStationsText = (TextView) findViewById(R.id.no_saved_stations_text);
+        volumeSeekbarHolder = findViewById(R.id.volume_seekbar_holder);
+
+        noStationsTextView = (TextView) findViewById(R.id.no_saved_stations_text);
+
+        closeVolumeUi();
 
         if (savedInstanceState != null) {
             Log.v(TAG, "Loading previous states");
             fmFrequencyTextView.setText(
                     savedInstanceState.getString(String.valueOf(R.id.fm_frequency_text))
             );
-            currentChannelView.setText(
+
+            if (!fmFrequencyTextView.getText().toString().isEmpty()) {
+                fmFrequencyTextView.setVisibility(View.VISIBLE);
+            } else {
+                fmFrequencyTextView.setVisibility(View.GONE);
+            }
+
+            updateChannelNameText(
                     savedInstanceState.getString(String.valueOf(R.id.channel_name))
             );
+
             dataRateTextView.setText(
                     savedInstanceState.getString(String.valueOf(R.id.data_rate))
             );
@@ -772,9 +779,15 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             programTextTextView.setText(
                     savedInstanceState.getString(String.valueOf(R.id.program_text))
             );
+
+            updateSlideshowImage(
+                    (Bitmap) savedInstanceState.getParcelable(String.valueOf(R.id.slideshow_image))
+            );
+
             stereoStateTextView.setText(
                     savedInstanceState.getString(String.valueOf(R.id.program_stereo_mode))
             );
+
             volumeSeekBar.setProgress(
                     savedInstanceState.getInt(String.valueOf(R.id.volume_seek_bar))
             );
@@ -789,14 +802,18 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void clearPlayerAttributes() {
         Log.d(TAG, "Clearing player attributes");
         fmFrequencyTextView.setText("");
+        fmFrequencyTextView.setVisibility(View.GONE);
         signalStrengthView.setText("");
         programTextTextView.setText("");
         stereoStateTextView.setText("");
+        updateSlideshowImage(null);
         onDabProgramDataRateChanged(0);
         onDabSignalQualityChanged(0);
         genreTextView.setText("");
         ensembleTextView.setText("");
-        currentChannelView.setText("");
+
+        channelNameTextView.setText("");
+
         updatePlayerAttributesFromMetadata();
     }
 
@@ -804,9 +821,24 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         if (playerBound) {
             RadioStation currentStation = playerService.getCurrentStation();
             if (currentStation != null) {
-                updateCurrentChannelName(currentStation.getName());
+                updateChannelNameText(currentStation.getName());
                 updateEnsembleName(currentStation.getEnsemble());
                 updateGenreName(RadioDevice.StringValues.getGenreFromId(currentStation.getGenreId()));
+
+                updateSlideshowImage(
+                        playerService
+                                .getMetadata()
+                                .getBitmap(
+                                        MediaMetadataCompat.METADATA_KEY_ART
+                                )
+                );
+                programTextTextView.setText(
+                        playerService
+                                .getMetadata()
+                                .getString(
+                                        MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION
+                                )
+                );
 
 
                 if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
@@ -818,6 +850,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                             new DecimalFormat("#.0")
                                     .format(currentStation.getFrequency() / 1000.0)
                     );
+                    fmFrequencyTextView.setVisibility(View.VISIBLE);
 
                     if (!userChangingFmFrequency) {
                         fmSeekBar.setProgress((playerService.getCurrentFmFrequency() -
@@ -828,16 +861,12 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 }
             }
         } else {
-            updateCurrentChannelName("");
+            updateChannelNameText("");
             updateEnsembleName("");
             updateGenreName("");
             if (fmSeekBar != null) {
                 fmSeekBar.setProgress(0);
             }
-        }
-
-        if (clearProgramText) {
-            programTextTextView.setText("");
         }
     }
 
@@ -855,8 +884,25 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         playButton.setImageResource(icon);
     }
 
-    public void updateCurrentChannelName(String channelName) {
-        currentChannelView.setText(channelName);
+    public void updateChannelNameText(String channelName) {
+        final int newVisibility;
+
+        if (channelName.length() > 0) {
+            newVisibility = View.VISIBLE;
+        } else {
+            newVisibility = View.GONE;
+        }
+
+        //if (channelNameTextView.getVisibility() != newVisibility) {
+        /*Log.e(TAG, "APPLYING TRANSISION?");
+        TransitionManager.beginDelayedTransition((ConstraintLayout) findViewById(R.id.player_layout), new TransitionSet()
+                .addTransition(new ChangeBounds()).addTransition(new Fade()));
+*/
+        //TransitionManager.endTransitions((ConstraintLayout) findViewById(R.id.player_layout));
+        //}
+
+        channelNameTextView.setVisibility(newVisibility);
+        channelNameTextView.setText(channelName);
     }
 
     public void updateEnsembleName(String ensembleName) {
@@ -867,154 +913,50 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         genreTextView.setText(genre);
     }
 
-    public void showStationList(int radioMode) {
-        stationListRecyclerView.stopScroll();
+    public void updateSlideshowImage(Bitmap slideshowImageBitmap) {
+        currentSlideshowImageBitmap = slideshowImageBitmap;
+        if (slideshowImageBitmap != null) {
+            slideshowImageView.setVisibility(View.VISIBLE);
+            slideshowImageView.setImageBitmap(slideshowImageBitmap);
+        } else {
+            slideshowImageView.setVisibility(View.GONE);
+        }
+    }
+
+    public void updateStationList(int radioMode) {
         if (radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationListAdapter.updateStationList(playerService.getFmRadioStations(), radioMode);
-            stationListAdapter.setCurrentStationIndex(playerService.getCurrentSavedFmStationIndex());
-            if (stationListAdapter.getCurrentStationIndex() > -1) {
-                stationListRecyclerView.scrollToPosition(playerService.getCurrentSavedFmStationIndex());
+            stationListAdapter.initialiseNewStationList(playerService.getFmRadioStations(), radioMode);
+
+            if (playerService.getCurrentSavedFmStationIndex() > -1) {
+                stationListAdapter.onCurrentStationChanged(playerService.getCurrentSavedFmStationIndex());
             }
-            stationListAdapter.notifyCurrentStationChanged();
 
             if (playerService.getFmRadioStations().length < 1) {
-                noStationsText.setVisibility(View.VISIBLE);
+                noStationsTextView.setVisibility(View.VISIBLE);
             } else {
-                noStationsText.setVisibility(View.GONE);
+                noStationsTextView.setVisibility(View.GONE);
             }
         } else {
-            stationListAdapter.updateStationList(playerService.getDabRadioStations(), radioMode);
-            stationListAdapter.setCurrentStationIndex(playerService.getCurrentDabChannelIndex());
-            if (stationListAdapter.getCurrentStationIndex() > -1) {
-                stationListRecyclerView.scrollToPosition(playerService.getCurrentDabChannelIndex());
+            stationListAdapter.initialiseNewStationList(playerService.getDabRadioStations(), radioMode);
+            if (playerService.getCurrentDabChannelIndex() > -1) {
+                stationListAdapter.onCurrentStationChanged(playerService.getCurrentDabChannelIndex());
             }
-            stationListAdapter.notifyCurrentStationChanged();
 
             if (playerService.getDabRadioStations().length < 1) {
-                noStationsText.setVisibility(View.VISIBLE);
+                noStationsTextView.setVisibility(View.VISIBLE);
             } else {
-                noStationsText.setVisibility(View.GONE);
+                noStationsTextView.setVisibility(View.GONE);
             }
         }
 
     }
 
     public void updateStationListSelection(final int channelIndex) {
-        stationListAdapter.setCurrentStationIndex(channelIndex);
-
-        if (selectChannelScrollRunnable != null) {
-            stationListRecyclerView.removeCallbacks(selectChannelScrollRunnable);
-        }
-
-        stationListRecyclerView.stopScroll();
-        stationListRecyclerView.clearOnScrollListeners();
-
-        selectChannelScrollRunnable =  new Runnable() {
-            @Override
-            public void run() {
-                stationListRecyclerView.clearOnScrollListeners();
-                stationListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    private boolean done = false;
-                    @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                        updateSelection();
-                    }
-
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        updateSelection();
-                    }
-
-                    private void updateSelection() {
-                        if (!done) {
-                            done = true;
-                            if (channelIndex == stationListAdapter.getCurrentStationIndex()) {
-                                stationListRecyclerView.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        stationListAdapter.notifyCurrentStationChanged();
-                                    }
-                                });
-                            }
-                            stationListRecyclerView.removeOnScrollListener(this);
-                        }
-                    }
-                });
-
-                if (playerBound &&
-                        stationListAdapter.getCurrentStationIndex() <
-                                stationListAdapter.getItemCount()) {
-                    if (stationListAdapter.getCurrentStationIndex() != -1) {
-
-                        stationListRecyclerView.smoothScrollToPosition(
-                                stationListAdapter.getCurrentStationIndex()
-                        );
-                    } else {
-                        stationListAdapter.notifyCurrentStationChanged();
-                    }
-                }
-            }
-        };
-
-        stationListRecyclerView.post(selectChannelScrollRunnable);
+        stationListAdapter.onCurrentStationChanged(channelIndex);
     }
 
-    public void updateCursorPosition(final int newCursorIndex) {
-        if (cursorScrollRunnable != null) {
-            stationListRecyclerView.removeCallbacks(cursorScrollRunnable);
-        }
-
-        stationListAdapter.setCursorIndex(newCursorIndex);
-        stationListRecyclerView.stopScroll();
-        stationListRecyclerView.clearOnScrollListeners();
-
-        cursorScrollRunnable =  new Runnable() {
-            @Override
-            public void run() {
-                if (newCursorIndex == stationListAdapter.getCursorIndex()) {
-                    stationListRecyclerView.clearOnScrollListeners();
-                    stationListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                        private boolean done = false;
-
-                        @Override
-                        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                            super.onScrollStateChanged(recyclerView, newState);
-                            updateSelection();
-                        }
-
-                        @Override
-                        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                            super.onScrolled(recyclerView, dx, dy);
-                            updateSelection();
-                        }
-
-                        private void updateSelection() {
-                            if (!done) {
-                                done = true;
-                                if (newCursorIndex == stationListAdapter.getCursorIndex()) {
-                                    stationListRecyclerView.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            stationListAdapter.notifyCursorPositionChanged();
-                                        }
-                                    });
-                                }
-
-                                stationListRecyclerView.removeOnScrollListener(this);
-                            }
-                        }
-                    });
-
-                    stationListLayoutManager.setSnapDuration(1);
-                    stationListRecyclerView.smoothScrollToPosition(stationListAdapter.getCursorIndex());
-                    stationListLayoutManager.setSnapDuration(SNAP_SPEED);
-                }
-            }
-        };
-
-        stationListRecyclerView.post(cursorScrollRunnable);
+    public void updateStationListCursorPosition(final int newCursorIndex) {
+        stationListAdapter.onCursorPositionChanged(newCursorIndex);
     }
 
     public void onChannelListDeleteModeChanged(boolean deleteMode) {
@@ -1034,49 +976,44 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             } else {
                 playerService.handleSetDabChannelRequest(channelIndex);
             }
-            playerService.handlePlayRequest();
+
+            if (playerService.getPlaybackState() == PlaybackStateCompat.STATE_STOPPED) {
+                playerService.handlePlayRequest();
+            }
         }
     }
 
     public void handleRemoveFmChannel(RadioStation radioStation) {
         playerService.removeFmRadioStation(radioStation);
         if (playerService.getFmRadioStations().length < 1) {
-            showStationList(playerService.getRadioMode());
+            updateStationList(playerService.getRadioMode());
         }
     }
 
-    public void handleNextCursorPosition() {
-        int newPosition = stationListAdapter.getCursorIndex() + 1;
-        if (newPosition >= stationListAdapter.getItemCount()) {
-            if (preferenceCursorScrollWrap) {
-                newPosition = 0;
+    public void handleMoveCursor(int direction) {
+        int newPosition;
+
+        newPosition = stationListAdapter.getCursorIndex() + direction;
+
+        if (newPosition >= stationListAdapter.getItemCount() || newPosition < 0) {
+            if (sharedPreferences.getBoolean(
+                    getString(R.string.PREF_CURSOR_SCROLL_WRAP),
+                    false
+            )) {
+                newPosition =
+                        RadioPlayerService.modulus(newPosition, stationListAdapter.getItemCount());
             } else {
-                newPosition = -1;
+                // Ignore this request as we have been told not to wrap
+                return;
             }
         }
 
-        if (newPosition != -1) {
-            updateCursorPosition(newPosition);
-        }
-    }
-
-    public void handlePreviousCursorPosition() {
-        int newPosition = stationListAdapter.getCursorIndex() - 1;
-        if (newPosition < 0) {
-            if (preferenceCursorScrollWrap) {
-                newPosition = stationListAdapter.getItemCount() - 1;
-            } else {
-                newPosition = -1;
-            }
-        }
-        if (newPosition != -1) {
-            updateCursorPosition(newPosition);
-        }
+        updateStationListCursorPosition(newPosition);
     }
 
     @Override
-    public void onProgramTextChanged(String programText) {
-        programTextTextView.setText(programText);
+    public void onNewProgramText(String programText) {
+        //programTextTextView.setText(programText);
     }
 
     @Override
@@ -1137,6 +1074,12 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onFmProgramTypeUpdated(int newFmProgramType) {
 
     }
+
+    @Override
+    public void onNewSlideshowImage(Bitmap bitmap) {
+
+    }
+
 
     @Override
     public void onRadioVolumeChanged(int volume) {
@@ -1233,7 +1176,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onStationListCopyComplete() {
         if (playerBound) {
             if (playerService.getRadioMode() == RadioDevice.Values.STREAM_MODE_DAB) {
-                showStationList(playerService.getRadioMode());
+                updateStationList(playerService.getRadioMode());
             }
             playerService.handlePlayRequest();
         }
@@ -1247,10 +1190,6 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
     public void onDestroy() {
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        if (sharedPreferences != null) {
-            sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-        }
 
         if (playerBound) {
             playerService.getMediaController().unregisterCallback(mediaControllerCallback);
@@ -1272,7 +1211,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 fmFrequencyTextView.getText().toString());
 
         outState.putString(String.valueOf(R.id.channel_name),
-                currentChannelView.getText().toString());
+                channelNameTextView.getText().toString());
 
         outState.putString(String.valueOf(R.id.data_rate),
                 dataRateTextView.getText().toString());
@@ -1288,6 +1227,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         outState.putString(String.valueOf(R.id.program_text),
                 programTextTextView.getText().toString());
+
+        outState.putParcelable(String.valueOf(R.id.slideshow_image), currentSlideshowImageBitmap);
 
         outState.putString(String.valueOf(R.id.program_stereo_mode),
                 stereoStateTextView.getText().toString());
@@ -1338,11 +1279,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 return true;
 
             case KeyEvent.KEYCODE_TAB:
-                handleNextCursorPosition();
+                handleMoveCursor(+1);
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_UP:
-                handlePreviousCursorPosition();
+                handleMoveCursor(-1);
                 return true;
 
             case KeyEvent.KEYCODE_BACK:
@@ -1365,7 +1306,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                     updateVolume(playerService.getPlayerVolume());
                 }
             }
-        } else if (!preferenceControllerInput) {
+        } else if (!sharedPreferences.getBoolean(
+                getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT),
+                false
+            )) {
             if (handleKeyDown(keyCode)) {
                 return true;
             }

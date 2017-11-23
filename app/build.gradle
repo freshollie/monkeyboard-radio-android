@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
         applicationId 'com.freshollie.monkeyboard.keystoneradio'
         minSdkVersion 16
-        targetSdkVersion 24
-        versionCode 2
-        versionName "Beta 1.2.2"
+        targetSdkVersion 26
+        versionCode 95
+        versionName "Beta 2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -22,18 +22,42 @@ android {
     }
 }
 
+// Automatically build the vertical layout from the horizontal layout
+task generateVerticalLayout(type: Exec) {
+    workingDir '.'
+    // Update this with your python
+    commandLine "python", "$rootDir/app/build_tools/make_vertical_layout.py"
+    doLast{
+        if (execResult.exitValue != 0) {
+            throw new GradleException(
+                "Failed to generate vertical layout, " +
+                "ensure python is in your system path, or " +
+                "update this gradle script with your python location"
+            )
+        }
+    }
+}
+
+/*project.afterEvaluate {
+    preBuild.dependsOn generateVerticalLayout
+}
+
+clean.dependsOn generateVerticalLayout
+clean.mustRunAfter generateVerticalLayout*/
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.android.support:cardview-v7:24.2.1'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
+
+    // Support libraries
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:support-v4:26.1.0'
+    compile 'com.android.support:cardview-v7:26.1.0'
+    compile 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:transition:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    // Third party libraries
     compile project(':usbSerialForAndroid')
     compile 'com.nshmura:snappysmoothscroller:1.0.0'
-    testCompile 'junit:junit:4.12'
 }

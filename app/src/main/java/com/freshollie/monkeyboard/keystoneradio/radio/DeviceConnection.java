@@ -15,15 +15,20 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
+import com.hoho.android.usbserial.driver.Ch34xSerialDriver;
+import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
+import com.hoho.android.usbserial.driver.FtdiSerialDriver;
+import com.hoho.android.usbserial.driver.ProlificSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Handles all connection interaction with the monkeyboard over the usb serial connection
@@ -36,9 +41,9 @@ public class DeviceConnection {
     static boolean DEBUG_OUTPUT = false;
     static boolean GET_RESPONSE_DEBUG = false;
 
-    public static final int MAX_PACKET_LENGTH = 255;
-    public final int COMMUNICATION_TIMEOUT_LENGTH = 20;
-    public final int RESPONSE_TIMEOUT_LENGTH = 200;
+    public static final int MAX_PACKET_LENGTH = 256;
+    public final int COMMUNICATION_TIMEOUT_LENGTH = 100;
+    public final int RESPONSE_TIMEOUT_LENGTH = 300;
 
     private final String ACTION_USB_PERMISSION =
             "com.freshollie.monkeyboard.keystoneradio.radio.deviceconnection.action.USB_PERMISSION";
@@ -89,7 +94,27 @@ public class DeviceConnection {
 
     private Thread connectThread;
 
+    private final ArrayList<Byte> readBuffer = new ArrayList<>();
+
     private boolean running = false;
+
+    private Runnable readBufferFillerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            while (!Thread.interrupted() && isConnectionOpen()) {
+                byte[] readBytes = new byte[MAX_PACKET_LENGTH];
+                try {
+                    int numRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
+                    for (int i = 0; i < numRead; i++) {
+                        readBuffer.add(readBytes[i]);
+                    }
+                } catch (IOException e) {
+                }
+            }
+        }
+    };
+
+    private Thread readBufferFillerThread;
 
     public class NotConnectedException extends IOException{
     }
@@ -218,7 +243,7 @@ public class DeviceConnection {
      */
     public void stop() {
         Log.v(TAG, "Stop");
-        if (isRunning()) {
+        if (isConnectionOpen()) {
             closeConnection();
             running = false;
             context.unregisterReceiver(usbBroadcastReceiver);
@@ -245,10 +270,10 @@ public class DeviceConnection {
         Log.v(TAG, "Opening connection to device");
 
         usbDeviceConnection = usbManager.openDevice(usbDevice);
-
         UsbSerialDriver driver = new CdcAcmSerialDriver(usbDevice);
-        deviceSerialInterface = driver.getPorts().get(0);
+
         Log.v(TAG, "Device has " + String.valueOf(driver.getPorts().size()) + " ports");
+        deviceSerialInterface = driver.getPorts().get(0);
 
         try {
             deviceSerialInterface.open(usbDeviceConnection);
@@ -256,18 +281,22 @@ public class DeviceConnection {
             deviceSerialInterface.setDTR(false);
             deviceSerialInterface.setRTS(true);
 
+            readBuffer.clear();
+
+            readBufferFillerThread = new Thread(readBufferFillerRunnable);
+            //readBufferFillerThread.start();
+
             running = true;
             if (connectionStateListener != null) {
                 connectionStateListener.onStart();
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             closeConnection();
             if (connectionStateListener != null) {
                 connectionStateListener.onFail();
             }
         }
-
     }
 
 
@@ -276,6 +305,11 @@ public class DeviceConnection {
      */
     private void closeConnection() {
         Log.v(TAG, "Closing connection to device");
+
+        if (readBufferFillerThread != null) {
+            readBufferFillerThread.interrupt();
+            readBufferFillerThread = null;
+        }
 
         if (deviceSerialInterface != null) {
             try {
@@ -302,13 +336,23 @@ public class DeviceConnection {
         return (byte) commandSerialNumber;
     }
 
+    private byte[] takeAllFromReadBuffer() {
+        byte[] bytes = new byte[readBuffer.size()];
+
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = readBuffer.remove(0);
+        }
+
+        return bytes;
+    }
+
     /**
-     * Gets the returned data from the given command serial number
+     * Reads the response data until it finds the returned data from the given command serial number
      *
      * @param serialNumber
      * @return
      */
-    private byte[] getResponse(byte serialNumber) throws IOException{
+    private byte[] getResponse(byte serialNumber) {
         /*
         * It does this by reading the in bytes until it gets a start command
         * byte, then once a full command is received it checks the serial number of the command to
@@ -320,11 +364,18 @@ public class DeviceConnection {
         // This holds a command while it is being received
         byte[] commandBytes = new byte[MAX_PACKET_LENGTH];
         int commandByteNumber = 0;
+        int payloadLength = -1;
 
         // Keep trying to read for a response byte until we time out
-        while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && isRunning()) {
-            byte[] readBytes = new byte[MAX_PACKET_LENGTH];
-            int numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
+        while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && isConnectionOpen()) {
+            byte[] readBytes = new byte[4096];
+            int numBytesRead = 0;
+
+            try {
+                numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
+            } catch (Exception e) {
+                break;
+            }
 
             for (int i = 0; i < numBytesRead; i++) {
                 byte readByte = readBytes[i];
@@ -332,47 +383,85 @@ public class DeviceConnection {
                     // We are currently reading a command
 
                     commandBytes[commandByteNumber] = readByte; // Add the next byte
-                    commandByteNumber ++;
+
                     if (GET_RESPONSE_DEBUG) {
                         Log.d(TAG, "Readbyte: " + String.valueOf(readByte));
                     }
-                    if (readByte == RadioDevice.ByteValues.END_BYTE) {
-                        if (GET_RESPONSE_DEBUG) {
-                            Log.d(TAG, "End of command found");
-                            Log.d(TAG, Arrays.toString(commandBytes));
-                        }
 
-                        // Checked if command is signed with our serial number
-                        if (commandBytes[3] == serialNumber) {
-                            if (GET_RESPONSE_DEBUG) {
-                                Log.v(TAG, "Command is ours");
-                            }
-                            // The command has finished being read and the command
-                            // is the command we are looking for so return it
-                            return Arrays.copyOfRange(commandBytes, 0, commandByteNumber);
-
-                        } else {
-                            // This was not our command response, ignore it and restart
+                    // We are at what should be the payload byte, so read the payload
+                    if (commandByteNumber == 5) {
+                        payloadLength = readByte & 0xFF;
+                        if (payloadLength > (255 - 6)) {
+                            Log.e(TAG, "Received a packet with a bad payload length: " + payloadLength);
                             commandByteNumber = 0;
+                            payloadLength = -1;
                             commandBytes = new byte[MAX_PACKET_LENGTH];
+                            continue;
                         }
                     }
+
+                    if (commandByteNumber == 3) {
+                        if (readByte != serialNumber) {
+                            // This was not our command response, ignore it and restart
+                            commandByteNumber = 0;
+                            payloadLength = -1;
+                            commandBytes = new byte[MAX_PACKET_LENGTH];
+                            continue;
+                        }
+
+                        if (GET_RESPONSE_DEBUG) {
+                            Log.v(TAG, "Command is ours");
+                        }
+                    }
+
+                    if (commandByteNumber > 5 && (commandByteNumber - 6) >= payloadLength) {
+                        // We are larger than the payload length
+                        if (readByte == RadioDevice.ByteValues.END_BYTE) {
+                            if (GET_RESPONSE_DEBUG) {
+                                Log.d(TAG, "End of command found");
+                                Log.d(TAG, Arrays.toString(commandBytes));
+                            }
+
+                            return Arrays.copyOfRange(commandBytes, 0, commandByteNumber + 1);
+
+                        } else {
+                            Log.v(TAG,String.valueOf(readByte));
+                            Log.v(TAG, "BAD PACKET " + Arrays.toString(commandBytes));
+
+                            // We are larger than the buffer size and we didn't get an end byte
+                            // So maybe continue trying to read
+                            commandByteNumber = 0;
+                            payloadLength = -1;
+                            commandBytes = new byte[MAX_PACKET_LENGTH];
+                            continue;
+                        }
+                    }
+
+                    commandByteNumber++;
                 } else if (readByte == RadioDevice.ByteValues.START_BYTE) {
                     // A new command has started
                     commandByteNumber = 0;
+                    payloadLength = -1;
+
                     commandBytes = new byte[MAX_PACKET_LENGTH];
                     if (GET_RESPONSE_DEBUG) {
                         Log.v(TAG, "Read: New command starting to be read");
                     }
 
                     commandBytes[0] = readByte;
-                    commandByteNumber ++;
+
+                    commandByteNumber++;
                 }
             }
         }
 
         if (DEBUG_OUTPUT) {
             Log.v(TAG, "getResponse timed out");
+        }
+        if (payloadLength > -1 &&
+                commandBytes[commandByteNumber - 1] == RadioDevice.ByteValues.END_BYTE) {
+            Log.e(TAG, "Timed out trying to read entire payload, but the last byte received was a response end byte");
+            Log.e(TAG, "Expected payload length: " + payloadLength + ", Actual length: " + (commandByteNumber - 6));
         }
         return new byte[MAX_PACKET_LENGTH];
     }
@@ -388,26 +477,53 @@ public class DeviceConnection {
     public synchronized byte[] sendForResponse(byte[] commandBuffer) throws NotConnectedException{
         byte[] responseBytes = new byte[MAX_PACKET_LENGTH];
 
-        if (isRunning()) {
+        if (isConnectionOpen()) {
+            // Sign our command with a serial number so we know the response is correct
+            final byte serialNumber = generateCommandSerialNumber();
+            commandBuffer[3] = serialNumber;
+
+            if (DEBUG_OUTPUT) {
+                Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
+            }
+
+            // New method to help read more values
+            // start reading response before we even send the request
+            final AtomicBoolean gotResponse = new AtomicBoolean();
+            gotResponse.set(false);
+
+            final AtomicBoolean threadStarted = new AtomicBoolean();
+            threadStarted.set(false);
+
+            final byte[][] threadResponse = new byte[1][MAX_PACKET_LENGTH];
+
+            // Make a new thread for the read request
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    threadStarted.set(true);
+                    threadResponse[0] = getResponse(serialNumber);
+                    gotResponse.set(true);
+                }
+            }).start();
+
+            // Wait until we know the thread has started before continuing
+            while (!threadStarted.get());
+
+            // Write the command
             try {
-                // Sign our command with a serial number so we know the response is correct
-                byte serialNumber = generateCommandSerialNumber();
-                commandBuffer[3] = serialNumber;
-
-                if (DEBUG_OUTPUT) {
-                    Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
-                }
-
                 deviceSerialInterface.write(commandBuffer, COMMUNICATION_TIMEOUT_LENGTH);
+            } catch (Exception ignore) {
 
-                responseBytes = getResponse(serialNumber);
+            }
 
-                if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
-                    Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
-                }
+            // Wait until we have a response, or the response has timed out
+            while (!gotResponse.get());
 
-            } catch (IOException e) {
-                //e.printStackTrace();
+            // Fill the response with what we got from the thread
+            responseBytes = threadResponse[0];
+
+            if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
+                Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
             }
         } else {
             throw new NotConnectedException();
@@ -420,7 +536,7 @@ public class DeviceConnection {
         connectionStateListener = listener;
     }
 
-    public boolean isRunning() {
+    public boolean isConnectionOpen() {
         return running;
     }
 

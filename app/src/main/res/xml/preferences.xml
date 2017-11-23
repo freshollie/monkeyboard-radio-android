@@ -22,7 +22,13 @@
             android:summaryOn="@string/pref_dab_mode_enabled_summary_on"
             android:summaryOff="@string/pref_dab_mode_enabled_summary_off"
             android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="@string/pref_fm_stereo_enabled_key"
+            android:title="@string/pref_fm_stereo_enabled_title"
+            android:summary="@string/pref_fm_stereo_enabled_summary"
+            android:defaultValue="false" />
     </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/settings_title_control">
 
@@ -43,6 +49,13 @@
             android:title="@string/setting_scroll_wrap"
             android:summary="@string/setting_scroll_warp_summary"
             />
+
+        <CheckBoxPreference
+            android:key="@string/pref_cursor_beta_mode"
+            android:title="@string/settings_cursor_beta_title"
+            android:summary="@string/settings_cursor_beta_summary"
+            />
+
         <CheckBoxPreference
             android:key="@string/pref_skip_buttons_control_key"
             android:title="@string/pref_skip_buttons_control_title"

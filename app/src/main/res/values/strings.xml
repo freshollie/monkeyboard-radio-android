@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Monkeyboard Keystone Radio</string>
 
-    <string name="no_saved_stations">Radio has no stored stations, perform scan?</string>
+    <string name="no_saved_stations_question">Radio has no stored stations, perform scan?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
@@ -53,7 +53,7 @@
     <string name="settings_icon_description">Settings</string>
 
     <string name="about_category_title">About</string>
-    <string name="about_text">Written by Oliver Bell, 2017\nGPL 3.0 Open Source \nhttp://github.com/freshollie/MonkeyboardAndroidRadioApp/</string>
+    <string name="about_text">Written by Oliver Bell, 2017\nGPL 3.0 Open Source \nhttp://github.com/freshollie/monkeyboard-radio-android/</string>
 
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
@@ -64,9 +64,9 @@
     <string name="FM_STATION_LIST_KEY">fm_station_list</string>
     <string name="VOLUME_KEY">volume</string>
     <string name="DUCK_VOLUME_KEY">duck_volume</string>
-    <string name="PLAY_ON_OPEN_KEY">play_on_open</string>
-    <string name="HEADUNIT_MAIN_INPUT_KEY">headunit_main_input</string>
-    <string name="SCROLL_WRAP_KEY">scroll_wrap</string>
+    <string name="PREF_PLAY_ON_OPEN">play_on_open</string>
+    <string name="PREF_HEADUNIT_CONTROLLER_INPUT">headunit_main_input</string>
+    <string name="PREF_CURSOR_SCROLL_WRAP">scroll_wrap</string>
     <string name="SYNC_VOLUME_KEY">sync_volume</string>
 
     <string name="pref_sync_volume_title">Sync radio and tablet volumes</string>
@@ -84,7 +84,7 @@
     <string name="pref_fm_mode_enabled_key">pref_fm_mode_enabled</string>
     <string name="pref_fm_mode_enabled_title">FM mode</string>
     <string name="mode_alert_message">At least one mode must be enabled</string>
-    <string name="pref_skip_buttons_control_summary">If checked then skip media buttons will skip to the next saved FM station,
+    <string name="pref_skip_buttons_control_summary">If checked then the "physical" skip media buttons will skip to the next saved FM station,
         otherwise they will control FM search</string>
     <string name="pref_skip_buttons_control_key">pref_skip_buttons_control</string>
     <string name="pref_skip_buttons_control_title">FM Skip buttons</string>
@@ -92,10 +92,19 @@
     <string name="pref_clear_fm_stations_title">Clear FM stations</string>
     <string name="pref_clear_fm_stations_summary">Clear all saved FM stations</string>
     <string name="TOTAL_COLLECTED_DAB_STATIONS_KEY">total_collected_dab_stations</string>
+    <string name="no_saved_stations_message">No saved stations</string>
+    <string name="dab">DAB</string>
+    <string name="fm">FM</string>
+    <string name="pref_cursor_beta_mode">pref_cursor_beta</string>
+    <string name="settings_cursor_beta_title">Beta cursor scrolling</string>
+    <string name="settings_cursor_beta_summary">Having this on means the cursor is more responsive but more laggy</string>
+    <string name="pref_fm_stereo_enabled_key">pref_fm_stereo_mode_enabled</string>
+    <string name="pref_fm_stereo_enabled_title">FM Stereo</string>
+    <string name="pref_fm_stereo_enabled_summary">When FM stereo is enabled, audio doesn\'t sound as clear with a weak</string>
 
 
     <string-array name="STATION_GENRES">
-        <item />
+        <item /> <!--0 is Nothing-->
         <item>News</item>
         <item>Current Affairs</item>
         <item>Information</item>
