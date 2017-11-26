@@ -7,10 +7,12 @@
 
 package com.freshollie.monkeyboard.keystoneradio.ui;
 
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 /**
  * Station list adapter is used to display the radio stations in a recycler view. It features
@@ -52,6 +55,18 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     private boolean waitForIdleScroll = false;
 
+    private static String SELECTION_CHANGED_EVENT = "selection_changed";
+    private static String CURSOR_CHANGED_EVENT = "cursor_changed";
+
+    private int numCardsWaitingToUpdate = 0;
+
+    private boolean selectionChangeQueued = false;
+
+    private int SELECTED_BACKGROUND_COLOR;
+    private int HIGHLIGHTED_BACKGROUND_COLOR;
+    private int REGULAR_CARD_COLOR;
+    private final int DELETE_MODE_BACKGROUND_COLOR;
+
     private OnScrollListener onScrollListener = new OnScrollListener() {
 
         @Override
@@ -77,6 +92,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             }
         }
     };
+    private int lastHighlightedIndex;
 
     public static class StationCard extends RecyclerView.ViewHolder {
         TextView stationName;
@@ -84,6 +100,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         TextView stationEnsemble;
         CardView stationCardLayout;
         View stationRemoveButton;
+        int cardColour;
 
         StationCard(View v) {
             super(v);
@@ -95,14 +112,33 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
     }
 
+    private int addAlpha(int color, int alpha) {
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+
+        return Color.argb(alpha, red, green, blue);
+    }
+
     public StationListAdapter(PlayerActivity playerActivity) {
         this.playerActivity = playerActivity;
+
+        SELECTED_BACKGROUND_COLOR = ContextCompat
+                .getColor(playerActivity, R.color.colorPrimaryDark);
+
+        HIGHLIGHTED_BACKGROUND_COLOR = addAlpha(ContextCompat
+                .getColor(playerActivity, R.color.colorAccent), 80);
+
+        REGULAR_CARD_COLOR = ContextCompat
+                .getColor(playerActivity, R.color.backgroundGrey);
+
+        DELETE_MODE_BACKGROUND_COLOR = addAlpha(ContextCompat
+                .getColor(playerActivity, R.color.colorHighlight), 80);
     }
 
     // Create a new station card for the station list
     @Override
-    public StationCard onCreateViewHolder(ViewGroup parent,
-                                                             int viewType) {
+    public StationCard onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         CardView stationCardView = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.station_card_layout, parent, false);
@@ -127,6 +163,44 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         this.layoutManager = null;
     }
 
+    private void colorCard(StationCard stationCard, int position) {
+        int newColor;
+        if (deleteMode) {
+            newColor = DELETE_MODE_BACKGROUND_COLOR;
+
+        } else if (position == currentStationIndex) {
+            newColor = SELECTED_BACKGROUND_COLOR;
+
+        } else if (position == cursorIndex) {
+            newColor = HIGHLIGHTED_BACKGROUND_COLOR;
+
+        } else {
+            newColor = REGULAR_CARD_COLOR;
+
+        }
+
+        if (stationCard.cardColour != newColor) {
+            stationCard.stationCardLayout.setCardBackgroundColor(newColor);
+            stationCard.cardColour = newColor;
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(final StationCard stationCard, final int position, List<Object> payloads) {
+        if(!payloads.isEmpty()) {
+            if (payloads.get(0) instanceof String) {
+                if (payloads.get(0).equals(CURSOR_CHANGED_EVENT)) {
+                    numCardsWaitingToUpdate--;
+                    Log.e("Test", String.valueOf(numCardsWaitingToUpdate));
+                    checkCardHighlightQueue();
+                }
+                colorCard(stationCard, position);
+                return;
+            }
+        }
+        onBindViewHolder(stationCard, position);
+    }
+
     @Override
     public void onBindViewHolder(final StationCard stationCard, final int position) {
         final RadioStation radioStation = stationList[position];
@@ -149,39 +223,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 )
         );
 
-        stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat.getColor(playerActivity, R.color.backgroundGrey));
-        if (position == currentStationIndex) {
-            stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.colorPrimaryDark)
-            );
-        }
-
-        if (position == cursorIndex && !deleteMode) {
-
-            if (position != currentStationIndex) {
-                stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
-                        .getColor(playerActivity, R.color.colorAccent)
-                );
-                stationCard.stationCardLayout.setCardBackgroundColor(
-                        stationCard.stationCardLayout.getCardBackgroundColor().withAlpha(80)
-                );
-            }
-
-        }
-
-        if (position != currentStationIndex && position != cursorIndex) {
-            //stationCard.stationItemBackground.setBackgroundColor(0);
-        }
-
-        if (deleteMode) {
-            stationCard.stationCardLayout.setCardBackgroundColor(ContextCompat
-                    .getColor(playerActivity, R.color.colorHighlight)
-            );
-            stationCard.stationCardLayout.setCardBackgroundColor(
-                    stationCard.stationCardLayout.getCardBackgroundColor().withAlpha(80)
-            );
-        }
-
+        colorCard(stationCard, position);
 
         stationCard.stationCardLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -287,10 +329,10 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     public void setAnimations(boolean on) {
         if (on) {
-            recyclerView.getItemAnimator().setChangeDuration(0);
+            recyclerView.getItemAnimator().setChangeDuration(10);
             recyclerView.getItemAnimator().setRemoveDuration(0);
-            recyclerView.getItemAnimator().setMoveDuration(0);
-            recyclerView.getItemAnimator().setAddDuration(0);
+            recyclerView.getItemAnimator().setMoveDuration(100);
+            recyclerView.getItemAnimator().setAddDuration(100);
         } else {
             recyclerView.getItemAnimator().setChangeDuration(0);
             recyclerView.getItemAnimator().setRemoveDuration(0);
@@ -307,6 +349,8 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         this.scrollingToIndex = -1;
         this.nextScrollIndex = -1;
         this.currentScrollIndex = 0;
+        this.lastHighlightedIndex = -1;
+        this.numCardsWaitingToUpdate = 0;
 
         this.waitForIdleScroll = false;
 
@@ -385,15 +429,38 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
     }
 
-    public void onCursorPositionChanged(int newCursorIndex) {
+    private void checkCardHighlightQueue() {
+        if (numCardsWaitingToUpdate == 0) {
+            if (selectionChangeQueued) {
+                numCardsWaitingToUpdate++;
+                selectionChangeQueued = false;
+                Log.e("Test", "Test");
+                recyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (lastHighlightedIndex != -1) {
+                            numCardsWaitingToUpdate++;
+                            notifyItemChanged(lastHighlightedIndex, CURSOR_CHANGED_EVENT);
+                        }
+
+                        Log.e("TEST", "Notifying cursor index change");
+                        notifyItemChanged(cursorIndex, CURSOR_CHANGED_EVENT);
+                        lastHighlightedIndex = cursorIndex;
+                    }
+                });
+            }
+
+        }
+    }
+
+    public void onCursorPositionChanged(final int newCursorIndex) {
         if (newCursorIndex == -1 || newCursorIndex == cursorIndex) {
             return;
         }
-
-        notifyItemChanged(cursorIndex);
-        notifyItemChanged(newCursorIndex);
-
         cursorIndex = newCursorIndex;
+
+        selectionChangeQueued = true;
+        checkCardHighlightQueue();
 
         layoutManager.setSnapDuration(1);
         scrollWhenPossible(cursorIndex);
@@ -413,17 +480,17 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
 
         if (lastCursorIndex > -1 && cursorIndex != lastCursorIndex) {
-            notifyItemChanged(lastCursorIndex);
+            notifyItemChanged(lastCursorIndex, SELECTION_CHANGED_EVENT);
         }
 
 
         if (lastStationIndex > -1  &&
                 lastCursorIndex != lastStationIndex) {
-            notifyItemChanged(lastStationIndex);
+            notifyItemChanged(lastStationIndex, SELECTION_CHANGED_EVENT);
         }
 
         if (currentStationIndex > -1) {
-            notifyItemChanged(currentStationIndex);
+            notifyItemChanged(currentStationIndex, SELECTION_CHANGED_EVENT);
             scrollWhenPossible(currentStationIndex);
         }
     }
