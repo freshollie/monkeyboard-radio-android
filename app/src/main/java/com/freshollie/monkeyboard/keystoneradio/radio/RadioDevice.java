@@ -277,7 +277,7 @@ public class RadioDevice {
 
     public static String getStringFromBytes(byte[] bytes) {
         try {
-            return new String(bytes, "UTF-16BE");
+            return new String(bytes, "UTF-16BE").trim();
         } catch (UnsupportedEncodingException e) {
             return "";
         }
