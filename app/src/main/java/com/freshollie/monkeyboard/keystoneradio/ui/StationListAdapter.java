@@ -23,6 +23,8 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -58,7 +60,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     private static String SELECTION_CHANGED_EVENT = "selection_changed";
     private static String CURSOR_CHANGED_EVENT = "cursor_changed";
 
-    private int numCardsWaitingToUpdate = 0;
+    private ArrayList<Integer> cardsWaitingToUpdate = new ArrayList<>();
 
     private boolean selectionChangeQueued = false;
 
@@ -189,11 +191,11 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     public void onBindViewHolder(final StationCard stationCard, final int position, List<Object> payloads) {
         if(!payloads.isEmpty()) {
             if (payloads.get(0) instanceof String) {
-                if (payloads.get(0).equals(CURSOR_CHANGED_EVENT)) {
-                    numCardsWaitingToUpdate--;
-                    Log.e("Test", String.valueOf(numCardsWaitingToUpdate));
-                    checkCardHighlightQueue();
+                Log.v("TAG", Arrays.toString(new List[]{payloads}));
+                if (cardsWaitingToUpdate.indexOf(position) > -1) {
+                    cardsWaitingToUpdate.remove(position);
                 }
+                checkCardHighlightQueue();
                 colorCard(stationCard, position);
                 return;
             }
@@ -350,7 +352,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         this.nextScrollIndex = -1;
         this.currentScrollIndex = 0;
         this.lastHighlightedIndex = -1;
-        this.numCardsWaitingToUpdate = 0;
+        this.cardsWaitingToUpdate.clear();
 
         this.waitForIdleScroll = false;
 
@@ -430,21 +432,25 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     }
 
     private void checkCardHighlightQueue() {
-        if (numCardsWaitingToUpdate == 0) {
+        if (cardsWaitingToUpdate.size() == 0) {
             if (selectionChangeQueued) {
-                numCardsWaitingToUpdate++;
                 selectionChangeQueued = false;
+
+                cardsWaitingToUpdate.add(-1);
+
                 Log.e("Test", "Test");
                 recyclerView.post(new Runnable() {
                     @Override
                     public void run() {
                         if (lastHighlightedIndex != -1) {
-                            numCardsWaitingToUpdate++;
+                            cardsWaitingToUpdate.add(lastHighlightedIndex);
                             notifyItemChanged(lastHighlightedIndex, CURSOR_CHANGED_EVENT);
                         }
 
                         Log.e("TEST", "Notifying cursor index change");
+                        cardsWaitingToUpdate.add(cursorIndex);
                         notifyItemChanged(cursorIndex, CURSOR_CHANGED_EVENT);
+                        cardsWaitingToUpdate.remove(0);
                         lastHighlightedIndex = cursorIndex;
                     }
                 });
