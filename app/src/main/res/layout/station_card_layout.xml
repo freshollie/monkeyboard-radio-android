@@ -11,9 +11,10 @@
     app:cardUseCompatPadding="true"
     android:layout_marginRight="?android:scrollbarSize"
     android:clickable="true"
+    android:focusable="true"
     android:id="@+id/station_item_layout"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/backgroundGrey">
+    app:cardBackgroundColor="@color/backgroundGrey" >
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -9,7 +9,6 @@
     <color name="backgroundDark">#263238</color>
     <color name="backgroundDarkAccent">#424242</color>
     <color name="backgroundDarker">#212121</color>
-    <color name="colorTest">#bbdefb</color>
 
     <color name="stationListBackgroundColor">@color/backgroundDarkAccent</color>
 

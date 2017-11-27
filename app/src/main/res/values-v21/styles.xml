@@ -6,7 +6,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <!-- <item name="android:colorBackground">@color/backgroundDark</item> -->
+        <!--On android 5.0+ the status bar color can be set
+            so we define it for devices API 21 and above -->
         <item name="android:statusBarColor">@color/backgroundDarker</item>
     </style>
 </resources>
