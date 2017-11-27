@@ -2,9 +2,9 @@
 
 <img align="right" src="screenshots/demo.gif">
 
-[Latest Releases](/releases)
+[Latest Release](/releases)
 
-Builds have only been tested on android 5.1 and 6.0, 
+Builds have only been properly tested on android 5.1 and 6.0 due to no USB support on the android emulator.
 
 If the app crashes on your system submit an issue with a full log file (Google it if you dont know how to do this)
 
