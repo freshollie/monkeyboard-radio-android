@@ -51,12 +51,6 @@
             />
 
         <CheckBoxPreference
-            android:key="@string/pref_cursor_beta_mode"
-            android:title="@string/settings_cursor_beta_title"
-            android:summary="@string/settings_cursor_beta_summary"
-            />
-
-        <CheckBoxPreference
             android:key="@string/pref_skip_buttons_control_key"
             android:title="@string/pref_skip_buttons_control_title"
             android:summary="@string/pref_skip_buttons_control_summary"
