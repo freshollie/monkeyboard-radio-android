@@ -49,10 +49,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     private StationListLayoutManager layoutManager;
 
-    private int targetScrollIndex = -1;
-
-    private Runnable scrollRunnable = null;
-
     private int nextScrollIndex = -1;
     private int scrollingToIndex = -1;
 
@@ -60,10 +56,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     private static String SELECTION_CHANGED_EVENT = "selection_changed";
     private static String CURSOR_CHANGED_EVENT = "cursor_changed";
-
-    private ArrayList<Integer> cardsWaitingToUpdate = new ArrayList<>();
-
-    private boolean selectionChangeQueued = false;
 
     private int SELECTED_BACKGROUND_COLOR;
     private int HIGHLIGHTED_BACKGROUND_COLOR;
@@ -372,7 +364,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         this.nextScrollIndex = -1;
         this.currentScrollIndex = 0;
         this.currentlyHighlightedIndex = -1;
-        this.cardsWaitingToUpdate.clear();
 
         this.waitForIdleScroll = false;
 
