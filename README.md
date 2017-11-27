@@ -1,4 +1,4 @@
-# Monkeyboard - DAB/DAB+ & FM radio for android
+# Monkeyboard - FM radio DAB/DAB+ for android
 
 <img align="right" src="screenshots/demo.gif">
 
