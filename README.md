@@ -2,7 +2,7 @@
 
 <img align="right" src="screenshots/demo.gif">
 
-[Latest Release](/releases)
+[Latest Release](../../releases)
 
 Builds have only been properly tested on android 5.1 and 6.0 due to no USB support on the android emulator.
 
