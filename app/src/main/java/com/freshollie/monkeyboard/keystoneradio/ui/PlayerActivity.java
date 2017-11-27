@@ -107,7 +107,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     private TextView noStationsTextView;
     private RecyclerView stationListRecyclerView;
-    private StationListAdapter stationListAdapter = new StationListAdapter(this);
+    private StationListAdapter stationListAdapter;
     private StationListLayoutManager stationListLayoutManager;
 
     private Bitmap currentSlideshowImageBitmap;
@@ -182,6 +182,8 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
+
+        stationListAdapter = new StationListAdapter(this);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -372,6 +374,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public void initialiseStationListUi() {
         stationListLayoutManager = new StationListLayoutManager(this);
+        stationListLayoutManager.setAutoMeasureEnabled(false);
 
         stationListRecyclerView = (RecyclerView) findViewById(R.id.station_list);
         stationListRecyclerView.setHasFixedSize(true);

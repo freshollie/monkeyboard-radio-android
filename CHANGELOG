@@ -1,3 +1,22 @@
+# BETA 2.1.1
+
+# Fixes
+- Fixed seekbar in lower android versions
+- Fixed stationlist lag
+
+# BETA 2.1
+
+## Changes
+- Serious layout optimisations with ConstraintLayout
+
+# BETA 2.0
+
+## New
+- Slideshow support!
+
+## Changes
+- Changed interface to support slideshow
+ 
 # BETA 1.2.2
 
 ## Fixes

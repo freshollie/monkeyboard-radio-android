@@ -1,20 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.1'
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
         applicationId 'com.freshollie.monkeyboard.keystoneradio'
         minSdkVersion 16
-        targetSdkVersion 26
-        versionCode 95
-        versionName "Beta 2.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        targetSdkVersion 27
+        versionCode 100
+        versionName "Beta 2.1.1"
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -49,12 +48,12 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     // Support libraries
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support:support-v4:26.1.0'
-    compile 'com.android.support:cardview-v7:26.1.0'
-    compile 'com.android.support:recyclerview-v7:26.1.0'
-    compile 'com.android.support:transition:26.1.0'
-    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:appcompat-v7:27.0.1'
+    compile 'com.android.support:support-v4:27.0.1'
+    compile 'com.android.support:cardview-v7:27.0.1'
+    compile 'com.android.support:recyclerview-v7:27.0.1'
+    compile 'com.android.support:transition:27.0.1'
+    compile 'com.android.support:design:27.0.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Third party libraries
