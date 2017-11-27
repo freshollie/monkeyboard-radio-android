@@ -24,7 +24,6 @@ import com.freshollie.monkeyboard.keystoneradio.radio.RadioStation;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,6 +33,8 @@ import java.util.List;
  */
 
 public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.StationCard> {
+    private static final String TAG = StationListAdapter.class.getSimpleName();
+
     private RadioStation[] stationList = new RadioStation[0];
 
     private PlayerActivity playerActivity;
@@ -71,15 +72,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     private OnScrollListener onScrollListener = new OnScrollListener() {
 
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-
+        private void checkScrollsQueue() {
             if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE && scrollingToIndex != -1) {
                 currentScrollIndex = scrollingToIndex;
             }
@@ -88,13 +81,28 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 return;
             }
 
+            scrollingToIndex = -1;
             if (nextScrollIndex != -1) {
-                scrollingToIndex = -1;
                 startNextScroll();
             }
         }
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                checkScrollsQueue();
+            }
+
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            checkScrollsQueue();
+        }
     };
-    private int lastHighlightedIndex;
+    private int currentlyHighlightedIndex;
 
     public static class StationCard extends RecyclerView.ViewHolder {
         TextView stationName;
@@ -124,6 +132,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     public StationListAdapter(PlayerActivity playerActivity) {
         this.playerActivity = playerActivity;
+        setHasStableIds(true);
 
         SELECTED_BACKGROUND_COLOR = ContextCompat
                 .getColor(playerActivity, R.color.colorPrimaryDark);
@@ -167,6 +176,10 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
     private void colorCard(StationCard stationCard, int position) {
         int newColor;
+
+        if (currentlyHighlightedIndex == position) {
+            currentlyHighlightedIndex = -1;
+        }
         if (deleteMode) {
             newColor = DELETE_MODE_BACKGROUND_COLOR;
 
@@ -175,6 +188,8 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
 
         } else if (position == cursorIndex) {
             newColor = HIGHLIGHTED_BACKGROUND_COLOR;
+
+            currentlyHighlightedIndex = position;
 
         } else {
             newColor = REGULAR_CARD_COLOR;
@@ -188,14 +203,19 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(final StationCard stationCard, final int position, List<Object> payloads) {
         if(!payloads.isEmpty()) {
-            if (payloads.get(0) instanceof String) {
-                Log.v("TAG", Arrays.toString(new List[]{payloads}));
-                if (cardsWaitingToUpdate.indexOf(position) > -1) {
-                    cardsWaitingToUpdate.remove(position);
-                }
-                checkCardHighlightQueue();
+            if (payloads.get(payloads.size() - 1) instanceof String) {
                 colorCard(stationCard, position);
                 return;
             }
@@ -351,7 +371,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         this.scrollingToIndex = -1;
         this.nextScrollIndex = -1;
         this.currentScrollIndex = 0;
-        this.lastHighlightedIndex = -1;
+        this.currentlyHighlightedIndex = -1;
         this.cardsWaitingToUpdate.clear();
 
         this.waitForIdleScroll = false;
@@ -383,7 +403,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
             return;
         }
 
-        recyclerView.stopScroll();
         final int nextScroll = nextScrollIndex;
 
         if (nextScroll < 0) {
@@ -391,17 +410,18 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
 
         nextScrollIndex = -1;
-
+        recyclerView.stopScroll();
+        
         // As the next item is not on screen, we are going to scroll directly to that page
         // and then do a smooth scroll after we have reached near that items
         if ((layoutManager.findFirstVisibleItemPosition() > nextScroll || layoutManager.findLastVisibleItemPosition() < nextScroll))  {
-            scrollingToIndex = nextScroll;
-
             // Setup a listener to scroll when this is done
             waitForIdleScroll = true;
             if (nextScrollIndex == -1) {
                 nextScrollIndex = nextScroll;
             }
+
+            scrollingToIndex = nextScroll;
 
             // Perform a jump scroll
             recyclerView.scrollToPosition(nextScrollIndex);
@@ -431,42 +451,26 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         }
     }
 
-    private void checkCardHighlightQueue() {
-        if (cardsWaitingToUpdate.size() == 0) {
-            if (selectionChangeQueued) {
-                selectionChangeQueued = false;
-
-                cardsWaitingToUpdate.add(-1);
-
-                Log.e("Test", "Test");
-                recyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (lastHighlightedIndex != -1) {
-                            cardsWaitingToUpdate.add(lastHighlightedIndex);
-                            notifyItemChanged(lastHighlightedIndex, CURSOR_CHANGED_EVENT);
-                        }
-
-                        Log.e("TEST", "Notifying cursor index change");
-                        cardsWaitingToUpdate.add(cursorIndex);
-                        notifyItemChanged(cursorIndex, CURSOR_CHANGED_EVENT);
-                        cardsWaitingToUpdate.remove(0);
-                        lastHighlightedIndex = cursorIndex;
-                    }
-                });
-            }
-
-        }
-    }
-
     public void onCursorPositionChanged(final int newCursorIndex) {
         if (newCursorIndex == -1 || newCursorIndex == cursorIndex) {
             return;
         }
         cursorIndex = newCursorIndex;
 
-        selectionChangeQueued = true;
-        checkCardHighlightQueue();
+        // Let the view know that the last highlighted index has changed, if we have one
+        if (currentlyHighlightedIndex != -1) {
+            if (layoutManager.findFirstVisibleItemPosition() <= currentlyHighlightedIndex &&
+                    layoutManager.findLastVisibleItemPosition() >= currentlyHighlightedIndex) {
+                notifyItemChanged(currentlyHighlightedIndex, CURSOR_CHANGED_EVENT);
+            }
+        }
+
+        // Only notify if we can actually see the card on the screen
+        // otherwise its going to be updated automatically anyway
+        if (layoutManager.findFirstVisibleItemPosition() <= cursorIndex &&
+                layoutManager.findLastVisibleItemPosition() >= cursorIndex) {
+            notifyItemChanged(cursorIndex, CURSOR_CHANGED_EVENT);
+        }
 
         layoutManager.setSnapDuration(1);
         scrollWhenPossible(cursorIndex);
