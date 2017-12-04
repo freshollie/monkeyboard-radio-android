@@ -1,4 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.radio.mot;
+package com.freshollie.monkeyboard.keystoneradio.radio.util.mot;
 
 import android.util.SparseArray;
 

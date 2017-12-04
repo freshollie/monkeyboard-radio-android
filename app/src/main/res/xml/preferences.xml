@@ -66,7 +66,7 @@
             android:summary="@string/setting_duck_volume_summary" />
 
         <CheckBoxPreference
-            android:key="@string/SYNC_VOLUME_KEY"
+            android:key="@string/pref_sync_volume_key"
             android:title="@string/pref_sync_volume_title"
             android:summaryOn="@string/pref_sync_volume_summary_on"
             android:summaryOff="@string/pref_sync_volume_summary_off"

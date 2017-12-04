@@ -1,6 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.radio.mot;
-
-import android.util.Log;
+package com.freshollie.monkeyboard.keystoneradio.radio.util.mot;
 
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 

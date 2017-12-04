@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Monkeyboard Keystone Radio</string>
+    <string name="app_name">Monkeyboard Radio</string>
 
     <string name="no_saved_stations_question">Radio has no stored stations, perform scan?</string>
     <string name="yes">Yes</string>
@@ -62,12 +62,12 @@
 
     <string name="DAB_STATION_LIST_KEY">dab_station_list</string>
     <string name="FM_STATION_LIST_KEY">fm_station_list</string>
-    <string name="VOLUME_KEY">volume</string>
+    <string name="saved_volume_key">volume</string>
     <string name="DUCK_VOLUME_KEY">duck_volume</string>
     <string name="PREF_PLAY_ON_OPEN">play_on_open</string>
     <string name="PREF_HEADUNIT_CONTROLLER_INPUT">headunit_main_input</string>
     <string name="PREF_CURSOR_SCROLL_WRAP">scroll_wrap</string>
-    <string name="SYNC_VOLUME_KEY">sync_volume</string>
+    <string name="pref_sync_volume_key">sync_volume</string>
 
     <string name="pref_sync_volume_title">Sync radio and tablet volumes</string>
     <string name="pref_sync_volume_summary_on">Radio volume and tablet music volume are synced</string>

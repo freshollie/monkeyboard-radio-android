@@ -1,8 +1,4 @@
-package com.freshollie.monkeyboard.keystoneradio.radio.mot;
-
-import android.util.Log;
-
-import java.util.Arrays;
+package com.freshollie.monkeyboard.keystoneradio.radio.util.mot;
 
 /**
  * Created by freshollie on 09.11.17.

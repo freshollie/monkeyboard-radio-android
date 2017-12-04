@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.freshollie.monkeyboard.keystoneradio.R;
 import com.freshollie.monkeyboard.keystoneradio.playback.RadioPlayerService;
-import com.freshollie.monkeyboard.keystoneradio.radio.RadioDeviceListenerManager;
+import com.freshollie.monkeyboard.keystoneradio.playback.RadioDeviceListenerManager;
 import com.freshollie.monkeyboard.keystoneradio.radio.RadioDevice;
 
 /**
