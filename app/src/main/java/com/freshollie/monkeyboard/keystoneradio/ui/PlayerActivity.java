@@ -1263,6 +1263,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
     public boolean handleKeyDown(int keyCode)  {
         switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_CENTER:
             case KeyEvent.KEYCODE_ENTER:
                 if (stationListAdapter != null) {
                     if (playerBound &&
@@ -1281,10 +1282,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                 }
                 return true;
 
+            case KeyEvent.KEYCODE_DPAD_DOWN:
             case KeyEvent.KEYCODE_TAB:
                 handleMoveCursor(+1);
                 return true;
-
             case KeyEvent.KEYCODE_DPAD_UP:
                 handleMoveCursor(-1);
                 return true;
@@ -1296,6 +1297,18 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                     finish();
                 }
                 return true;
+
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (playerService != null) {
+                    playerService.handleNextChannelRequest();
+                }
+                return true;
+
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (playerService != null) {
+                    playerService.handlePreviousChannelRequest();
+                }
+                return false;
         }
 
         return false;
@@ -1319,12 +1332,12 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         } else {
             // Custom input has already been handled
             switch(keyCode) {
-                case KeyEvent.ACTION_UP:
-                    return true;
+                case KeyEvent.KEYCODE_DPAD_DOWN:
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                case KeyEvent.KEYCODE_DPAD_CENTER:
                 case KeyEvent.KEYCODE_TAB:
-                    return true;
                 case KeyEvent.KEYCODE_DPAD_UP:
-                    return true;
                 case KeyEvent.KEYCODE_ENTER:
                     return true;
              }
