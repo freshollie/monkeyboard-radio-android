@@ -13,7 +13,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -22,6 +22,7 @@ android {
 }
 
 // Automatically build the vertical layout from the horizontal layout
+// Currently disabled due to the addition of constraint layout, please make manually
 task generateVerticalLayout(type: Exec) {
     workingDir '.'
     // Update this with your python
@@ -48,12 +49,12 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     // Support libraries
-    compile 'com.android.support:appcompat-v7:27.0.1'
-    compile 'com.android.support:support-v4:27.0.1'
-    compile 'com.android.support:cardview-v7:27.0.1'
-    compile 'com.android.support:recyclerview-v7:27.0.1'
-    compile 'com.android.support:transition:27.0.1'
-    compile 'com.android.support:design:27.0.1'
+    compile 'com.android.support:support-compat:27.0.2'
+    compile 'com.android.support:support-media-compat:27.0.2'
+    compile 'com.android.support:cardview-v7:27.0.2'
+    compile 'com.android.support:recyclerview-v7:27.0.2'
+    compile 'com.android.support:transition:27.0.2'
+    compile 'com.android.support:design:27.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Third party libraries
