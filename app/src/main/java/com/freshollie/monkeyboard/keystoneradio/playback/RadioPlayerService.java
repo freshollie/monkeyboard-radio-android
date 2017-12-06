@@ -1178,10 +1178,19 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         if (mediaSession != null) {
             mediaSession.setPlaybackState(
                     playbackStateBuilder
+                        .setActions(
+                                PlaybackStateCompat.ACTION_FAST_FORWARD |
+                                PlaybackStateCompat.ACTION_REWIND |
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE
+                        )
                         .setState(
                                 state,
                                 0,
-                                1)
+                                1
+                        )
                         .build()
             );
         }

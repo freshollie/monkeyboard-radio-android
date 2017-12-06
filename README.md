@@ -1,22 +1,28 @@
-# Monkeyboard - FM & DAB/DAB+ radio for android
+# Monkeyboard - FM radio DAB/DAB+ for android
 
 <img align="right" src="screenshots/demo.gif">
 
 [Latest Release](../../releases)
 
-Builds have only been properly tested on android 5.1 and 6.0 due to no USB support on the android emulator.
+Builds have only been properly tested on android 4.1 and 8.0 in an emulator, as well as 5.1 and 6.0 on real devices.
 
 If the app crashes on your system submit an issue with a full log file (Google it if you dont know how to do this)
 
 ## About
 
-A [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-fm-digital-radio-development-board) (Keystone radio) is a full DAB/DAB+ & FM radio on a circuitboard.
+A [Monkeyboard](http://www.monkeyboard.org/products/85-developmentboard/80-dab-fm-digital-radio-development-board) 
+(Keystone radio) is a full DAB/DAB+ & FM radio on a circuitboard.
 
-This app interfaces with a Monkeyboard and provides a control and feedback interface for the user. The Monkeyboard communicates via USB serial, and so to use the board a USB Host cable is required to connect the board to the android device.
+This app interfaces with a Monkeyboard and provides a control and feedback interface for the user. 
+The Monkeyboard communicates via USB serial, and so to use the board a USB Host cable is required to connect the 
+board to the android device.
 
-The app is designed to act as if it is a normal music player as so will act accordingly. Audio focus will be followed, and a mediaplayer notification is provided. 
+The app is designed to act as if it is a normal music player as so will act accordingly. Audio focus will be 
+followed, and a mediaplayer notification is provided. 
 
-The Monkeyboard does not transmit audio over the USB connection, it is only outputted directly from the board itsself. The user will need to mix this audio with the tablet audio externally. (Think of the android device as being a screen for the Monkeyboard)
+The Monkeyboard does not transmit audio over the USB connection, it is only outputted directly from the board itsself. 
+The user will need to mix this audio with the tablet audio externally. (Think of the android device as being a 
+screen for the Monkeyboard)
 
 The interface is designed to work on all device sizes.
 
@@ -32,11 +38,12 @@ The interface is designed to work on all device sizes.
 
 ## Future improvements
 
-- Due to the developmental process of this app (and it being my first android mediaplayer app), the activity service stack can be simplified. Currently the activity and the service need to be modulised instead of bundling lots of the code into Radio API which shouldn't be.
+- Due to the developmental process of this app (and it being my first android mediaplayer app), the activity service stack can be simplified. 
+Currently the activity and the service need to be modulised instead of bundling lots of the code into Radio API which shouldn't be there.
 
 ## Libraries
 
-- [usb-serial-for-android](https://github.com/freshollie/usb-serial-for-android) - A forked version of this library has been used with slight modifitcations to the UsbCDC driver
+- [usb-serial-for-android](https://github.com/freshollie/usb-serial-for-android) - A forked version of usb-serial-for-android with slight modifications to reduce a verbose log output.
 - [SnappySmoothScroller](https://github.com/nshmura/SnappySmoothScroller)
 
 ## Contributing
@@ -52,27 +59,38 @@ Building this repository requires downloading the submodule `usb-serial-for-andr
 After cloning the repository
 
 `git submodule init`
+
 `git submodule -r sync`
 
 ## Screenshots
+
+### Android 6.0
 <p align="center">
     <img src="screenshots/main_interface.png" alt="Main interface" width="800"/>
 </p>
 
+### Android 4.1
+<p align="center">
+    <img src="screenshots/android_16.png" alt="Interface on android 4.1" width="800"/>
+</p>
+
+### Media notificiation
 <p align="center">
     <img src="screenshots/notification.png" alt="Notification with controls, program infromation, and slideshow image" width="800"/>
 </p>
 
-
+### Settings
 <p align="center">
     <img src="screenshots/settings_interface.png" align="center" alt="Settings interface" width="800"/>
 </p>
 
-
+### DAB Radio search
 <p align="center">
     <img src="screenshots/dab_search.gif" alt="Searching interface" width="800"/>
 </p>
 
+
+### Designed for all screens
 <p align="center">
     <img src="screenshots/portrait.png" alt="Main interface protrait" width="400"/>
 </p>

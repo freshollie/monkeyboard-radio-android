@@ -204,7 +204,7 @@ public class RadioPlayerNotification extends MediaControllerCompat.Callback {
                             getPendingIntentForAction(RadioPlayerService.ACTION_PREVIOUS)
                     )
                     .addAction(
-                            R.drawable.ic_fast_rewind_white_24dp,
+                            R.drawable.ic_notification_rewind,
                             "search_backwards",
                             getPendingIntentForAction(RadioPlayerService.ACTION_SEARCH_BACKWARDS)
                     )
@@ -214,7 +214,7 @@ public class RadioPlayerNotification extends MediaControllerCompat.Callback {
                             getPendingIntentForAction(playAction)
                     )
                     .addAction(
-                            R.drawable.ic_fast_forward_white_24dp,
+                            R.drawable.ic_notification_fast_forward,
                             "search_forwards",
                             getPendingIntentForAction(RadioPlayerService.ACTION_SEARCH_FORWARDS)
                     )
