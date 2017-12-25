@@ -1414,7 +1414,8 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
         }
 
         @Override
-        public void onStop() { notifyDismissed();
+        public void onStop() {
+            notifyDismissed();
         }
 
         @Override
@@ -1434,60 +1435,6 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
                 handlePreviousChannelRequest();
             } else {
                 handleSearchBackwards();
-            }
-        }
-
-        @Override
-        public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-            Log.v(TAG, "Got media button intent");
-            KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-
-            if (event.getAction() == KeyEvent.ACTION_UP) {
-                switch (event.getKeyCode()) {
-                    case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                        if (sharedPreferences.getBoolean(
-                                getString(R.string.PREF_HEADUNIT_CONTROLLER_INPUT),
-                                false
-                            )) {
-                            handlePlayRequest();
-                        } else {
-                            if (isPlaying()) {
-                                handlePauseRequest();
-                            } else {
-                                handlePlayRequest();
-                            }
-                        }
-                        return true;
-
-                    case KeyEvent.KEYCODE_MEDIA_PLAY:
-                        onPlay();
-                        return true;
-
-                    case KeyEvent.KEYCODE_MEDIA_NEXT:
-                        onSkipToNext();
-                        return true;
-
-                    case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                        onFastForward();
-                        return true;
-
-                    case KeyEvent.KEYCODE_MEDIA_REWIND:
-                        onRewind();
-                        return true;
-
-                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                        onSkipToPrevious();
-                        return true;
-
-                    case KeyEvent.KEYCODE_MEDIA_STOP:
-                        onPause();
-                        return true;
-
-                    default:
-                        return false;
-                }
-            } else {
-                return false;
             }
         }
     }
