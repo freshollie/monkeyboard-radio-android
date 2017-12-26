@@ -60,7 +60,7 @@ After cloning the repository
 
 `git submodule init`
 
-`git submodule -r sync`
+`git submodule update usb-serial-for-android`
 
 ## Screenshots
 
