@@ -21,7 +21,6 @@ import com.freshollie.monkeyboard.keystoneradio.radio.mot.MOTObjectsManager;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -38,7 +37,6 @@ public class RadioDevice {
     private int lastVolume;
     private int lastProgramDataRate;
     private int lastPlayStatus;
-    private String lastProgramText;
     private int lastSignalQuality; // For DAB
     private int lastStereoState;
     private int lastFmSignalStrength; // For FM
@@ -49,8 +47,6 @@ public class RadioDevice {
     private int lastStreamMode;
 
     private DABSearchTask dabSearchTask;
-
-    private int pollNumber = 0;
 
     private int COMMAND_ATTEMPTS_TIMEOUT = 300;
 
@@ -71,7 +67,7 @@ public class RadioDevice {
         static byte CLASS_STREAM = 0x01;
         static byte STREAM_Play = 0x00;
         static byte STREAM_Stop = 0x01;
-        static byte STREAM_SEARCH = 0x02;
+        static byte STREAM_Search = 0x02;
         static byte STREAM_AutoSearch = 0x03;
         static byte STREAM_StopSearch = 0x04;
         static byte STREAM_GetPlayStatus = 0x05;
@@ -181,6 +177,9 @@ public class RadioDevice {
                     Log.v(TAG, "Poll Loop stopped");
                     break;
                 }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignored) {}
             }
         }
     };
@@ -468,7 +467,7 @@ public class RadioDevice {
         }
         return call(
                 ByteValues.CLASS_STREAM,
-                ByteValues.STREAM_SEARCH,
+                ByteValues.STREAM_Search,
                 new byte[]{
                         (byte) direction
                 }
@@ -1040,7 +1039,6 @@ public class RadioDevice {
                 lastFmSignalStrength = -1;
                 lastFmFrequency = -1;
                 lastProgramDataRate = -1;
-                lastProgramText = "";
                 lastSignalQuality = -1;
             }
 
@@ -1052,29 +1050,26 @@ public class RadioDevice {
                 lastVolume = newVolume;
             }
 
-            // Only poll this every 20 polls
-            if (pollNumber % 20 == 0) {
-                if (getPlayMode() == Values.STREAM_MODE_DAB) {
-                    int newProgramDataRate = getProgramDataRate();
-                    if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
-                        listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
-                        lastProgramDataRate = newProgramDataRate;
-                    }
+            if (getPlayMode() == Values.STREAM_MODE_DAB) {
+                int newProgramDataRate = getProgramDataRate();
+                if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
+                    listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
+                    lastProgramDataRate = newProgramDataRate;
                 }
+            }
 
-                int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
-                if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
-                    listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
-                    lastFmProgramType = newFmProgramType;
+            int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
+            if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
+                listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
+                lastFmProgramType = newFmProgramType;
 
-                }
+            }
 
-                int newStereoState = getStereo();
-                if (newStereoState != lastStereoState) {
-                    lastStereoState = newStereoState;
-                    if (newStereoState != -1) {
-                        listenerManager.notifyStereoStateChanged(newStereoState);
-                    }
+            int newStereoState = getStereo();
+            if (newStereoState != lastStereoState) {
+                lastStereoState = newStereoState;
+                if (newStereoState != -1) {
+                    listenerManager.notifyStereoStateChanged(newStereoState);
                 }
             }
 
@@ -1084,36 +1079,50 @@ public class RadioDevice {
                     listenerManager.notifyDabSignalQualityChanged(newSignalQuality);
                     lastSignalQuality = newSignalQuality;
                 }
-
+                // This is pretty much all in beta. It works but its very messy
                 int channelId = getPlayIndex();
-
+                // Ask the board for new MOT data
                 byte[] motData = getMOTData();
                 if (motData.length > 0) {
+                    // We have some data so let the object manager
+                    // know about new data for this channel.
                     motObjectsManager.onNewData(channelId, motData);
-                    MOTObject channelObject = motObjectsManager.getChannelObject(channelId);
 
+                    // Have we made an object for this channel and is it complete?
+                    MOTObject channelObject = motObjectsManager.getChannelObject(channelId);
                     if (channelObject != null && channelObject.isComplete()) {
-                        if (MOTObjectsManager.DEBUG) Log.i(TAG, "MOT object completed");
+
+                        if (MOTObjectsManager.DEBUG)
+                            Log.i(TAG, "MOT object completed");
+
+                        // We can only process slideshow data, so ignore other types
                         if (channelObject.getApplicationType() == MOTObject.APPLICATION_TYPE_SLIDESHOW) {
+                            // We take the body and convert it to a bitmap
                             byte[] body = motObjectsManager.getChannelObject(channelId).getBodyData();
                             BitmapFactory.Options options = new BitmapFactory.Options();
                             Bitmap bitmap = BitmapFactory.decodeByteArray(body, 0, body.length, options);
+
+                            // Only send valid bitmap images, the width and the height need to be less
+                            // Than 1000 or the image is probably corrupt.
                             if (options.outWidth < 1000 && options.outHeight < 1000 && bitmap != null) {
-                                if (MOTObjectsManager.DEBUG) Log.i(TAG, "Notifying new slideshow image");
+                                if (MOTObjectsManager.DEBUG)
+                                    Log.i(TAG, "Notifying new slideshow image");
+
                                 listenerManager.notifyNewSlideshowImage(
                                         bitmap
                                 );
+
                             } else {
                                 if (MOTObjectsManager.DEBUG) Log.e(TAG, "Made bad image");
                             }
                         }
+                        // As we have now processed this object it can be reset
                         motObjectsManager.removeChannelObject(channelId);
                     }
                 }
 
             } else {
                 // We only need to search this stuff for FM
-
                 int newSignalStrength = getSignalStrength();
                 if (newSignalStrength != lastFmSignalStrength && newSignalStrength != -1) {
                     listenerManager.notifyFmSignalStrengthChanged(newSignalStrength);
@@ -1159,8 +1168,6 @@ public class RadioDevice {
             }
             return false;
         }
-        pollNumber += 1;
-        pollNumber %= 255;
 
         return true;
     }

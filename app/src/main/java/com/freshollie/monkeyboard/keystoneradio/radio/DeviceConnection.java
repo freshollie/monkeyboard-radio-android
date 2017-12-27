@@ -42,8 +42,8 @@ public class DeviceConnection {
     static boolean GET_RESPONSE_DEBUG = false;
 
     public static final int MAX_PACKET_LENGTH = 256;
-    public final int COMMUNICATION_TIMEOUT_LENGTH = 100;
-    public final int RESPONSE_TIMEOUT_LENGTH = 300;
+    private static final int COMMUNICATION_TIMEOUT_LENGTH = 100;
+    private static final int RESPONSE_TIMEOUT_LENGTH = 300;
 
     private final String ACTION_USB_PERMISSION =
             "com.freshollie.monkeyboard.keystoneradio.radio.deviceconnection.action.USB_PERMISSION";
@@ -58,7 +58,7 @@ public class DeviceConnection {
 
     private Context context;
 
-    private int RECONNECT_TIMEOUT = 5000;
+    private static final int RECONNECT_TIMEOUT = 5000;
 
     // Used in case the device disconnects for 5000ms
     private Runnable reconnectRunnable = new Runnable() {
@@ -74,6 +74,9 @@ public class DeviceConnection {
                     start();
                     return;
                 }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignored) {}
             }
 
             Log.v(TAG, "Reconnecting failed, closing connection");
@@ -115,6 +118,8 @@ public class DeviceConnection {
     };
 
     private Thread readBufferFillerThread;
+    private boolean readRunning;
+    private byte[] lastResponse;
 
     public class NotConnectedException extends IOException{
     }
@@ -128,29 +133,22 @@ public class DeviceConnection {
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "Intent Received: " + intent.getAction());
 
-            switch (intent.getAction()) {
-
-                case (ACTION_USB_PERMISSION):
-                    synchronized (this) {
-                        UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                            if (device != null) {
-                                Log.v(TAG, "Permission for device granted");
-                                start();
-                            }
-                        }
-                    }
-                    return;
-
-                case (UsbManager.ACTION_USB_DEVICE_DETACHED):
-                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+            if (ACTION_USB_PERMISSION.equals(intent.getAction())) {
+                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                     if (device != null) {
-                        if (device.getVendorId() == RadioDevice.VENDOR_ID &&
-                                device.getProductId() == RadioDevice.PRODUCT_ID) {
-                            attemptReconnect();
-                        }
+                        Log.v(TAG, "Permission for device granted");
+                        start();
                     }
-
+                }
+            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(intent.getAction())) {
+                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                if (device != null) {
+                    if (device.getVendorId() == RadioDevice.VENDOR_ID &&
+                            device.getProductId() == RadioDevice.PRODUCT_ID) {
+                        attemptReconnect();
+                    }
+                }
             }
         }
     };
@@ -158,7 +156,7 @@ public class DeviceConnection {
     private PendingIntent usbPermissionIntent;
 
     /**
-     * Initialises connection. Requires context.
+     * Initialises connection object. Requires context.
      * @param appContext
      */
     public DeviceConnection(Context appContext) {
@@ -314,9 +312,7 @@ public class DeviceConnection {
         if (deviceSerialInterface != null) {
             try {
                 deviceSerialInterface.close();
-            } catch (IOException e){
-
-            }
+            } catch (IOException ignored){}
         }
 
         deviceSerialInterface = null;
@@ -354,10 +350,10 @@ public class DeviceConnection {
      */
     private byte[] getResponse(byte serialNumber) {
         /*
-        * It does this by reading the in bytes until it gets a start command
-        * byte, then once a full command is received it checks the serial number of the command to
-        * verify it is the correct command
-         */
+            It does this by reading the in bytes until it gets a start command
+            byte, then once a full command is received it checks the serial number of the command to
+            verify it is the correct command
+        */
 
         long startTime = System.currentTimeMillis();
 
@@ -382,13 +378,14 @@ public class DeviceConnection {
                 if (commandByteNumber > 0) {
                     // We are currently reading a command
 
-                    commandBytes[commandByteNumber] = readByte; // Add the next byte
+                    // Add the next byte
+                    commandBytes[commandByteNumber] = readByte;
 
                     if (GET_RESPONSE_DEBUG) {
                         Log.d(TAG, "Readbyte: " + String.valueOf(readByte));
                     }
 
-                    // We are at what should be the payload byte, so read the payload
+                    // We are at what should be the payload length byte, so read the payload length
                     if (commandByteNumber == 5) {
                         payloadLength = readByte & 0xFF;
                         if (payloadLength > (255 - 6)) {
@@ -415,7 +412,7 @@ public class DeviceConnection {
                     }
 
                     if (commandByteNumber > 5 && (commandByteNumber - 6) >= payloadLength) {
-                        // We are larger than the payload length
+                        // We at at least our required payload length
                         if (readByte == RadioDevice.ByteValues.END_BYTE) {
                             if (GET_RESPONSE_DEBUG) {
                                 Log.d(TAG, "End of command found");
@@ -429,7 +426,7 @@ public class DeviceConnection {
                             Log.v(TAG, "BAD PACKET " + Arrays.toString(commandBytes));
 
                             // We are larger than the buffer size and we didn't get an end byte
-                            // So maybe continue trying to read
+                            // So maybe continue trying to read, but drop our received buffer
                             commandByteNumber = 0;
                             payloadLength = -1;
                             commandBytes = new byte[MAX_PACKET_LENGTH];
@@ -488,40 +485,43 @@ public class DeviceConnection {
 
             // New method to help read more values
             // start reading response before we even send the request
-            final AtomicBoolean gotResponse = new AtomicBoolean();
-            gotResponse.set(false);
 
+            // This is a bit of a hack
             final AtomicBoolean threadStarted = new AtomicBoolean();
             threadStarted.set(false);
 
             final byte[][] threadResponse = new byte[1][MAX_PACKET_LENGTH];
 
             // Make a new thread for the read request
-            new Thread(new Runnable() {
+            Thread getResponseThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     threadStarted.set(true);
                     threadResponse[0] = getResponse(serialNumber);
-                    gotResponse.set(true);
                 }
-            }).start();
+            });
+
+            getResponseThread.start();
 
             // Wait until we know the thread has started before continuing
-            while (!threadStarted.get());
+            while (getResponseThread.isAlive()) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException ignored) {}
+            }
 
             // Write the command
             try {
                 deviceSerialInterface.write(commandBuffer, COMMUNICATION_TIMEOUT_LENGTH);
-            } catch (Exception ignore) {
-
-            }
+            } catch (Exception ignored) {}
 
             // Wait until we have a response, or the response has timed out
-            while (!gotResponse.get());
+            try {
+                getResponseThread.join();
+            } catch (InterruptedException ignored) {}
 
             // Fill the response with what we got from the thread
-            responseBytes = threadResponse[0];
-
+// Write the command
             if (responseBytes[0] != 0 && DEBUG_OUTPUT) {
                 Log.v(TAG, "Response bytes, " + Arrays.toString(responseBytes));
             }
