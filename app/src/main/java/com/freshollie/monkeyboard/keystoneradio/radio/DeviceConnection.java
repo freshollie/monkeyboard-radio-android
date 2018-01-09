@@ -18,17 +18,12 @@ import android.hardware.usb.UsbManager;
 import android.util.Log;
 
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
-import com.hoho.android.usbserial.driver.Ch34xSerialDriver;
-import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
-import com.hoho.android.usbserial.driver.FtdiSerialDriver;
-import com.hoho.android.usbserial.driver.ProlificSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Handles all connection interaction with the monkeyboard over the usb serial connection
@@ -75,7 +70,7 @@ public class DeviceConnection {
                     return;
                 }
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 } catch (InterruptedException ignored) {}
             }
 
@@ -104,12 +99,14 @@ public class DeviceConnection {
     private Runnable readBufferFillerRunnable = new Runnable() {
         @Override
         public void run() {
-            while (!Thread.interrupted() && isConnectionOpen()) {
+            while (!Thread.interrupted() && running) {
                 byte[] readBytes = new byte[MAX_PACKET_LENGTH];
                 try {
                     int numRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
-                    for (int i = 0; i < numRead; i++) {
-                        readBuffer.add(readBytes[i]);
+                    synchronized (readBuffer) {
+                        for (int i = 0; i < numRead; i++) {
+                            readBuffer.add(readBytes[i]);
+                        }
                     }
                 } catch (IOException e) {
                 }
@@ -282,7 +279,7 @@ public class DeviceConnection {
             readBuffer.clear();
 
             readBufferFillerThread = new Thread(readBufferFillerRunnable);
-            //readBufferFillerThread.start();
+            readBufferFillerThread.start();
 
             running = true;
             if (connectionStateListener != null) {
@@ -332,14 +329,15 @@ public class DeviceConnection {
         return (byte) commandSerialNumber;
     }
 
-    private byte[] takeAllFromReadBuffer() {
-        byte[] bytes = new byte[readBuffer.size()];
-
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = readBuffer.remove(0);
+    private Byte[] takeAllFromReadBuffer() {
+        synchronized (readBuffer) {
+            if (readBuffer.size() < 1) {
+                return new Byte[0];
+            }
+            Byte[] bytes = readBuffer.toArray(new Byte[readBuffer.size()]);
+            readBuffer.clear();
+            return bytes;
         }
-
-        return bytes;
     }
 
     /**
@@ -363,18 +361,16 @@ public class DeviceConnection {
         int payloadLength = -1;
 
         // Keep trying to read for a response byte until we time out
-        while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && isConnectionOpen()) {
-            byte[] readBytes = new byte[4096];
-            int numBytesRead = 0;
-
+        while ((System.currentTimeMillis() - startTime) < RESPONSE_TIMEOUT_LENGTH && running) {
+            /*
             try {
                 numBytesRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
             } catch (Exception e) {
                 break;
             }
+            */
 
-            for (int i = 0; i < numBytesRead; i++) {
-                byte readByte = readBytes[i];
+            for (byte readByte: takeAllFromReadBuffer()) {
                 if (commandByteNumber > 0) {
                     // We are currently reading a command
 
@@ -460,6 +456,7 @@ public class DeviceConnection {
             Log.e(TAG, "Timed out trying to read entire payload, but the last byte received was a response end byte");
             Log.e(TAG, "Expected payload length: " + payloadLength + ", Actual length: " + (commandByteNumber - 6));
         }
+
         return new byte[MAX_PACKET_LENGTH];
     }
 
@@ -474,7 +471,7 @@ public class DeviceConnection {
     public synchronized byte[] sendForResponse(byte[] commandBuffer) throws NotConnectedException{
         byte[] responseBytes = new byte[MAX_PACKET_LENGTH];
 
-        if (isConnectionOpen()) {
+        if (running) {
             // Sign our command with a serial number so we know the response is correct
             final byte serialNumber = generateCommandSerialNumber();
             commandBuffer[3] = serialNumber;
@@ -483,42 +480,12 @@ public class DeviceConnection {
                 Log.v(TAG, "Send bytes, " + Arrays.toString(commandBuffer));
             }
 
-            // New method to help read more values
-            // start reading response before we even send the request
-
-            // This is a bit of a hack
-            final AtomicBoolean threadStarted = new AtomicBoolean();
-            threadStarted.set(false);
-
-            final byte[][] threadResponse = new byte[1][MAX_PACKET_LENGTH];
-
-            // Make a new thread for the read request
-            Thread getResponseThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    threadStarted.set(true);
-                    threadResponse[0] = getResponse(serialNumber);
-                }
-            });
-
-            getResponseThread.start();
-
-            // Wait until we know the thread has started before continuing
-            while (getResponseThread.isAlive()) {
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException ignored) {}
-            }
-
             // Write the command
             try {
                 deviceSerialInterface.write(commandBuffer, COMMUNICATION_TIMEOUT_LENGTH);
             } catch (Exception ignored) {}
 
-            // Wait until we have a response, or the response has timed out
-            try {
-                getResponseThread.join();
-            } catch (InterruptedException ignored) {}
+            responseBytes = getResponse(serialNumber);
 
             // Fill the response with what we got from the thread
 // Write the command

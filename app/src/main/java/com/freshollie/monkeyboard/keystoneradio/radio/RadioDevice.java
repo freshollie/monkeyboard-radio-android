@@ -173,13 +173,16 @@ public class RadioDevice {
         public void run() {
             Log.v(TAG, "Poll Loop started");
             while (true) {
-                if (!poll() || !connection.isConnectionOpen() || Thread.currentThread().isInterrupted()) {
+                if (!poll() || !connection.isConnectionOpen() || Thread.interrupted()) {
                     Log.v(TAG, "Poll Loop stopped");
                     break;
                 }
                 try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {}
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    Log.v(TAG, "Poll Loop stopped");
+                    break;
+                }
             }
         }
     };
@@ -1050,21 +1053,6 @@ public class RadioDevice {
                 lastVolume = newVolume;
             }
 
-            if (getPlayMode() == Values.STREAM_MODE_DAB) {
-                int newProgramDataRate = getProgramDataRate();
-                if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
-                    listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
-                    lastProgramDataRate = newProgramDataRate;
-                }
-            }
-
-            int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
-            if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
-                listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
-                lastFmProgramType = newFmProgramType;
-
-            }
-
             int newStereoState = getStereo();
             if (newStereoState != lastStereoState) {
                 lastStereoState = newStereoState;
@@ -1073,7 +1061,24 @@ public class RadioDevice {
                 }
             }
 
+            String newProgramText = getProgramText();
+            if (newProgramText != null && !newProgramText.isEmpty()) {
+                listenerManager.notifyProgramTextChanged(newProgramText);
+            }
+
+            int newPlayStatus = getPlayStatus();
+            if (newPlayStatus != lastPlayStatus && newPlayStatus != -1) {
+                listenerManager.notifyPlayStatusChanged(newPlayStatus);
+                lastPlayStatus = newPlayStatus;
+            }
+
             if (currentStreamMode == Values.STREAM_MODE_DAB) {
+                int newProgramDataRate = getProgramDataRate();
+                if (newProgramDataRate != lastProgramDataRate && newProgramDataRate != -1) {
+                    listenerManager.notifyDabProgramDataRateChanged(newProgramDataRate);
+                    lastProgramDataRate = newProgramDataRate;
+                }
+
                 int newSignalQuality = getSignalQuality();
                 if (newSignalQuality != lastSignalQuality && newSignalQuality != -1) {
                     listenerManager.notifyDabSignalQualityChanged(newSignalQuality);
@@ -1122,6 +1127,14 @@ public class RadioDevice {
                 }
 
             } else {
+
+                int newFmProgramType = getProgramType(Values.MIN_FM_FREQUENCY);
+                if (newFmProgramType != lastFmProgramType && newFmProgramType != -1) {
+                    listenerManager.notifyFmProgramTypeUpdated(newFmProgramType);
+                    lastFmProgramType = newFmProgramType;
+
+                }
+
                 // We only need to search this stuff for FM
                 int newSignalStrength = getSignalStrength();
                 if (newSignalStrength != lastFmSignalStrength && newSignalStrength != -1) {
@@ -1148,20 +1161,6 @@ public class RadioDevice {
                 }
             }
 
-
-            String newProgramText = getProgramText();
-            if (newProgramText != null) {
-                if (!newProgramText.isEmpty()) {
-                    listenerManager.notifyProgramTextChanged(newProgramText);
-                }
-            }
-
-            int newPlayStatus = getPlayStatus();
-
-            if (newPlayStatus != lastPlayStatus && newPlayStatus != -1) {
-                listenerManager.notifyPlayStatusChanged(newPlayStatus);
-                lastPlayStatus = newPlayStatus;
-            }
         } catch (Exception e) {
             if (connection.isDeviceAttached() && connection.isConnectionOpen()) {
                 e.printStackTrace();

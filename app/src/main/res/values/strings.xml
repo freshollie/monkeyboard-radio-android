@@ -37,8 +37,7 @@
     <string name="dialog_dab_search_copying_channels_progress">Copied %1$d channels</string>
 
     <string name="setting_duck_volume">Duck Volume</string>
-    <string name="setting_duck_volume_summary">Volume that will be set when \
-        another app needs temporary audio focus</string>
+    <string name="setting_duck_volume_summary">Volume that will be set when another app needs temporary audio focus</string>
     <string name="setting_duck_volume_updated">Duck volume updated</string>
 
     <string name="setting_play_on_open">Play on open</string>
