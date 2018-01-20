@@ -178,7 +178,7 @@ public class RadioDevice {
                     break;
                 }
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(25);
                 } catch (InterruptedException e) {
                     Log.v(TAG, "Poll Loop stopped");
                     break;
@@ -505,6 +505,9 @@ public class RadioDevice {
     }
 
     public int getPlayIndex() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getPlayIndex()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
@@ -530,6 +533,9 @@ public class RadioDevice {
     }
 
     public int getStereo() {
+        if (DEBUG_OUT_COMMANDS) {
+            Log.v(TAG, "getStereo()");
+        }
         byte[] response =
                 call(
                         ByteValues.CLASS_STREAM,
