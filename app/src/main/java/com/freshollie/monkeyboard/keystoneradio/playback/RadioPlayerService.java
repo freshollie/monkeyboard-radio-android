@@ -57,15 +57,15 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     public final static String ACTION_SEARCH_BACKWARDS =
             "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.SEARCH_BACKWARDS";
     public final static String ACTION_NEXT =
-            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.NEXT";
+            "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.NEXT";
     public final static String ACTION_PREVIOUS =
-            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.PREVIOUS";
+            "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.PREVIOUS";
     public final static String ACTION_STOP =
-            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.STOP";
+            "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.STOP";
     public final static String ACTION_PLAY =
-            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.PLAY";
+            "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.PLAY";
     public final static String ACTION_PAUSE =
-            "com.freshollie..monkeyboard.keystoneradio.playback.radioplayerservice.action.PAUSE";
+            "com.freshollie.monkeyboard.keystoneradio.playback.radioplayerservice.action.PAUSE";
 
     public final static String ACTION_SET_RADIO_MODE = "";
 
@@ -509,12 +509,12 @@ public class RadioPlayerService extends Service implements AudioManager.OnAudioF
     }
 
     public boolean saveCurrentFmStation() {
-        RadioStation radioStationCopy = new RadioStation();
-        radioStationCopy.setName(currentFmRadioStation.getName());
-        radioStationCopy.setGenreId(currentFmRadioStation.getGenreId());
-        radioStationCopy.setFrequency(currentFmRadioStation.getFrequency());
-
         if (currentFmRadioStation != null) {
+            RadioStation radioStationCopy = new RadioStation();
+            radioStationCopy.setName(currentFmRadioStation.getName());
+            radioStationCopy.setGenreId(currentFmRadioStation.getGenreId());
+            radioStationCopy.setFrequency(currentFmRadioStation.getFrequency());
+
             for (RadioStation station: fmRadioStations) {
                 if (((station.getFrequency()) / 100) * 100
                         == ((radioStationCopy.getFrequency()) / 100) * 100) {

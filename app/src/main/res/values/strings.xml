@@ -52,7 +52,7 @@
     <string name="settings_icon_description">Settings</string>
 
     <string name="about_category_title">About</string>
-    <string name="about_text">Written by Oliver Bell, 2017\nGPL 3.0 Open Source \nhttp://github.com/freshollie/monkeyboard-radio-android/</string>
+    <string name="about_text">Written by Oliver Bell, 2018\nGPLv3.0 Open Source \nhttp://github.com/freshollie/monkeyboard-radio-android/</string>
 
     <string name="program_datarate_placeholder">%1$d Kbps</string>
 
@@ -75,7 +75,10 @@
     <string name="RADIO_MODE_KEY">radio_mode</string>
     <string name="fm_frequency_placeholder">%s MHz</string>
     <string name="remove_station_description">Remove this channel</string>
+
+    <string name="cannot_save_station_text">Unable to save unknown station</string>
     <string name="channel_already_exists_message">Channel already saved</string>
+
     <string name="pref_dab_mode_enabled_key">dab_mode_enabled</string>
     <string name="pref_dab_mode_enabled_title">DAB mode</string>
     <string name="pref_dab_mode_enabled_summary_on">Enabled</string>
@@ -99,7 +102,6 @@
     <string name="no_saved_stations_message">No saved stations</string>
     <string name="dab">DAB</string>
     <string name="fm">FM</string>
-
 
 
     <string-array name="STATION_GENRES">

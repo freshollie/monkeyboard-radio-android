@@ -440,15 +440,27 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
         });
 
         fmSeekBar.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
+
+        // Add channel FAB is used to save FM channels to the FM channel list
         addChannelFab.setVisibility(modeSwitch.isChecked() ? View.VISIBLE: View.GONE);
         addChannelFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (playerBound) {
+                    // If we are not in delete mode this is a save command
                     if (stationListAdapter != null && !stationListAdapter.isDeleteMode()) {
-                        if (playerService.saveCurrentFmStation()) {
+                        // If there is no current station, we cannot save it
+                        if (playerService.getCurrentStation() == null) {
+                            Snackbar.make(
+                                    stationListRecyclerView,
+                                    R.string.cannot_save_station_text,
+                                    Snackbar.LENGTH_SHORT
+                            ).show();
+                        } else if (playerService.saveCurrentFmStation()) {
+                            // We were able to save a new station, so update the list
                             updateStationList(playerService.getRadioMode());
                         } else {
+                            // Otherwise make a snackbar to show we couldn't save this station
                             Snackbar.make(
                                     stationListRecyclerView,
                                     R.string.channel_already_exists_message,
@@ -456,6 +468,7 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
                             ).show();
                         }
                     } else {
+                        // As we are in delete mode, this command closes delete mode
                         stationListAdapter.closeDeleteMode();
                     }
                 }

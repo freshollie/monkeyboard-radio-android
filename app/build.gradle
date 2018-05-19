@@ -8,8 +8,8 @@ android {
         applicationId 'com.freshollie.monkeyboard.keystoneradio'
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 113
-        versionName "2.1.4-beta"
+        versionCode 114
+        versionName "2.1.5-beta"
         setProperty("archivesBaseName", "$versionName")
     }
     buildTypes {
@@ -26,7 +26,7 @@ android {
 // Currently disabled due to the addition of constraint layout, please make manually
 task generateVerticalLayout(type: Exec) {
     workingDir '.'
-    // Update this with your python
+    // Update this with your python binary
     commandLine "python", "$rootDir/app/build_tools/make_vertical_layout.py"
     doLast{
         if (execResult.exitValue != 0) {
