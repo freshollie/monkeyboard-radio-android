@@ -255,7 +255,6 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
         });
 
         if (deleteMode && radioMode == RadioDevice.Values.STREAM_MODE_FM) {
-            stationCard.stationCardLayout.setOnClickListener(null);
             stationCard.stationRemoveButton.setVisibility(View.VISIBLE);
         } else {
             stationCard.stationRemoveButton.setVisibility(View.INVISIBLE);
@@ -267,7 +266,7 @@ public class StationListAdapter extends RecyclerView.Adapter<StationListAdapter.
                 if (deleteMode) {
                     playerActivity.handleRemoveFmChannel(radioStation);
                     onStationRemoved(stationCard.getAdapterPosition());
-                } if (currentStationIndex == stationCard.getAdapterPosition()) {
+                } else if (currentStationIndex == stationCard.getAdapterPosition()) {
                     scrollWhenPossible(stationCard.getAdapterPosition());
                 } else {
                     playerActivity.handleChannelClicked(stationCard.getAdapterPosition());

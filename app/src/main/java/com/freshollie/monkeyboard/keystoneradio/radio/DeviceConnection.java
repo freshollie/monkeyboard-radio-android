@@ -108,7 +108,7 @@ public class DeviceConnection {
                             readBuffer.add(readBytes[i]);
                         }
                     }
-                } catch (IOException e) {
+                } catch (IOException|NullPointerException e) {
                 }
             }
         }
