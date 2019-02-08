@@ -2,7 +2,9 @@
 
 <img align="right" src="screenshots/demo.gif">
 
-[Latest Release](../../releases)
+[Latest Release on Github](../../releases)
+
+[Get it on F-Droid](https://f-droid.org/packages/com.freshollie.monkeyboard.keystoneradio/)
 
 Builds have only been properly tested on android 4.1 and 8.0 in an emulator, as well as 5.1 and 6.0 on real devices.
 
