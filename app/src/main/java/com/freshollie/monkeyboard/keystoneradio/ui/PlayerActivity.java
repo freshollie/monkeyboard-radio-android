@@ -716,11 +716,11 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
 
         // At full volume
         if (volume > 8) {
-            icon = R.drawable.ic_volume_up_white_24dp;
+            icon = R.drawable.ic_volume_up_white_100dp;
         } else if (volume > 0) {
-            icon = R.drawable.ic_volume_down_white_24dp;
+            icon = R.drawable.ic_volume_down_white_100dp;
         } else {
-            icon = R.drawable.ic_volume_mute_white_24dp;
+            icon = R.drawable.ic_volume_mute_white_100dp;
         }
 
         volumeButton.setImageResource(icon);
@@ -1104,10 +1104,10 @@ public class PlayerActivity extends AppCompatActivity implements RadioDeviceList
             if (playerService.isDucked() && playerService.isPlaying()) { // Ducking
                 if (volume == 0) {
                     // Full duck
-                    icon = R.drawable.ic_volume_mute_white_24dp;
+                    icon = R.drawable.ic_volume_mute_white_100dp;
                 } else {
                     // Duck
-                    icon = R.drawable.ic_volume_down_white_24dp;
+                    icon = R.drawable.ic_volume_down_white_100dp;
                 }
             }
         }
