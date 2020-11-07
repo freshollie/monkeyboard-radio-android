@@ -99,7 +99,7 @@ public class DeviceConnection {
     private Runnable readBufferFillerRunnable = new Runnable() {
         @Override
         public void run() {
-            while (!Thread.interrupted() && running) {
+            while (!Thread.interrupted() && running && deviceSerialInterface != null) {
                 byte[] readBytes = new byte[MAX_PACKET_LENGTH];
                 try {
                     int numRead = deviceSerialInterface.read(readBytes, COMMUNICATION_TIMEOUT_LENGTH);
